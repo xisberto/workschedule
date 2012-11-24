@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="fstp_entrance">fstp_entrance</string>
+    <string name="fstp_exit">fstp_exit</string>
+    <string name="sndp_entrance">sndp_entrance</string>
+    <string name="sndp_exit">sndp_exit</string>
+    <string name="fste_entrance">fste_entrance</string>
+    <string name="fste_exit">fste_exit</string>
+    <string name="snde_entrance">snde_entrance</string>
+    <string name="snde_exit">snde_exit</string>
+
+</resources>

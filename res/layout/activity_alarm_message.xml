@@ -1,0 +1,32 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/alarm_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AlarmMessageActivity" >
+
+
+    <TextView
+        android:id="@+id/period_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/alarm_time"
+        android:text=""
+        android:textColor="@android:color/white"
+        android:textSize="40sp"
+        android:textStyle="bold" />
+    
+    <TextView
+        android:id="@+id/alarm_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:keepScreenOn="true"
+        android:text="00:00"
+        android:textColor="@android:color/white"
+        android:textSize="50sp"
+        android:textStyle="bold" />
+
+</RelativeLayout>
