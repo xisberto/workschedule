@@ -18,7 +18,8 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
 
-public class AlarmMessageActivity extends SherlockActivity implements OnTouchListener {
+public class AlarmMessageActivity extends SherlockActivity implements
+		OnTouchListener {
 	private PowerManager.WakeLock wl;
 	private MediaPlayer mMediaPlayer;
 
@@ -30,12 +31,10 @@ public class AlarmMessageActivity extends SherlockActivity implements OnTouchLis
 				| PowerManager.ACQUIRE_CAUSES_WAKEUP, "WorkSchedule");
 		wl.acquire();
 		this.getWindow().setFlags(
-				WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-						| WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+				WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
 						| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
 						| WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON,
-				WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-						| WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+				WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
 						| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
 						| WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
@@ -53,22 +52,6 @@ public class AlarmMessageActivity extends SherlockActivity implements OnTouchLis
 		playSound(this, getAlarmUri());
 	}
 
-	private void playSound(Context context, Uri alert) {
-		mMediaPlayer = new MediaPlayer();
-		try {
-			mMediaPlayer.setDataSource(context, alert);
-			final AudioManager audioManager = (AudioManager) context
-					.getSystemService(Context.AUDIO_SERVICE);
-			if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
-				mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-				mMediaPlayer.prepare();
-				mMediaPlayer.start();
-			}
-		} catch (IOException e) {
-			System.out.println("OOPS");
-		}
-	}
-
 	// Get an alarm sound. Try for an alarm. If none set, try notification,
 	// Otherwise, ringtone.
 	private Uri getAlarmUri() {
@@ -84,11 +67,33 @@ public class AlarmMessageActivity extends SherlockActivity implements OnTouchLis
 		return alert;
 	}
 
+	private void playSound(Context context, Uri alert) {
+		mMediaPlayer = new MediaPlayer();
+		mMediaPlayer.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK);
+		try {
+			mMediaPlayer.setDataSource(context, alert);
+			final AudioManager audioManager = (AudioManager) context
+					.getSystemService(Context.AUDIO_SERVICE);
+			if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
+				mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+				mMediaPlayer.prepare();
+				mMediaPlayer.start();
+			}
+		} catch (IOException e) {
+			System.out.println("OOPS");
+		}
+	}
+
 	@Override
-	protected void onStop() {
-		super.onStop();
+	public boolean onTouch(View view, MotionEvent motion) {
 		mMediaPlayer.stop();
 		mMediaPlayer.release();
+		return false;
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
 		if ((wl != null) && (wl.isHeld())) {
 			wl.release();
 		} else {
@@ -97,9 +102,14 @@ public class AlarmMessageActivity extends SherlockActivity implements OnTouchLis
 	}
 
 	@Override
-	public boolean onTouch(View view, MotionEvent motion) {
-		mMediaPlayer.stop();
-		return false;
+	protected void onDestroy() {
+		super.onDestroy();
+		try {
+			mMediaPlayer.stop();
+			mMediaPlayer.release();
+		} catch (Exception e) {
+		}
+
 	}
 
 }
