@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="app_name">Horário do Ponto</string>
+    <string name="menu_settings">Preferências</string>
+    <string name="lbl_fstp_entrance">1º Período: Entrada</string>
+    <string name="lbl_fstp_exit">1º Período: Saída</string>
+    <string name="lbl_sndp_entrance">2º Período: Entrada</string>
+    <string name="lbl_sndp_exit">2º Período: Saída</string>
+    <string name="lbl_fste_entrance">1º Extra: Entrada</string>
+    <string name="lbl_fste_exit">1º Extra: Saída</string>
+    <string name="lbl_snde_entrance">2º Extra: Entrada</string>
+    <string name="lbl_snde_exit">2º Extra: Saída</string>
+    <string name="time_zero">00:00</string>
+    <string name="alarm_set">Próximo alarme para:</string>
+    <string name="dismiss">Dispensar</string>
+    <string name="snooze">Soneca</string>
+    <string name="snooze_not_implemented">Função soneca ainda não implementada</string>
+    
+</resources>

@@ -10,8 +10,6 @@ import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,7 +20,7 @@ import android.content.SharedPreferences.Editor;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.DialogFragment;
 import android.text.format.DateFormat;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -116,6 +114,21 @@ public class MainActivity extends SherlockFragmentActivity implements
 		}
 
 	}
+	
+	/**
+	 * Get a String in "kk:mm" format and returns a Calendar containing the today date plus this time
+	 * @param time the desired time in "kk:mm" format
+	 * @return a Calendar with the date set to today and the time set to the value in {@code time}
+	 */
+	private Calendar formatCalendar(String time) {
+		Calendar cal = Calendar.getInstance();
+		int hour = Integer.parseInt(time.split(":")[0]);
+		int minute = Integer.parseInt(time.split(":")[1]);
+		cal.set(Calendar.HOUR_OF_DAY, hour);
+		cal.set(Calendar.MINUTE, minute);
+		cal.set(Calendar.SECOND, 0);
+		return cal;
+	}
 
 	public void onTimeSet(int hour, int minute, int callerId) {
 		Calendar cal = Calendar.getInstance();
@@ -125,8 +138,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		Period period = PeriodIds.get(callerId);
 		Period next = Period.SNDE_EXIT;
-		Editor editor = PreferenceManager.getDefaultSharedPreferences(
-				getApplicationContext()).edit();
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
+				getApplicationContext());
+		Editor editor = prefs.edit();
 
 		editor.putString(getString(period.pref_id),
 				DateFormat.format("kk:mm", cal).toString());
@@ -134,31 +148,47 @@ public class MainActivity extends SherlockFragmentActivity implements
 		switch (period) {
 		case FSTP_ENTRANCE:
 			next = Period.FSTP_EXIT;
-			cal.add(Calendar.HOUR_OF_DAY, 4);
+			int fstp_duration = Integer.parseInt(prefs.getString(getString(R.string.key_fstp_duration), "4"));
+			cal.add(Calendar.HOUR_OF_DAY, fstp_duration);
 			editor.putString(getString(next.pref_id),
 					DateFormat.format("kk:mm", cal).toString());
+			apply(editor);
 			setAlarm(this, next.label_id, cal);
 		case FSTP_EXIT:
 			next = Period.SNDP_ENTRANCE;
-			cal.add(Calendar.HOUR_OF_DAY, 1);
+			int lunch_interval = Integer.parseInt(prefs.getString(getString(R.string.key_lunch_interval), "1"));
+			cal.add(Calendar.HOUR_OF_DAY, lunch_interval);
 			editor.putString(getString(next.pref_id),
 					DateFormat.format("kk:mm", cal).toString());
+			apply(editor);
 			setAlarm(this, next.label_id, cal);
 		case SNDP_ENTRANCE:
 			next = Period.SNDP_EXIT;
-			cal.add(Calendar.HOUR_OF_DAY, 4);
+			
+			Calendar work_time = formatCalendar(prefs.getString(getString(R.string.key_work_time), "08:00"));
+			Calendar fstp_entrance = formatCalendar(prefs.getString(getString(R.string.fstp_entrance), "08:00"));
+			Calendar fstp_exit = formatCalendar(prefs.getString(getString(R.string.fstp_exit), "12:00"));
+			
+			long mili_sndp_duration = work_time.getTimeInMillis() - (fstp_exit.getTimeInMillis() - fstp_entrance.getTimeInMillis());
+			Calendar sndp_duration = Calendar.getInstance();
+			sndp_duration.setTimeInMillis(mili_sndp_duration);
+			
+			cal.add(Calendar.HOUR_OF_DAY, sndp_duration.get(Calendar.HOUR_OF_DAY));
+			cal.add(Calendar.MINUTE, sndp_duration.get(Calendar.MINUTE));
 			editor.putString(getString(next.pref_id),
 					DateFormat.format("kk:mm", cal).toString());
 			setAlarm(this, next.label_id, cal);
 		case SNDP_EXIT:
 			next = Period.FSTE_ENTRANCE;
-			cal.add(Calendar.MINUTE, 15);
+			int extra_interval = Integer.parseInt(prefs.getString(getString(R.string.key_extra_interval), "15"));
+			cal.add(Calendar.MINUTE, extra_interval);
 			editor.putString(getString(next.pref_id),
 					DateFormat.format("kk:mm", cal).toString());
 			setAlarm(this, next.label_id, cal);
 		case FSTE_ENTRANCE:
 			next = Period.FSTE_EXIT;
-			cal.add(Calendar.HOUR_OF_DAY, 2);
+			int fste_duration = Integer.parseInt(prefs.getString(getString(R.string.key_fste_duration), "15"));
+			cal.add(Calendar.HOUR_OF_DAY, fste_duration);
 			editor.putString(getString(next.pref_id),
 					DateFormat.format("kk:mm", cal).toString());
 			setAlarm(this, next.label_id, cal);
@@ -183,41 +213,16 @@ public class MainActivity extends SherlockFragmentActivity implements
 	 *            the time when the alarm will start
 	 */
 	protected void setAlarm(Context context, int period_label_id, Calendar cal) {
-		// Prepare intent to AlarmManager
 		String time = DateFormat.format("kk:mm", cal).toString();
-		Intent intentAlarm = new Intent(context, AlarmMessageActivity.class);
-		intentAlarm.putExtra("period_label_id", period_label_id);
-		intentAlarm.putExtra("time", time);
-		// Those flags prevent the user to come back to the alarm dialog
-		intentAlarm.setFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
-				| Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		Intent intentAlarm = new Intent(context, AlarmReceiver.class);
+		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_PERIOD_LABEL_ID, period_label_id);
+		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_TIME, time);
 		PendingIntent alarmSender = PendingIntent
-				.getActivity(context, period_label_id, intentAlarm,
-						PendingIntent.FLAG_CANCEL_CURRENT);
+				.getBroadcast(context, period_label_id, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
+				
 		AlarmManager am = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 		am.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), alarmSender);
-		// Log.i("Alarm was set to", );
-	}
-
-	protected void setNotification(Context context, String time, int alarmId,
-			Calendar cal) {
-		// Prepare intent to Notification as a copy of intentAlarm and set
-		// another action
-		Intent intentNofity = new Intent(context, AlarmMessageActivity.class);
-		intentNofity.putExtra("time", time);
-		intentNofity.putExtra("alarmId", alarmId);
-		PendingIntent notifySender = PendingIntent.getActivity(context,
-				alarmId, intentNofity, PendingIntent.FLAG_UPDATE_CURRENT);
-		NotificationManager nm = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification notification = new NotificationCompat.Builder(context)
-				.setSmallIcon(R.drawable.ic_choose_time).setOngoing(true)
-				.setContentTitle(context.getString(R.string.alarm_set))
-				.setContentText(time)
-				.setTicker(context.getString(R.string.alarm_set) + " " + time)
-				.setContentIntent(notifySender).getNotification();
-		nm.notify(alarmId, notification);
 	}
 
 	@SuppressLint("NewApi")
@@ -263,6 +268,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 			PeriodIds.put(period.pref_id, period);
 		}
 
+		PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.settings, false);
+		
 		updateLayout();
 	}
 
@@ -280,6 +287,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case R.id.menu_settings:
+			Intent settings = new Intent(this, SettingsActivity.class);
+			startActivity(settings);
 		default:
 			return false;
 		}
