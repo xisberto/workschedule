@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.xisberto.workschedule"
-    android:versionCode="009"
+    android:versionCode="090"
     android:versionName="0.9beta" >
 
     <uses-sdk
@@ -25,6 +25,14 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="net.xisberto.workschedule.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName="net.xisberto.workschedule.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.xisberto.workschedule.MainActivity" />
+        </activity>
+        <activity
             android:name="net.xisberto.workschedule.AlarmMessageActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:excludeFromRecents="true"
@@ -40,8 +48,18 @@
         </receiver>
 
         <activity
-            android:name="net.xisberto.workschedule.SettingsActivity"
-            android:label="@string/title_activity_settings" >
+            android:name="net.xisberto.workschedule.AboutActivity"
+            android:label="@string/title_activity_about"
+            android:parentActivityName="net.xisberto.workschedule.SettingsActivity" >
+            <intent-filter>
+                <action android:name="net.xisberto.workschedule.AboutActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.xisberto.workschedule.SettingsActivity" />
         </activity>
     </application>
 

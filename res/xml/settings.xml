@@ -1,21 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" ><ListPreference android:title="@string/lbl_work_time" android:key="@string/key_work_time" android:defaultValue="08:00" android:entryValues="@array/values_work_time" android:entries="@array/entries_work_time" /><EditTextPreference
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <ListPreference
+        android:defaultValue="08:00"
+        android:entries="@array/entries_work_time"
+        android:entryValues="@array/values_work_time"
+        android:key="@string/key_work_time"
+        android:title="@string/lbl_work_time" />
+
+    <EditTextPreference
+        android:defaultValue="4"
+        android:inputType="number"
         android:key="@string/key_fstp_duration"
-        android:title="@string/lbl_fstp_duration"
-        android:inputType="number" android:defaultValue="4"/>
+        android:summary="@string/sum_fstp_duration"
+        android:title="@string/lbl_fstp_duration" />
     <EditTextPreference
+        android:defaultValue="1"
+        android:inputType="number"
         android:key="@string/key_lunch_interval"
-        android:title="@string/lbl_lunch_interval"
-        android:inputType="number" android:defaultValue="1"/>
+        android:summary="@string/sum_lunch_interval"
+        android:title="@string/lbl_lunch_interval" />
     <EditTextPreference
+        android:defaultValue="1"
+        android:inputType="number"
         android:key="@string/key_fste_duration"
-        android:title="@string/lbl_fste_duration"
-        android:inputType="number" android:defaultValue="1"/>
+        android:summary="@string/sum_fste_duration"
+        android:title="@string/lbl_fste_duration" />
     <EditTextPreference
+        android:defaultValue="15"
+        android:inputType="number"
         android:key="@string/key_extra_interval"
-        android:title="@string/lbl_extra_intetrval"
-        android:inputType="number" android:summary="@string/sum_extra_interval" android:defaultValue="15"/>
-    
-    
+        android:summary="@string/sum_extra_interval"
+        android:title="@string/lbl_extra_intetrval" />
+    <PreferenceScreen android:title="@string/lbl_about">
+        <intent android:action="net.xisberto.workschedule.AboutActivity" />
+    </PreferenceScreen>
 
 </PreferenceScreen>

@@ -20,7 +20,6 @@ import android.content.SharedPreferences.Editor;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.DialogFragment;
 import android.text.format.DateFormat;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -270,12 +269,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.settings, false);
 		
-		updateLayout();
 	}
 
 	@Override
-	protected void onDestroy() {
-		super.onDestroy();
+	protected void onResume() {
+		super.onResume();
+		updateLayout();
 	}
 
 	@Override
