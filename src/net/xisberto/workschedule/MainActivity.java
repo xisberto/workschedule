@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -27,7 +26,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
@@ -109,6 +107,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
+			timePicker.clearFocus();
 			switch (which) {
 			case AlertDialog.BUTTON_POSITIVE:
 				int callerId = getArguments().getInt("callerId");
@@ -161,7 +160,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			cal.add(Calendar.HOUR_OF_DAY, fstp_duration);
 			editor.putString(getString(next.pref_id),
 					DateFormat.format("kk:mm", cal).toString());
-			apply(editor);
+			Utils.apply(editor);
 			setAlarm(this, next.label_id, cal);
 		case FSTP_EXIT:
 			next = Period.SNDP_ENTRANCE;
@@ -169,7 +168,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			cal.add(Calendar.HOUR_OF_DAY, lunch_interval);
 			editor.putString(getString(next.pref_id),
 					DateFormat.format("kk:mm", cal).toString());
-			apply(editor);
+			Utils.apply(editor);
 			setAlarm(this, next.label_id, cal);
 		case SNDP_ENTRANCE:
 			next = Period.SNDP_EXIT;
@@ -207,7 +206,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		default:
 			break;
 		}
-		apply(editor);
+		Utils.apply(editor);
 		updateLayout();
 	}
 
@@ -232,15 +231,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 		AlarmManager am = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 		am.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), alarmSender);
-	}
-
-	@SuppressLint("NewApi")
-	private static void apply(Editor editor) {
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-			editor.commit();
-		} else {
-			editor.apply();
-		}
 	}
 
 	private List<Map<String, Object>> getPeriodsTimes() {
