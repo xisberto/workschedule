@@ -15,7 +15,7 @@
     android:versionName="0.9beta" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="7"
         android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
