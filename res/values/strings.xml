@@ -39,11 +39,6 @@
     <string name="lbl_fste_duration">1st Extra Duration</string>
     <string name="lbl_about">About</string>
     
-    <string name="sum_lunch_interval">Inform value in minutes</string>
-    <string name="sum_extra_interval">The interval between the 2nd Period and the 1st Extra, in minutes</string>
-    <string name="sum_fstp_duration">Inform value in hours</string>
-    <string name="sum_fste_duration">Inform value in hours</string>
-    
     <string name="title_activity_about">About</string>
     <string name="author_name">Created by Humberto Fraga, based on an idea by Marcos Lacerda</string>
 

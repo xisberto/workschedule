@@ -39,11 +39,6 @@
     <string name="lbl_fste_duration">Duração do 1º Extra</string>
     <string name="lbl_about">Sobre</string>
     
-    <string name="sum_lunch_interval">Informe o valor em minutos</string>
-    <string name="sum_extra_interval">O intervalo entre o 2º Período e o 1º Extra, em minutos</string>
-    <string name="sum_fstp_duration">Informe o valor em horas</string>
-    <string name="sum_fste_duration">Informe o valor em horas</string>
-    
     <string name="title_activity_about">Sobre</string>
     <string name="author_name">Criado por Humberto Fraga, baseado em uma ideia de Marcos Lacerda</string>
 </resources>

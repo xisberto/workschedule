@@ -21,13 +21,6 @@
     <string name="snde_exit">snde_exit</string>
     
     <string name="key_work_time">work_time</string>
-    <string-array name="values_work_time">
-        <item >06:00</item>
-        <item >08:00</item>
-    </string-array>
-    <string-array name="default_work_time">
-        <item >08:00</item>
-    </string-array>
     <string name="key_lunch_interval">lunch_interval</string>
     <string name="key_extra_interval">extra_interval</string>
     <string name="key_fstp_duration">fstp_duration</string>
