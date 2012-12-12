@@ -133,24 +133,21 @@ public class MainActivity extends SherlockFragmentActivity implements
 	}
 
 	private Calendar getCalendarFromPreference(String key) {
-		int hour = prefs.getInt(key+TimePickerPreference.SUFIX_HOUR, TimePickerPreference.DEFAULT_HOUR);
-		int minute = prefs.getInt(key+TimePickerPreference.SUFIX_MINUTE, TimePickerPreference.DEFAULT_MINUTE);
+		int hour = prefs.getInt(key + TimePickerPreference.SUFIX_HOUR,
+				TimePickerPreference.DEFAULT_HOUR);
+		int minute = prefs.getInt(key + TimePickerPreference.SUFIX_MINUTE,
+				TimePickerPreference.DEFAULT_MINUTE);
 		return getCalendarFromTime(hour, minute);
 	}
-	
-	/**
-	 * Get a String in "kk:mm" format and returns a Calendar containing the
-	 * today date plus this time
-	 * 
-	 * @param time
-	 *            the desired time in "kk:mm" format
-	 * @return a Calendar with the date set to today and the time set to the
-	 *         value in {@code time}
-	 */
-	private Calendar formatCalendar(String time) {
-		int hour = Integer.parseInt(time.split(":")[0]);
-		int minute = Integer.parseInt(time.split(":")[1]);
-		return getCalendarFromTime(hour, minute);
+
+	private void saveCalendarToPreference(Calendar cal, String key) {
+		Editor editor = prefs
+				.edit()
+				.putInt(key + TimePickerPreference.SUFIX_HOUR,
+						cal.get(Calendar.HOUR_OF_DAY))
+				.putInt(key + TimePickerPreference.SUFIX_MINUTE,
+						cal.get(Calendar.MINUTE));
+		Utils.apply(editor);
 	}
 	
 	private void addCalendars(Calendar cal1, Calendar cal2) {
@@ -158,42 +155,42 @@ public class MainActivity extends SherlockFragmentActivity implements
 		cal1.add(Calendar.MINUTE, cal2.get(Calendar.MINUTE));
 	}
 
-	//TODO: change all period preferences to the ".hour" and ".minute" format
 	public void onTimeSet(int hour, int minute, int callerId) {
-		//This object will be incremented ad each step of the switch bellow
+		// This object will be incremented ad each step of the switch bellow
 		Calendar cal = getCalendarFromTime(hour, minute);
 
 		Period period = PeriodIds.get(callerId);
 		Period next_period = Period.SNDE_EXIT;
-		
+
 		Editor editor = prefs.edit();
-		editor.putString(getString(period.pref_id),
-				DateFormat.format("kk:mm", cal).toString());
-		editor.putBoolean(getString(period.pref_id)+".isset", false);
+		saveCalendarToPreference(cal, getString(period.pref_id));
+		editor.putBoolean(getString(period.pref_id) + ".isset", false);
 		Utils.apply(editor);
 
 		switch (period) {
 		case FSTP_ENTRANCE:
 			next_period = Period.FSTP_EXIT;
-			addCalendars(cal, getCalendarFromPreference(getString(R.string.key_fstp_duration)));
+			addCalendars(
+					cal,
+					getCalendarFromPreference(getString(R.string.key_fstp_duration)));
 			saveAlarm(next_period, cal);
 		case FSTP_EXIT:
 			next_period = Period.SNDP_ENTRANCE;
-			addCalendars(cal, getCalendarFromPreference(getString(R.string.key_lunch_interval)));
+			addCalendars(
+					cal,
+					getCalendarFromPreference(getString(R.string.key_lunch_interval)));
 			saveAlarm(next_period, cal);
 		case SNDP_ENTRANCE:
 			next_period = Period.SNDP_EXIT;
 
-			Calendar work_time = formatCalendar(prefs.getString(
-					getString(R.string.key_work_time), "08:00"));
-			Calendar fstp_entrance = formatCalendar(prefs.getString(
-					getString(R.string.fstp_entrance), "08:00"));
-			Calendar fstp_exit = formatCalendar(prefs.getString(
-					getString(R.string.fstp_exit), "12:00"));
+			Calendar work_time = getCalendarFromPreference(getString(R.string.key_work_time));
+			Calendar fstp_entrance = getCalendarFromPreference(getString(R.string.fstp_entrance));
+			Calendar fstp_exit = getCalendarFromPreference(getString(R.string.fstp_exit));
 
-			long mili_sndp_duration = 
+			long mili_sndp_duration =
 					work_time.getTimeInMillis()
 					- (fstp_exit.getTimeInMillis() - fstp_entrance.getTimeInMillis());
+			
 			Calendar sndp_duration = Calendar.getInstance();
 			sndp_duration.setTimeInMillis(mili_sndp_duration);
 
@@ -201,11 +198,15 @@ public class MainActivity extends SherlockFragmentActivity implements
 			saveAlarm(next_period, cal);
 		case SNDP_EXIT:
 			next_period = Period.FSTE_ENTRANCE;
-			addCalendars(cal, getCalendarFromPreference(getString(R.string.key_extra_interval)));
+			addCalendars(
+					cal,
+					getCalendarFromPreference(getString(R.string.key_extra_interval)));
 			saveAlarm(next_period, cal);
 		case FSTE_ENTRANCE:
 			next_period = Period.FSTE_EXIT;
-			addCalendars(cal, getCalendarFromPreference(getString(R.string.key_fste_duration)));
+			addCalendars(
+					cal,
+					getCalendarFromPreference(getString(R.string.key_fste_duration)));
 			saveAlarm(next_period, cal);
 		case FSTE_EXIT:
 		case SNDE_ENTRANCE:
@@ -218,13 +219,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	private void saveAlarm(Period period, Calendar cal) {
 		Editor editor = prefs.edit();
-		editor.putString(getString(period.pref_id),
-				DateFormat.format("kk:mm", cal).toString());
-		editor.putBoolean(getString(period.pref_id)+".isset", true);
+		saveCalendarToPreference(cal, getString(period.pref_id));
+		editor.putBoolean(getString(period.pref_id) + ".isset", true);
 		Utils.apply(editor);
 		setAlarm(this, period.label_id, cal);
 	}
-	
+
 	/**
 	 * Set a new alarm
 	 * 
@@ -256,9 +256,13 @@ public class MainActivity extends SherlockFragmentActivity implements
 			Map<String, Object> item = new HashMap<String, Object>();
 			item.put("id", period.pref_id);
 			item.put("name", getResources().getString(period.label_id));
-			item.put("time", prefs.getString(
-					getString(period.pref_id), "00:00"));
-			item.put("isset", prefs.getBoolean(getString(period.pref_id)+".isset", false));
+			
+			Calendar cal = getCalendarFromPreference(getString(period.pref_id));
+			String time = DateFormat.format("kk:mm", cal).toString();
+			item.put("time", time);
+			
+			item.put("isset", prefs.getBoolean(getString(period.pref_id)
+					+ ".isset", false));
 			result.add(item);
 		}
 		return result;
@@ -267,7 +271,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private void updateLayout() {
 		ListView list = (ListView) findViewById(R.id.list);
 		String[] from = new String[] { "name", "time", "isset" };
-		int[] to = new int[] { R.id.period_label, R.id.period_time, R.id.toggle_alarm };
+		int[] to = new int[] { R.id.period_label, R.id.period_time,
+				R.id.check_alarm };
 		SimpleAdapter adapter = new SimpleAdapter(this, getPeriodsInfo(),
 				R.layout.period_list_item, from, to);
 		list.setAdapter(adapter);
@@ -281,13 +286,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		prefs = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
+		Utils.setDefaultPreferenceValues(getApplicationContext(), prefs);
 
 		for (Period period : Period.values()) {
 			PeriodIds.put(period.pref_id, period);
 		}
-
-		PreferenceManager.setDefaultValues(getApplicationContext(),
-				R.xml.settings, false);
 
 	}
 
