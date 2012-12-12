@@ -45,8 +45,6 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class MainActivity extends SherlockFragmentActivity implements
 		OnItemClickListener {
-	public static final String PREF_TOTAL_HOURS = "total_hours",
-			PREF_INTERVAL = "interval";
 
 	public enum Period {
 		FSTP_ENTRANCE(R.string.fstp_entrance, R.string.lbl_fstp_entrance), FSTP_EXIT(
@@ -68,6 +66,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 	}
 
 	private static final SparseArray<Period> PeriodIds = new SparseArray<MainActivity.Period>();
+
+	private SharedPreferences prefs;
 
 	public static class TimePickerFragment extends SherlockDialogFragment
 			implements OnClickListener {
@@ -122,94 +122,109 @@ public class MainActivity extends SherlockFragmentActivity implements
 		}
 
 	}
-	
-	/**
-	 * Get a String in "kk:mm" format and returns a Calendar containing the today date plus this time
-	 * @param time the desired time in "kk:mm" format
-	 * @return a Calendar with the date set to today and the time set to the value in {@code time}
-	 */
-	private Calendar formatCalendar(String time) {
+
+	private Calendar getCalendarFromTime(int hour, int minute) {
 		Calendar cal = Calendar.getInstance();
-		int hour = Integer.parseInt(time.split(":")[0]);
-		int minute = Integer.parseInt(time.split(":")[1]);
 		cal.set(Calendar.HOUR_OF_DAY, hour);
 		cal.set(Calendar.MINUTE, minute);
 		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
 		return cal;
 	}
 
+	private Calendar getCalendarFromPreference(String key) {
+		int hour = prefs.getInt(key+TimePickerPreference.SUFIX_HOUR, TimePickerPreference.DEFAULT_HOUR);
+		int minute = prefs.getInt(key+TimePickerPreference.SUFIX_MINUTE, TimePickerPreference.DEFAULT_MINUTE);
+		return getCalendarFromTime(hour, minute);
+	}
+	
+	/**
+	 * Get a String in "kk:mm" format and returns a Calendar containing the
+	 * today date plus this time
+	 * 
+	 * @param time
+	 *            the desired time in "kk:mm" format
+	 * @return a Calendar with the date set to today and the time set to the
+	 *         value in {@code time}
+	 */
+	private Calendar formatCalendar(String time) {
+		int hour = Integer.parseInt(time.split(":")[0]);
+		int minute = Integer.parseInt(time.split(":")[1]);
+		return getCalendarFromTime(hour, minute);
+	}
+	
+	private void addCalendars(Calendar cal1, Calendar cal2) {
+		cal1.add(Calendar.HOUR_OF_DAY, cal2.get(Calendar.HOUR_OF_DAY));
+		cal1.add(Calendar.MINUTE, cal2.get(Calendar.MINUTE));
+	}
+
+	//TODO: change all period preferences to the ".hour" and ".minute" format
 	public void onTimeSet(int hour, int minute, int callerId) {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.HOUR_OF_DAY, hour);
-		cal.set(Calendar.MINUTE, minute);
-		cal.set(Calendar.SECOND, 0);
+		//This object will be incremented ad each step of the switch bellow
+		Calendar cal = getCalendarFromTime(hour, minute);
 
 		Period period = PeriodIds.get(callerId);
-		Period next = Period.SNDE_EXIT;
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
-				getApplicationContext());
+		Period next_period = Period.SNDE_EXIT;
+		
 		Editor editor = prefs.edit();
-
 		editor.putString(getString(period.pref_id),
 				DateFormat.format("kk:mm", cal).toString());
+		editor.putBoolean(getString(period.pref_id)+".isset", false);
+		Utils.apply(editor);
 
 		switch (period) {
 		case FSTP_ENTRANCE:
-			next = Period.FSTP_EXIT;
-			int fstp_duration = Integer.parseInt(prefs.getString(getString(R.string.key_fstp_duration), "4"));
-			cal.add(Calendar.HOUR_OF_DAY, fstp_duration);
-			editor.putString(getString(next.pref_id),
-					DateFormat.format("kk:mm", cal).toString());
-			Utils.apply(editor);
-			setAlarm(this, next.label_id, cal);
+			next_period = Period.FSTP_EXIT;
+			addCalendars(cal, getCalendarFromPreference(getString(R.string.key_fstp_duration)));
+			saveAlarm(next_period, cal);
 		case FSTP_EXIT:
-			next = Period.SNDP_ENTRANCE;
-			int lunch_interval = Integer.parseInt(prefs.getString(getString(R.string.key_lunch_interval), "1"));
-			cal.add(Calendar.HOUR_OF_DAY, lunch_interval);
-			editor.putString(getString(next.pref_id),
-					DateFormat.format("kk:mm", cal).toString());
-			Utils.apply(editor);
-			setAlarm(this, next.label_id, cal);
+			next_period = Period.SNDP_ENTRANCE;
+			addCalendars(cal, getCalendarFromPreference(getString(R.string.key_lunch_interval)));
+			saveAlarm(next_period, cal);
 		case SNDP_ENTRANCE:
-			next = Period.SNDP_EXIT;
-			
-			Calendar work_time = formatCalendar(prefs.getString(getString(R.string.key_work_time), "08:00"));
-			Calendar fstp_entrance = formatCalendar(prefs.getString(getString(R.string.fstp_entrance), "08:00"));
-			Calendar fstp_exit = formatCalendar(prefs.getString(getString(R.string.fstp_exit), "12:00"));
-			
-			long mili_sndp_duration = work_time.getTimeInMillis() - (fstp_exit.getTimeInMillis() - fstp_entrance.getTimeInMillis());
+			next_period = Period.SNDP_EXIT;
+
+			Calendar work_time = formatCalendar(prefs.getString(
+					getString(R.string.key_work_time), "08:00"));
+			Calendar fstp_entrance = formatCalendar(prefs.getString(
+					getString(R.string.fstp_entrance), "08:00"));
+			Calendar fstp_exit = formatCalendar(prefs.getString(
+					getString(R.string.fstp_exit), "12:00"));
+
+			long mili_sndp_duration = 
+					work_time.getTimeInMillis()
+					- (fstp_exit.getTimeInMillis() - fstp_entrance.getTimeInMillis());
 			Calendar sndp_duration = Calendar.getInstance();
 			sndp_duration.setTimeInMillis(mili_sndp_duration);
-			
-			cal.add(Calendar.HOUR_OF_DAY, sndp_duration.get(Calendar.HOUR_OF_DAY));
-			cal.add(Calendar.MINUTE, sndp_duration.get(Calendar.MINUTE));
-			editor.putString(getString(next.pref_id),
-					DateFormat.format("kk:mm", cal).toString());
-			setAlarm(this, next.label_id, cal);
+
+			addCalendars(cal, sndp_duration);
+			saveAlarm(next_period, cal);
 		case SNDP_EXIT:
-			next = Period.FSTE_ENTRANCE;
-			int extra_interval = Integer.parseInt(prefs.getString(getString(R.string.key_extra_interval), "15"));
-			cal.add(Calendar.MINUTE, extra_interval);
-			editor.putString(getString(next.pref_id),
-					DateFormat.format("kk:mm", cal).toString());
-			setAlarm(this, next.label_id, cal);
+			next_period = Period.FSTE_ENTRANCE;
+			addCalendars(cal, getCalendarFromPreference(getString(R.string.key_extra_interval)));
+			saveAlarm(next_period, cal);
 		case FSTE_ENTRANCE:
-			next = Period.FSTE_EXIT;
-			int fste_duration = Integer.parseInt(prefs.getString(getString(R.string.key_fste_duration), "15"));
-			cal.add(Calendar.HOUR_OF_DAY, fste_duration);
-			editor.putString(getString(next.pref_id),
-					DateFormat.format("kk:mm", cal).toString());
-			setAlarm(this, next.label_id, cal);
+			next_period = Period.FSTE_EXIT;
+			addCalendars(cal, getCalendarFromPreference(getString(R.string.key_fste_duration)));
+			saveAlarm(next_period, cal);
 		case FSTE_EXIT:
 		case SNDE_ENTRANCE:
 		case SNDE_EXIT:
 		default:
 			break;
 		}
-		Utils.apply(editor);
 		updateLayout();
 	}
 
+	private void saveAlarm(Period period, Calendar cal) {
+		Editor editor = prefs.edit();
+		editor.putString(getString(period.pref_id),
+				DateFormat.format("kk:mm", cal).toString());
+		editor.putBoolean(getString(period.pref_id)+".isset", true);
+		Utils.apply(editor);
+		setAlarm(this, period.label_id, cal);
+	}
+	
 	/**
 	 * Set a new alarm
 	 * 
@@ -223,26 +238,27 @@ public class MainActivity extends SherlockFragmentActivity implements
 	protected void setAlarm(Context context, int period_label_id, Calendar cal) {
 		String time = DateFormat.format("kk:mm", cal).toString();
 		Intent intentAlarm = new Intent(context, AlarmReceiver.class);
-		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_PERIOD_LABEL_ID, period_label_id);
+		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_PERIOD_LABEL_ID,
+				period_label_id);
 		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_TIME, time);
 		PendingIntent alarmSender = PendingIntent
-				.getBroadcast(context, period_label_id, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
-				
+				.getBroadcast(context, period_label_id, intentAlarm,
+						PendingIntent.FLAG_CANCEL_CURRENT);
+
 		AlarmManager am = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 		am.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), alarmSender);
 	}
 
-	private List<Map<String, Object>> getPeriodsTimes() {
+	private List<Map<String, Object>> getPeriodsInfo() {
 		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext());
 		for (Period period : Period.values()) {
 			Map<String, Object> item = new HashMap<String, Object>();
 			item.put("id", period.pref_id);
 			item.put("name", getResources().getString(period.label_id));
 			item.put("time", prefs.getString(
-					getResources().getString(period.pref_id), "00:00"));
+					getString(period.pref_id), "00:00"));
+			item.put("isset", prefs.getBoolean(getString(period.pref_id)+".isset", false));
 			result.add(item);
 		}
 		return result;
@@ -250,9 +266,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	private void updateLayout() {
 		ListView list = (ListView) findViewById(R.id.list);
-		String[] from = new String[] { "name", "time" };
-		int[] to = new int[] { R.id.period_label, R.id.period_time };
-		SimpleAdapter adapter = new SimpleAdapter(this, getPeriodsTimes(),
+		String[] from = new String[] { "name", "time", "isset" };
+		int[] to = new int[] { R.id.period_label, R.id.period_time, R.id.toggle_alarm };
+		SimpleAdapter adapter = new SimpleAdapter(this, getPeriodsInfo(),
 				R.layout.period_list_item, from, to);
 		list.setAdapter(adapter);
 		list.setOnItemClickListener(this);
@@ -263,12 +279,16 @@ public class MainActivity extends SherlockFragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		prefs = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+
 		for (Period period : Period.values()) {
 			PeriodIds.put(period.pref_id, period);
 		}
 
-		PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.settings, false);
-		
+		PreferenceManager.setDefaultValues(getApplicationContext(),
+				R.xml.settings, false);
+
 	}
 
 	@Override

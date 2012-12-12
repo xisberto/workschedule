@@ -21,7 +21,8 @@ import android.widget.TimePicker;
 
 public class TimePickerPreference extends DialogPreference {
 	private TimePicker timepicker;
-	private static final int DEFAULT_HOUR = 1, DEFAULT_MINUTE = 0;
+	public static final int DEFAULT_HOUR = 1, DEFAULT_MINUTE = 0;
+	public static final String SUFIX_HOUR = ".hour", SUFIX_MINUTE = ".minute";
 
 	public TimePickerPreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -31,10 +32,13 @@ public class TimePickerPreference extends DialogPreference {
 	@Override
 	protected View onCreateDialogView() {
 		timepicker = new TimePicker(getContext());
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(getContext());
 		timepicker.setIs24HourView(DateFormat.is24HourFormat(getContext()));
-		timepicker.setCurrentHour(prefs.getInt(getKey()+".hour", DEFAULT_HOUR));
-		timepicker.setCurrentMinute(prefs.getInt(getKey()+".minute", DEFAULT_MINUTE));
+		timepicker.setCurrentHour(prefs.getInt(getKey() + SUFIX_HOUR,
+				DEFAULT_HOUR));
+		timepicker.setCurrentMinute(prefs.getInt(getKey() + SUFIX_MINUTE,
+				DEFAULT_MINUTE));
 		return timepicker;
 	}
 
@@ -43,9 +47,11 @@ public class TimePickerPreference extends DialogPreference {
 		super.onDialogClosed(positiveResult);
 		if (positiveResult) {
 			timepicker.clearFocus();
-			SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
-			editor.putInt(getKey()+".hour", timepicker.getCurrentHour());
-			editor.putInt(getKey()+".minute", timepicker.getCurrentMinute());
+			SharedPreferences.Editor editor = PreferenceManager
+					.getDefaultSharedPreferences(getContext()).edit();
+			editor.putInt(getKey() + SUFIX_HOUR, timepicker.getCurrentHour());
+			editor.putInt(getKey() + SUFIX_MINUTE,
+					timepicker.getCurrentMinute());
 			Utils.apply(editor);
 		}
 	}
