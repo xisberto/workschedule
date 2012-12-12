@@ -8,9 +8,11 @@
  * Contributors:
  *     Humberto Fraga - initial API and implementation
  ******************************************************************************/
-package net.xisberto.workschedule;
+package net.xisberto.work_schedule;
 
 import java.util.Calendar;
+
+import net.xisberto.work_schedule.Settings.Period;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -28,16 +30,19 @@ public class AlarmReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Bundle extras = intent.getExtras();
-		showNotification(context, extras.getInt(AlarmMessageActivity.EXTRA_PERIOD_LABEL_ID), extras.getString(AlarmMessageActivity.EXTRA_TIME));
+		int pref_id = extras.getInt(AlarmMessageActivity.EXTRA_PERIOD_ID);
+		Period p = Period.getFromPrefId(pref_id);
+		showNotification(context, p, extras.getString(AlarmMessageActivity.EXTRA_TIME));
+		new Settings(context).unsetAlarm(p);
 	}
 	
-	protected void showNotification(Context context, int period_label_id, String time) {
+	protected void showNotification(Context context, Period period, String time) {
 		Intent intentAlarm = new Intent(context, AlarmMessageActivity.class);
 		intentAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_TIME, time);
-		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_PERIOD_LABEL_ID, period_label_id);
+		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID, period.pref_id);
 		
-		PendingIntent notifySender = PendingIntent.getActivity(context, period_label_id, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent notifySender = PendingIntent.getActivity(context, period.pref_id, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT);
 		
 		Intent intent_cancel = new Intent(context, AlarmMessageActivity.class);
 		intent_cancel.setAction(AlarmMessageActivity.ACTION_CANCEL);
@@ -49,8 +54,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 		NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		Notification notification = new NotificationCompat.Builder(context)
 				.setSmallIcon(R.drawable.ic_stat_notification)
-				.setContentTitle(context.getString(period_label_id))
-				.setTicker(context.getString(period_label_id))
+				.setContentTitle(context.getString(period.label_id))
+				.setTicker(context.getString(period.label_id))
 				//.addAction(R.drawable.ic_choose_time, context.getString(R.string.dismiss), cancel_alarm)
 				//.addAction(R.drawable.ic_choose_time, context.getString(R.string.snooze), snooze_alarm)
 				.setWhen(Calendar.getInstance().getTimeInMillis())
@@ -59,7 +64,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 				.setContentIntent(notifySender)
 				.build();
 		
-		nm.notify(period_label_id, notification);
+		nm.notify(period.pref_id, notification);
 		context.startActivity(intentAlarm);
 	}
 }

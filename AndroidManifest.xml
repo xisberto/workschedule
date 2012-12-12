@@ -10,9 +10,9 @@
       Humberto Fraga - initial API and implementation
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.xisberto.workschedule"
-    android:versionCode="090"
-    android:versionName="0.9beta" >
+    package="net.xisberto.work_schedule"
+    android:versionCode="091"
+    android:versionName="0.9.9 beta" >
 
     <uses-sdk
         android:minSdkVersion="7"
@@ -26,7 +26,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="net.xisberto.workschedule.MainActivity"
+            android:name="MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,7 +35,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="net.xisberto.workschedule.SettingsActivity"
+            android:name="SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName="net.xisberto.workschedule.MainActivity" >
             <meta-data
@@ -43,7 +43,7 @@
                 android:value="net.xisberto.workschedule.MainActivity" />
         </activity>
         <activity
-            android:name="net.xisberto.workschedule.AlarmMessageActivity"
+            android:name="AlarmMessageActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
@@ -52,17 +52,17 @@
         </activity>
 
         <receiver
-            android:name="net.xisberto.workschedule.AlarmReceiver"
+            android:name="AlarmReceiver"
             android:enabled="true"
             android:exported="false" >
         </receiver>
 
         <activity
-            android:name="net.xisberto.workschedule.AboutActivity"
+            android:name="AboutActivity"
             android:label="@string/title_activity_about"
             android:parentActivityName="net.xisberto.workschedule.SettingsActivity" >
             <intent-filter>
-                <action android:name="net.xisberto.workschedule.AboutActivity" />
+                <action android:name="net.xisberto.work_schedule.AboutActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

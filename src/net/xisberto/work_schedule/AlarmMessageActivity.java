@@ -8,9 +8,11 @@
  * Contributors:
  *     Humberto Fraga - initial API and implementation
  ******************************************************************************/
-package net.xisberto.workschedule;
+package net.xisberto.work_schedule;
 
 import java.io.IOException;
+
+import net.xisberto.work_schedule.Settings.Period;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -36,7 +38,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		DialogInterface.OnClickListener {
 	public static final String EXTRA_TIME = "time",
-			EXTRA_PERIOD_LABEL_ID = "period_label_id",
+			EXTRA_PERIOD_ID = "period_id",
 			ACTION_CANCEL = "net.xisberto.workschedule.cancel", ACTION_SNOOZE = "net.xisberto.workschedule.snooze";
 	private MediaPlayer mMediaPlayer;
 	private String time;
@@ -44,11 +46,11 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 
 	public static class AlarmDialog extends SherlockDialogFragment {
 
-		public static AlarmDialog newInstance(int period_label_id, String time) {
+		public static AlarmDialog newInstance(int period_id, String time) {
 			AlarmDialog alarmDialog = new AlarmDialog();
 			Bundle args = new Bundle();
-			args.putInt(AlarmMessageActivity.EXTRA_PERIOD_LABEL_ID,
-					period_label_id);
+			args.putInt(AlarmMessageActivity.EXTRA_PERIOD_ID,
+					period_id);
 			args.putString(AlarmMessageActivity.EXTRA_TIME, time);
 			alarmDialog.setArguments(args);
 			return alarmDialog;
@@ -62,12 +64,13 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 			((TextView) view.findViewById(R.id.alarm_time))
 					.setText(getArguments().getString(
 							AlarmMessageActivity.EXTRA_TIME));
+			
+			int period_id = getArguments().getInt(AlarmMessageActivity.EXTRA_PERIOD_ID);
+			Period period = Period.getFromPrefId(period_id);
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
 					.setView(view)
-					.setTitle(
-							getArguments().getInt(
-									AlarmMessageActivity.EXTRA_PERIOD_LABEL_ID))
+					.setTitle(period.label_id)
 					.setPositiveButton(R.string.dismiss,
 							(OnClickListener) getActivity())
 					.setNegativeButton(R.string.snooze,
@@ -166,7 +169,7 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		super.onCreate(savedInstanceState);
 
 		time = getIntent().getStringExtra(EXTRA_TIME);
-		period_label_id = getIntent().getIntExtra(EXTRA_PERIOD_LABEL_ID,
+		period_label_id = getIntent().getIntExtra(EXTRA_PERIOD_ID,
 				R.string.sndp_entrance);
 
 		// Dismiss any previous dialogs and notifications

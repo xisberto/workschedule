@@ -8,13 +8,12 @@
  * Contributors:
  *     Humberto Fraga <xisberto@gmail.com> - initial API and implementation
  ******************************************************************************/
-package net.xisberto.workschedule;
+package net.xisberto.work_schedule;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.DialogPreference;
 import android.preference.PreferenceManager;
-import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TimePicker;
@@ -34,7 +33,7 @@ public class TimePickerPreference extends DialogPreference {
 		timepicker = new TimePicker(getContext());
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(getContext());
-		timepicker.setIs24HourView(DateFormat.is24HourFormat(getContext()));
+		timepicker.setIs24HourView(true);
 		timepicker.setCurrentHour(prefs.getInt(getKey() + SUFIX_HOUR,
 				DEFAULT_HOUR));
 		timepicker.setCurrentMinute(prefs.getInt(getKey() + SUFIX_MINUTE,
@@ -52,7 +51,7 @@ public class TimePickerPreference extends DialogPreference {
 			editor.putInt(getKey() + SUFIX_HOUR, timepicker.getCurrentHour());
 			editor.putInt(getKey() + SUFIX_MINUTE,
 					timepicker.getCurrentMinute());
-			Utils.apply(editor);
+			Settings.apply(editor);
 		}
 	}
 
