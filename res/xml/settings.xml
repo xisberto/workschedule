@@ -18,30 +18,23 @@
         android:key="@string/key_work_time"
         android:title="@string/lbl_work_time" />
 
-    <EditTextPreference
-        android:defaultValue="4"
-        android:inputType="number"
+    <net.xisberto.workschedule.TimePickerPreference
         android:key="@string/key_fstp_duration"
         android:summary="@string/sum_fstp_duration"
         android:title="@string/lbl_fstp_duration" />
-    <EditTextPreference
-        android:defaultValue="1"
-        android:inputType="number"
+    <net.xisberto.workschedule.TimePickerPreference
         android:key="@string/key_lunch_interval"
         android:summary="@string/sum_lunch_interval"
         android:title="@string/lbl_lunch_interval" />
-    <EditTextPreference
-        android:defaultValue="1"
-        android:inputType="number"
+    <net.xisberto.workschedule.TimePickerPreference
         android:key="@string/key_fste_duration"
         android:summary="@string/sum_fste_duration"
         android:title="@string/lbl_fste_duration" />
-    <EditTextPreference
-        android:defaultValue="15"
-        android:inputType="number"
+    <net.xisberto.workschedule.TimePickerPreference
         android:key="@string/key_extra_interval"
         android:summary="@string/sum_extra_interval"
         android:title="@string/lbl_extra_intetrval" />
+    
     <PreferenceScreen android:title="@string/lbl_about">
         <intent android:action="net.xisberto.workschedule.AboutActivity" />
     </PreferenceScreen>
