@@ -79,31 +79,6 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 			return builder.create();
 		}
 
-		@Override
-		public void onStop() {
-			super.onStop();
-			Log.i("dialog", "onStop");
-		}
-
-		@Override
-		public void onCancel(DialogInterface dialog) {
-			super.onCancel(dialog);
-			getActivity().finish();
-			Log.i("dialog", "onCancel");
-		}
-
-		@Override
-		public void onDismiss(DialogInterface dialog) {
-			super.onDismiss(dialog);
-			Log.i("dialog", "onDismiss");
-		}
-
-		@Override
-		public void onDetach() {
-			super.onDetach();
-			Log.i("dialog", "onDetach");
-		}
-
 	}
 
 	// Get an alarm sound. Try for an alarm. If none set, try notification,
@@ -187,7 +162,6 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	protected void onResume() {
 		super.onResume();
 		mMediaPlayer.start();
-		Log.i("alarm", "onResume");
 	}
 
 	@Override
@@ -199,7 +173,6 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 			mMediaPlayer = null;
 			dismissNotification();
 		}
-		Log.i("alarm", "onStop");
 	}
 
 	@Override

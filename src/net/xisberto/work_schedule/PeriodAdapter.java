@@ -1,11 +1,8 @@
 package net.xisberto.work_schedule;
 
-import java.sql.Date;
-
 import net.xisberto.work_schedule.Settings.Period;
 import android.content.Context;
 import android.database.DataSetObserver;
-import android.text.format.DateFormat;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,23 +53,22 @@ public class PeriodAdapter implements ListAdapter {
 		final Period period = (Period) getItem(position);
 		final Settings settings = new Settings(context);
 		final String period_pref_key = context.getString(period.pref_id);
-		
+
 		((TextView) view.findViewById(R.id.period_label)).setText(context
 				.getString(period.label_id));
-		String format = "hh:mmaa";
-		if (DateFormat.is24HourFormat(context)) {
-			format = "kk:mm";
-		}
-		((TextView) view.findViewById(R.id.period_time)).setText(DateFormat
-				.format(format, settings.getCalendar(period_pref_key)));
-		
+
+		((TextView) view.findViewById(R.id.period_time)).setText(settings
+				.formatCalendar(settings.getCalendar(period_pref_key)));
+
 		CheckBox check_alarm = (CheckBox) view.findViewById(R.id.check_alarm);
 		check_alarm.setChecked(settings.isAlarmSet(period.pref_id));
 		check_alarm.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View view) {
-				settings.setAlarm(period, settings.getCalendar(period_pref_key), ((CheckBox)view).isChecked());
+				settings.setAlarm(period,
+						settings.getCalendar(period_pref_key),
+						((CheckBox) view).isChecked());
 			}
 		});
 

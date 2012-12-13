@@ -126,6 +126,14 @@ public class Settings {
 	public Calendar getCalendar(int pref_id) {
 		return getCalendar(context.getString(pref_id));
 	}
+	
+	public String formatCalendar(Calendar cal) {
+		String inFormat = "hh:mm aa";
+		if (DateFormat.is24HourFormat(context)) {
+			inFormat = "kk:mm";
+		}
+		return DateFormat.format(inFormat, cal).toString();
+	}
 
 	public void saveCalendar(Calendar cal, String key) {
 		Editor editor = prefs
@@ -159,7 +167,7 @@ public class Settings {
 		apply(editor);
 		
 		//Set or cancel the alarm
-		String time = DateFormat.format("kk:mm", cal).toString();
+		String time = formatCalendar(cal);
 		Intent intentAlarm = new Intent(context, AlarmReceiver.class);
 		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID,
 				period.pref_id);
