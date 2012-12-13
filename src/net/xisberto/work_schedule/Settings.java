@@ -44,7 +44,7 @@ public class Settings {
 			this.pref_id = pref_id;
 			this.label_id = label_id;
 		}
-		
+
 		public static Period getFromPrefId(int pref_id) {
 			for (Period period : Period.values()) {
 				if (period.pref_id == pref_id) {
@@ -55,7 +55,7 @@ public class Settings {
 		}
 
 	}
-	
+
 	public Settings(Context context) {
 		this.context = context;
 		prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -69,43 +69,69 @@ public class Settings {
 			editor.apply();
 		}
 	}
-	
+
 	public void setDefaultPreferenceValues() {
 		Editor editor = prefs.edit();
-		String key_work_time = context.getString(R.string.key_work_time),
-				key_fstp_duration = context.getString(R.string.key_fstp_duration),
-				key_lunch_interval = context.getString(R.string.key_lunch_interval),
-				key_extra_interval = context.getString(R.string.key_extra_interval),
-				key_fste_duration = context.getString(R.string.key_fste_duration);
-		
-		if (! prefs.contains(key_work_time+TimePickerPreference.SUFIX_HOUR)) {
-			editor.putInt(key_work_time+TimePickerPreference.SUFIX_HOUR, 8);
-			editor.putInt(key_work_time+TimePickerPreference.SUFIX_MINUTE, 0);
+		String key_work_time = context.getString(R.string.key_work_time), key_fstp_duration = context
+				.getString(R.string.key_fstp_duration), key_lunch_interval = context
+				.getString(R.string.key_lunch_interval), key_extra_interval = context
+				.getString(R.string.key_extra_interval), key_fste_duration = context
+				.getString(R.string.key_fste_duration);
+
+		if (!prefs.contains(key_work_time + TimePickerPreference.SUFIX_HOUR)) {
+			editor.putInt(key_work_time + TimePickerPreference.SUFIX_HOUR, 8);
+			editor.putInt(key_work_time + TimePickerPreference.SUFIX_MINUTE, 0);
 		}
-		
-		if (! prefs.contains(key_fstp_duration+TimePickerPreference.SUFIX_HOUR)) {
-			editor.putInt(key_fstp_duration+TimePickerPreference.SUFIX_HOUR, 4);
-			editor.putInt(key_fstp_duration+TimePickerPreference.SUFIX_MINUTE, 0);
+
+		if (!prefs
+				.contains(key_fstp_duration + TimePickerPreference.SUFIX_HOUR)) {
+			editor.putInt(key_fstp_duration + TimePickerPreference.SUFIX_HOUR,
+					4);
+			editor.putInt(
+					key_fstp_duration + TimePickerPreference.SUFIX_MINUTE, 0);
 		}
-		
-		if (! prefs.contains(key_lunch_interval+TimePickerPreference.SUFIX_HOUR)) {
-			editor.putInt(key_lunch_interval+TimePickerPreference.SUFIX_HOUR, 1);
-			editor.putInt(key_lunch_interval+TimePickerPreference.SUFIX_MINUTE, 0);
+
+		if (!prefs.contains(key_lunch_interval
+				+ TimePickerPreference.SUFIX_HOUR)) {
+			editor.putInt(key_lunch_interval + TimePickerPreference.SUFIX_HOUR,
+					1);
+			editor.putInt(key_lunch_interval
+					+ TimePickerPreference.SUFIX_MINUTE, 0);
 		}
-		
-		if (! prefs.contains(key_extra_interval+TimePickerPreference.SUFIX_HOUR)) {
-			editor.putInt(key_extra_interval+TimePickerPreference.SUFIX_HOUR, 0);
-			editor.putInt(key_extra_interval+TimePickerPreference.SUFIX_MINUTE, 15);
+
+		if (!prefs.contains(key_extra_interval
+				+ TimePickerPreference.SUFIX_HOUR)) {
+			editor.putInt(key_extra_interval + TimePickerPreference.SUFIX_HOUR,
+					0);
+			editor.putInt(key_extra_interval
+					+ TimePickerPreference.SUFIX_MINUTE, 15);
 		}
-		
-		if (! prefs.contains(key_fste_duration+TimePickerPreference.SUFIX_HOUR)) {
-			editor.putInt(key_fste_duration+TimePickerPreference.SUFIX_HOUR, 1);
-			editor.putInt(key_fste_duration+TimePickerPreference.SUFIX_MINUTE, 0);
+
+		if (!prefs
+				.contains(key_fste_duration + TimePickerPreference.SUFIX_HOUR)) {
+			editor.putInt(key_fste_duration + TimePickerPreference.SUFIX_HOUR,
+					1);
+			editor.putInt(
+					key_fste_duration + TimePickerPreference.SUFIX_MINUTE, 0);
 		}
-		
+
 		apply(editor);
 	}
-	
+
+	public boolean canAskForRating() {
+		if (Math.random() >= 0.6) {
+			return prefs.getBoolean(
+					context.getString(R.string.key_ask_for_rating), true);
+		}
+		return false;
+	}
+
+	public void setAskForRating(boolean value) {
+		Editor editor = prefs.edit().putBoolean(
+				context.getString(R.string.key_ask_for_rating), value);
+		apply(editor);
+	}
+
 	public Calendar getCalendarFromTime(int hour, int minute) {
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.HOUR_OF_DAY, hour);
@@ -122,11 +148,11 @@ public class Settings {
 				TimePickerPreference.DEFAULT_MINUTE);
 		return getCalendarFromTime(hour, minute);
 	}
-	
+
 	public Calendar getCalendar(int pref_id) {
 		return getCalendar(context.getString(pref_id));
 	}
-	
+
 	public String formatCalendar(Calendar cal) {
 		String inFormat = "hh:mm aa";
 		if (DateFormat.is24HourFormat(context)) {
@@ -144,11 +170,12 @@ public class Settings {
 						cal.get(Calendar.MINUTE));
 		apply(editor);
 	}
-	
+
 	public boolean isAlarmSet(int period_pref_id) {
-		return prefs.getBoolean(context.getString(period_pref_id)+".isset", false);
+		return prefs.getBoolean(context.getString(period_pref_id) + ".isset",
+				false);
 	}
-	
+
 	/**
 	 * Set a new alarm
 	 * 
@@ -160,32 +187,31 @@ public class Settings {
 	 *            the time when the alarm will start
 	 */
 	public void setAlarm(Period period, Calendar cal, boolean enabled) {
-		//Save the time and the status to the SharedPreferences
+		// Save the time and the status to the SharedPreferences
 		Editor editor = prefs.edit();
 		saveCalendar(cal, context.getString(period.pref_id));
 		editor.putBoolean(context.getString(period.pref_id) + ".isset", enabled);
 		apply(editor);
-		
-		//Set or cancel the alarm
+
+		// Set or cancel the alarm
 		String time = formatCalendar(cal);
 		Intent intentAlarm = new Intent(context, AlarmReceiver.class);
 		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID,
 				period.pref_id);
 		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_TIME, time);
-		PendingIntent alarmSender = PendingIntent
-				.getBroadcast(context, period.pref_id, intentAlarm,
-						PendingIntent.FLAG_CANCEL_CURRENT);
+		PendingIntent alarmSender = PendingIntent.getBroadcast(context,
+				period.pref_id, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
 
 		AlarmManager am = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 		if (enabled) {
-			am.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), alarmSender);	
+			am.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), alarmSender);
 		} else {
 			am.cancel(alarmSender);
 		}
-		
+
 	}
-	
+
 	public void unsetAlarm(Period period) {
 		setAlarm(period, getCalendar(period.pref_id), false);
 	}

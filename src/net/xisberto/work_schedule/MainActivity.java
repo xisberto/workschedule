@@ -13,94 +13,33 @@ package net.xisberto.work_schedule;
 import java.util.Calendar;
 
 import net.xisberto.work_schedule.Settings.Period;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
+import net.xisberto.work_schedule.TimePickerFragment.OnTimePickerSetListener;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.TimePicker;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
 public class MainActivity extends SherlockFragmentActivity implements
-		OnItemClickListener {
+		OnItemClickListener, OnTimePickerSetListener {
 
 	private static final SparseArray<Period> PeriodIds = new SparseArray<Period>();
 
 	private Settings settings;
-
-	public static class TimePickerFragment extends SherlockDialogFragment
-			implements OnClickListener {
-
-		private TimePicker timePicker;
-
-		public static TimePickerFragment newInstance(int callerId) {
-			TimePickerFragment dialog_fragment = new TimePickerFragment();
-			Bundle args = new Bundle();
-			args.putInt("callerId", callerId);
-			dialog_fragment.setArguments(args);
-			return dialog_fragment;
-		}
-
-		@Override
-		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			final Calendar c = Calendar.getInstance();
-			int hourOfDay = c.get(Calendar.HOUR_OF_DAY);
-			int minute = c.get(Calendar.MINUTE);
-
-			LayoutInflater inflater = (LayoutInflater) getActivity()
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			View view = inflater.inflate(R.layout.time_picker_dialog, null);
-			timePicker = (TimePicker) view.findViewById(R.id.timePicker);
-			timePicker
-					.setIs24HourView(DateFormat.is24HourFormat(getActivity()));
-			timePicker.setCurrentHour(hourOfDay);
-			timePicker.setCurrentMinute(minute);
-
-			// Create a new instance of TimePickerDialog and return it
-			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-					.setView(view)
-					.setPositiveButton(getString(android.R.string.ok), this)
-					.setNegativeButton(getString(android.R.string.cancel), this);
-			return builder.create();
-		}
-
-		@Override
-		public void onClick(DialogInterface dialog, int which) {
-			timePicker.clearFocus();
-			switch (which) {
-			case AlertDialog.BUTTON_POSITIVE:
-				int callerId = getArguments().getInt("callerId");
-				((MainActivity) getActivity()).onTimeSet(
-						timePicker.getCurrentHour(),
-						timePicker.getCurrentMinute(), callerId);
-				break;
-			case AlertDialog.BUTTON_NEGATIVE:
-			default:
-				break;
-			}
-		}
-
-	}
 
 	private void addCalendars(Calendar cal1, Calendar cal2) {
 		cal1.add(Calendar.HOUR_OF_DAY, cal2.get(Calendar.HOUR_OF_DAY));
 		cal1.add(Calendar.MINUTE, cal2.get(Calendar.MINUTE));
 	}
 
+	@Override
 	public void onTimeSet(int hour, int minute, int callerId) {
 		// This object will be incremented ad each step of the switch bellow
 		Calendar cal = settings.getCalendarFromTime(hour, minute);
@@ -160,6 +99,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 			break;
 		}
 		updateLayout();
+		if (settings.canAskForRating()) {
+			RatingDialog dialog = new RatingDialog();
+			dialog.show(getSupportFragmentManager(), "rating");
+		}
 	}
 
 	private void updateLayout() {

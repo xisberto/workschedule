@@ -26,4 +26,6 @@
     <string name="key_fstp_duration">fstp_duration</string>
     <string name="key_fste_duration">fste_duration</string>
 
+    <string name="key_ask_for_rating">ask_for_rating</string>
+    
 </resources>

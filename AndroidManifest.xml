@@ -11,7 +11,7 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.xisberto.work_schedule"
-    android:versionCode="091"
+    android:versionCode="092"
     android:versionName="0.9.9 beta" >
 
     <uses-sdk
@@ -37,10 +37,10 @@
         <activity
             android:name="SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName="net.xisberto.workschedule.MainActivity" >
+            android:parentActivityName="net.xisberto.work_schedule.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="net.xisberto.workschedule.MainActivity" />
+                android:value="net.xisberto.work_schedule.MainActivity" />
         </activity>
         <activity
             android:name="AlarmMessageActivity"
@@ -59,8 +59,8 @@
 
         <activity
             android:name="AboutActivity"
-            android:label="@string/title_activity_about"
-            android:parentActivityName="net.xisberto.workschedule.SettingsActivity" >
+            android:label="@string/lbl_about"
+            android:parentActivityName="net.xisberto.work_schedule.SettingsActivity" >
             <intent-filter>
                 <action android:name="net.xisberto.work_schedule.AboutActivity" />
 
@@ -69,7 +69,7 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="net.xisberto.workschedule.SettingsActivity" />
+                android:value="net.xisberto.work_schedule.SettingsActivity" />
         </activity>
     </application>
 
