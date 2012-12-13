@@ -13,13 +13,13 @@
     android:id="@+id/RelativeLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="3dp"
-    android:minHeight="?android:attr/listPreferredItemHeight" >
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:padding="3dp" >
 
     <CheckBox
         android:id="@+id/check_alarm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:focusable="false"
@@ -31,7 +31,6 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/check_alarm"
-        android:text="2nd Period Entrance"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -40,7 +39,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:text="13:00"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </RelativeLayout>
