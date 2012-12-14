@@ -119,9 +119,23 @@ public class Settings {
 	}
 
 	public boolean canAskForRating() {
-		if (Math.random() >= 0.6) {
-			return prefs.getBoolean(
-					context.getString(R.string.key_ask_for_rating), true);
+		boolean ask_for_rating = prefs.getBoolean(
+				context.getString(R.string.key_ask_for_rating), true);
+		//If shouldn't ask, exit without any other calculation
+		if (ask_for_rating == false) {
+			return false;
+		}
+		//After 8 iterations, will begin to ask
+		int ask_counter = prefs.getInt(
+				context.getString(R.string.key_ask_counter), 0);
+		if (ask_counter < 8) {
+			ask_counter++;
+			apply(prefs.edit().putInt(
+					context.getString(R.string.key_ask_counter), ask_counter));
+			return false;
+		} else if (Math.random() >= 0.6) {
+			//After the 8 iterations, have a 40% chance of asking
+			return ask_for_rating;
 		}
 		return false;
 	}
