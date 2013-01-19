@@ -25,7 +25,7 @@
     <string name="alarm_set">Next alarm set to</string>
     <string name="dismiss">Dismiss</string>
     <string name="snooze">Snooze</string>
-    <string name="snooze_not_implemented">Snooze function not implemented yet</string>
+    <string name="snooze_set_to">Snooze set to</string>
     
     <string name="title_activity_settings">Settings</string>
     <string name="lbl_work_time">Total Work Time</string>

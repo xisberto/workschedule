@@ -11,14 +11,17 @@
 package net.xisberto.work_schedule;
 
 import java.io.IOException;
+import java.util.Calendar;
 
 import net.xisberto.work_schedule.Settings.Period;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -26,6 +29,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,18 +43,19 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		DialogInterface.OnClickListener {
 	public static final String EXTRA_TIME = "time",
 			EXTRA_PERIOD_ID = "period_id",
-			ACTION_CANCEL = "net.xisberto.workschedule.cancel", ACTION_SNOOZE = "net.xisberto.workschedule.snooze";
+			ACTION_SHOW_ALARM = "net.xisberto.workschedule.showalarm",
+			ACTION_CANCEL = "net.xisberto.workschedule.cancel",
+			ACTION_SNOOZE = "net.xisberto.workschedule.snooze";
 	private MediaPlayer mMediaPlayer;
 	private String time;
-	private int period_label_id;
+	private int period_pref_id;
 
 	public static class AlarmDialog extends SherlockDialogFragment {
 
 		public static AlarmDialog newInstance(int period_id, String time) {
 			AlarmDialog alarmDialog = new AlarmDialog();
 			Bundle args = new Bundle();
-			args.putInt(AlarmMessageActivity.EXTRA_PERIOD_ID,
-					period_id);
+			args.putInt(AlarmMessageActivity.EXTRA_PERIOD_ID, period_id);
 			args.putString(AlarmMessageActivity.EXTRA_TIME, time);
 			alarmDialog.setArguments(args);
 			return alarmDialog;
@@ -64,8 +69,9 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 			((TextView) view.findViewById(R.id.alarm_time))
 					.setText(getArguments().getString(
 							AlarmMessageActivity.EXTRA_TIME));
-			
-			int period_id = getArguments().getInt(AlarmMessageActivity.EXTRA_PERIOD_ID);
+
+			int period_id = getArguments().getInt(
+					AlarmMessageActivity.EXTRA_PERIOD_ID);
 			Period period = Period.getFromPrefId(period_id);
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
@@ -77,6 +83,12 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 							(OnClickListener) getActivity());
 
 			return builder.create();
+		}
+
+		@Override
+		public void onDismiss(DialogInterface dialog) {
+			super.onDismiss(dialog);
+			((AlarmMessageActivity)getActivity()).cancelAlarm();
 		}
 
 	}
@@ -123,20 +135,77 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	private void dismissNotification() {
 		NotificationManager nm = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
-		nm.cancel(period_label_id);
+		nm.cancel(period_pref_id);
+	}
+	
+	private void stopSound() {
+		if (mMediaPlayer != null) {
+			mMediaPlayer.stop();
+			mMediaPlayer.release();
+			mMediaPlayer = null;
+		}
 	}
 
 	private void cancelAlarm() {
 		dismissNotification();
 		dismisDialog();
+		stopSound();
 		finish();
 	}
 
 	private void snoozeAlarm() {
-		dismissNotification();
-		Toast.makeText(this, R.string.snooze_not_implemented,
+		Settings settings = new Settings(getApplicationContext());
+		Calendar alarm_time = settings.getCalendar(period_pref_id);
+		alarm_time.add(Calendar.MINUTE, 10);
+		Period period = Period.getFromPrefId(period_pref_id);
+		settings.setAlarm(period, alarm_time, true);
+		Toast.makeText(
+				this,
+				getResources().getString(R.string.snooze_set_to)
+						+ settings.formatCalendar(alarm_time),
 				Toast.LENGTH_SHORT).show();
-		finish();
+		cancelAlarm();
+	}
+
+	private void showNotification() {
+		Period period = Period.getFromPrefId(period_pref_id);
+		
+		Intent intentAlarm = new Intent(this, AlarmMessageActivity.class);
+		intentAlarm.setAction(AlarmMessageActivity.ACTION_SHOW_ALARM);
+		intentAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_TIME, time);
+		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID,
+				period.pref_id);
+
+		PendingIntent notifySender = PendingIntent.getActivity(this,
+				period.pref_id, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT);
+
+		Intent intent_cancel = new Intent(this, AlarmMessageActivity.class);
+		intent_cancel.setAction(AlarmMessageActivity.ACTION_CANCEL);
+		PendingIntent cancel_alarm = PendingIntent.getActivity(this, 0,
+				intent_cancel, Intent.FLAG_ACTIVITY_NEW_TASK);
+		Intent intent_snooze = new Intent(this, AlarmMessageActivity.class);
+		intent_snooze.setAction(AlarmMessageActivity.ACTION_SNOOZE);
+		PendingIntent snooze_alarm = PendingIntent.getActivity(this, 1,
+				intent_snooze, Intent.FLAG_ACTIVITY_NEW_TASK);
+
+		NotificationManager nm = (NotificationManager) this
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+		Notification notification = new NotificationCompat.Builder(this)
+				.setSmallIcon(R.drawable.ic_stat_notification)
+				.setContentTitle(this.getString(period.label_id))
+				.setTicker(this.getString(period.label_id))
+				.setWhen(Calendar.getInstance().getTimeInMillis())
+				.setOngoing(true)
+				.setOnlyAlertOnce(true)
+				.setContentIntent(notifySender)
+				.addAction(R.drawable.ic_snooze,
+						this.getString(R.string.snooze), snooze_alarm)
+				.addAction(R.drawable.ic_dismiss,
+						this.getString(R.string.dismiss), cancel_alarm)
+				.build();
+
+		nm.notify(period.pref_id, notification);
 	}
 
 	@Override
@@ -144,13 +213,13 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		super.onCreate(savedInstanceState);
 
 		time = getIntent().getStringExtra(EXTRA_TIME);
-		period_label_id = getIntent().getIntExtra(EXTRA_PERIOD_ID,
+		period_pref_id = getIntent().getIntExtra(EXTRA_PERIOD_ID,
 				R.string.sndp_entrance);
 
-		// Dismiss any previous dialogs and notifications
+		// Dismiss any previous dialogs
 		dismisDialog();
 
-		AlarmDialog dialog = AlarmDialog.newInstance(period_label_id, time);
+		AlarmDialog dialog = AlarmDialog.newInstance(period_pref_id, time);
 		dialog.show(getSupportFragmentManager(), "alarm");
 
 		prepareSound(getApplicationContext(), getAlarmUri());
@@ -159,19 +228,28 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	}
 
 	@Override
+	protected void onStart() {
+		super.onStart();
+		Log.i("alarm", "onStart");
+	}
+
+	@Override
 	protected void onResume() {
 		super.onResume();
+		Log.i("alarm", "onResume");
+		dismissNotification();
 		mMediaPlayer.start();
+		Log.i(getApplication().getPackageName(), "action: " + getIntent().getAction());
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
-		if (isFinishing()) {
-			mMediaPlayer.stop();
-			mMediaPlayer.release();
-			mMediaPlayer = null;
-			dismissNotification();
+		getIntent().setAction("none");
+		if (!isFinishing()) {
+			showNotification();
+		} else {
+			cancelAlarm();
 		}
 	}
 

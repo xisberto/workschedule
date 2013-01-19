@@ -25,7 +25,7 @@
     <string name="alarm_set">Próximo alarme para:</string>
     <string name="dismiss">Dispensar</string>
     <string name="snooze">Soneca</string>
-    <string name="snooze_not_implemented">Função soneca ainda não implementada</string>
+    <string name="snooze_set_to">Soneca para </string>
        
     <string name="title_activity_settings">Preferências</string>
     <string name="lbl_work_time">Tempo total de trabalho</string>

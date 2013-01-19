@@ -167,6 +167,12 @@ public class Settings {
 		return getCalendar(context.getString(pref_id));
 	}
 
+	/**
+	 * Formats {@code cal} in a simple time String using {@link DateFormat}.
+	 * @param cal
+	 * @return a string formated on 24h or 12h according to 
+	 * {@code DateFormat.is24HourFormat}
+	 */
 	public String formatCalendar(Calendar cal) {
 		String inFormat = "hh:mm aa";
 		if (DateFormat.is24HourFormat(context)) {
