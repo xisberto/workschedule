@@ -107,7 +107,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	private void updateLayout() {
 		ListView list = (ListView) findViewById(R.id.list);
-		list.setAdapter(new PeriodAdapter(this, PeriodIds));
+		list.setAdapter(new PeriodListAdapter(this, PeriodIds));
 		list.setOnItemClickListener(this);
 	}
 

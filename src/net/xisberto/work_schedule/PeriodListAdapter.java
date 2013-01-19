@@ -22,11 +22,11 @@ import android.widget.CheckBox;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-public class PeriodAdapter implements ListAdapter {
+public class PeriodListAdapter implements ListAdapter {
 	Context context;
 	private SparseArray<Period> list;
 
-	public PeriodAdapter(Context context, SparseArray<Period> periods) {
+	public PeriodListAdapter(Context context, SparseArray<Period> periods) {
 		this.context = context;
 		list = periods;
 	}
