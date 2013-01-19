@@ -9,36 +9,38 @@
   Contributors:
       Humberto Fraga - initial API and implementation
 -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/RelativeLayout1"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="horizontal"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    android:padding="3dp" >
+    android:paddingEnd="3dp" >
 
     <CheckBox
         android:id="@+id/check_alarm"
-        android:layout_width="50dp"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
+        android:layout_weight="1"
         android:focusable="false"
         android:focusableInTouchMode="false" />
 
     <TextView
         android:id="@+id/period_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/check_alarm"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="3dp"
+        android:layout_weight="5"
+        android:gravity="center|start"
+        android:text="@string/lbl_sndp_entrance"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
         android:id="@+id/period_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:gravity="center|end"
+        android:text="@string/time_zero"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
-</RelativeLayout>
+</LinearLayout>
