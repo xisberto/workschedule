@@ -11,24 +11,36 @@
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <net.xisberto.work_schedule.TimePickerPreference
-        android:key="@string/key_work_time"
-        android:title="@string/lbl_work_time" />
-    <net.xisberto.work_schedule.TimePickerPreference
-        android:key="@string/key_fstp_duration"
-        android:title="@string/lbl_fstp_duration" />
-    <net.xisberto.work_schedule.TimePickerPreference
-        android:key="@string/key_lunch_interval"
-        android:title="@string/lbl_lunch_interval" />
-    <net.xisberto.work_schedule.TimePickerPreference
-        android:key="@string/key_fste_duration"
-        android:title="@string/lbl_fste_duration" />
-    <net.xisberto.work_schedule.TimePickerPreference
-        android:key="@string/key_extra_interval"
-        android:title="@string/lbl_extra_intetrval" />
-    
-    <PreferenceScreen android:title="@string/lbl_about">
-        <intent android:action="net.xisberto.work_schedule.AboutActivity" />
-    </PreferenceScreen>
+    <PreferenceCategory android:title="@string/pref_category_intervals" >
+        <net.xisberto.work_schedule.TimePickerPreference
+            android:key="@string/key_work_time"
+            android:title="@string/lbl_work_time" />
+        <net.xisberto.work_schedule.TimePickerPreference
+            android:key="@string/key_fstp_duration"
+            android:title="@string/lbl_fstp_duration" />
+        <net.xisberto.work_schedule.TimePickerPreference
+            android:key="@string/key_lunch_interval"
+            android:title="@string/lbl_lunch_interval" />
+        <net.xisberto.work_schedule.TimePickerPreference
+            android:key="@string/key_fste_duration"
+            android:title="@string/lbl_fste_duration" />
+        <net.xisberto.work_schedule.TimePickerPreference
+            android:key="@string/key_extra_interval"
+            android:title="@string/lbl_extra_intetrval" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_category_alarm" >
+        <net.xisberto.work_schedule.TimePickerPreference
+            android:key="@string/key_snooze_increment"
+            android:title="@string/lbl_snooze_increment" />
+
+        <RingtonePreference
+            android:key="@string/key_ringtone"
+            android:title="@string/lbl_ringtone" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_category_general" >
+        <PreferenceScreen android:title="@string/lbl_about" >
+            <intent android:action="net.xisberto.work_schedule.AboutActivity" />
+        </PreferenceScreen>
+    </PreferenceCategory>
 
 </PreferenceScreen>

@@ -29,4 +29,7 @@
     <string name="key_ask_for_rating">ask_for_rating</string>
     <string name="key_ask_counter">ask_counter</string>
     
+    <string name="key_snooze_increment">snooze_increment</string>
+    <string name="key_ringtone">ringtone</string>
+    
 </resources>

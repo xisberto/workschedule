@@ -23,6 +23,14 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
 
+/**
+ * @author 00790186373
+ *
+ */
+/**
+ * @author 00790186373
+ * 
+ */
 public class Settings {
 	private Context context;
 	private SharedPreferences prefs;
@@ -76,7 +84,8 @@ public class Settings {
 				.getString(R.string.key_fstp_duration), key_lunch_interval = context
 				.getString(R.string.key_lunch_interval), key_extra_interval = context
 				.getString(R.string.key_extra_interval), key_fste_duration = context
-				.getString(R.string.key_fste_duration);
+				.getString(R.string.key_fste_duration), key_snooze_increment = context
+				.getString(R.string.key_snooze_increment);
 
 		if (!prefs.contains(key_work_time + TimePickerPreference.SUFIX_HOUR)) {
 			editor.putInt(key_work_time + TimePickerPreference.SUFIX_HOUR, 8);
@@ -115,17 +124,24 @@ public class Settings {
 					key_fste_duration + TimePickerPreference.SUFIX_MINUTE, 0);
 		}
 
+		if (!prefs.contains(key_snooze_increment)) {
+			editor.putInt(key_snooze_increment
+					+ TimePickerPreference.SUFIX_HOUR, 0);
+			editor.putInt(key_snooze_increment
+					+ TimePickerPreference.SUFIX_MINUTE, 10);
+		}
+
 		apply(editor);
 	}
 
 	public boolean canAskForRating() {
 		boolean ask_for_rating = prefs.getBoolean(
 				context.getString(R.string.key_ask_for_rating), true);
-		//If shouldn't ask, exit without any other calculation
+		// If shouldn't ask, exit without any other calculation
 		if (ask_for_rating == false) {
 			return false;
 		}
-		//After 8 iterations, will begin to ask
+		// After 8 iterations, will begin to ask
 		int ask_counter = prefs.getInt(
 				context.getString(R.string.key_ask_counter), 0);
 		if (ask_counter < 8) {
@@ -134,7 +150,7 @@ public class Settings {
 					context.getString(R.string.key_ask_counter), ask_counter));
 			return false;
 		} else if (Math.random() >= 0.6) {
-			//After the 8 iterations, have a 40% chance of asking
+			// After the 8 iterations, have a 40% chance of asking
 			return ask_for_rating;
 		}
 		return false;
@@ -146,6 +162,16 @@ public class Settings {
 		apply(editor);
 	}
 
+	/**
+	 * Builds a {@link Calendar} with date equals as the actual day, hour and
+	 * minute as specified and seconds and milliseconds set to zero.
+	 * 
+	 * @param hour
+	 *            the hour for the {@link Calendar}
+	 * @param minute
+	 *            the minute for the {@link Calendar}
+	 * @return the {@link Calendar} built
+	 */
 	public Calendar getCalendarFromTime(int hour, int minute) {
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.HOUR_OF_DAY, hour);
@@ -155,6 +181,16 @@ public class Settings {
 		return cal;
 	}
 
+	/**
+	 * Returns the Calendar with the alarm for a preference.
+	 * 
+	 * @param key
+	 *            the key of the preference
+	 * @return the Calendar for this preference. The date is the actual day, and
+	 *         the hour and minute are the specified on the key (see
+	 *         {@link TimePickerPreference} to Work Schedule's time
+	 *         preferences).
+	 */
 	public Calendar getCalendar(String key) {
 		int hour = prefs.getInt(key + TimePickerPreference.SUFIX_HOUR,
 				TimePickerPreference.DEFAULT_HOUR);
@@ -163,15 +199,27 @@ public class Settings {
 		return getCalendarFromTime(hour, minute);
 	}
 
+	/**
+	 * Return a Calendar with the alarm for a preference
+	 * 
+	 * @param pref_id
+	 *            the id for the preference, as defined on the project's
+	 *            resources.
+	 * @return the Calendar for this preference. The date is the actual day, and
+	 *         the hour and minute are the specified on the key (see
+	 *         {@link TimePickerPreference} to Work Schedule's time
+	 *         preferences).
+	 */
 	public Calendar getCalendar(int pref_id) {
 		return getCalendar(context.getString(pref_id));
 	}
 
 	/**
 	 * Formats {@code cal} in a simple time String using {@link DateFormat}.
+	 * 
 	 * @param cal
-	 * @return a string formated on 24h or 12h according to 
-	 * {@code DateFormat.is24HourFormat}
+	 * @return a string formated on 24h or 12h according to
+	 *         {@code DateFormat.is24HourFormat}
 	 */
 	public String formatCalendar(Calendar cal) {
 		String inFormat = "hh:mm aa";

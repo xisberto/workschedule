@@ -41,5 +41,12 @@
     <string name="no">No</string>
     
     <string name="author_name">Created by Humberto Fraga, based on an idea by Marcos Lacerda</string>
+    
+    <string name="pref_category_intervals">Intervals</string>
+    <string name="pref_category_alarm">Alarm</string>
+    <string name="pref_category_general">General</string>
+
+    <string name="lbl_snooze_increment">Snooze increment</string>
+    <string name="lbl_ringtone">Ringtone</string>
 
 </resources>

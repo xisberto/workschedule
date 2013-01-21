@@ -14,84 +14,47 @@ import java.io.IOException;
 import java.util.Calendar;
 
 import net.xisberto.work_schedule.Settings.Period;
-import android.app.AlertDialog;
-import android.app.Dialog;
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.DialogInterface.OnClickListener;
+import android.graphics.Point;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Display;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 public class AlarmMessageActivity extends SherlockFragmentActivity implements
-		DialogInterface.OnClickListener {
+		OnTouchListener {
 	public static final String EXTRA_TIME = "time",
 			EXTRA_PERIOD_ID = "period_id",
-			ACTION_SHOW_ALARM = "net.xisberto.workschedule.showalarm",
-			ACTION_CANCEL = "net.xisberto.workschedule.cancel",
-			ACTION_SNOOZE = "net.xisberto.workschedule.snooze";
+			ACTION_SHOW_ALARM = "net.xisberto.workschedule.showalarm";
+	private static final String DEBUG_TAG = "net.xisberto.workschedule";
 	private MediaPlayer mMediaPlayer;
-	private String time;
 	private int period_pref_id;
-
-	public static class AlarmDialog extends SherlockDialogFragment {
-
-		public static AlarmDialog newInstance(int period_id, String time) {
-			AlarmDialog alarmDialog = new AlarmDialog();
-			Bundle args = new Bundle();
-			args.putInt(AlarmMessageActivity.EXTRA_PERIOD_ID, period_id);
-			args.putString(AlarmMessageActivity.EXTRA_TIME, time);
-			alarmDialog.setArguments(args);
-			return alarmDialog;
-		}
-
-		@Override
-		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			LayoutInflater inflater = (LayoutInflater) getActivity()
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			View view = inflater.inflate(R.layout.activity_alarm_message, null);
-			((TextView) view.findViewById(R.id.alarm_time))
-					.setText(getArguments().getString(
-							AlarmMessageActivity.EXTRA_TIME));
-
-			int period_id = getArguments().getInt(
-					AlarmMessageActivity.EXTRA_PERIOD_ID);
-			Period period = Period.getFromPrefId(period_id);
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-					.setView(view)
-					.setTitle(period.label_id)
-					.setPositiveButton(R.string.dismiss,
-							(OnClickListener) getActivity())
-					.setNegativeButton(R.string.snooze,
-							(OnClickListener) getActivity());
-
-			return builder.create();
-		}
-
-		@Override
-		public void onDismiss(DialogInterface dialog) {
-			super.onDismiss(dialog);
-			((AlarmMessageActivity)getActivity()).cancelAlarm();
-		}
-
-	}
+	private TextView text_snooze;
+	private TextView text_dismiss;
+	private int deltaY;
+	private boolean has_snoozed;
+	private Settings settings;
 
 	// Get an alarm sound. Try for an alarm. If none set, try notification,
 	// Otherwise, ringtone.
@@ -117,18 +80,11 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 					.getSystemService(Context.AUDIO_SERVICE);
 			if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
 				mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+				mMediaPlayer.setLooping(true);
 				mMediaPlayer.prepare();
 			}
 		} catch (IOException e) {
 			System.out.println("OOPS");
-		}
-	}
-
-	private void dismisDialog() {
-		AlarmDialog dialog = (AlarmDialog) getSupportFragmentManager()
-				.findFragmentByTag("alarm");
-		if (dialog != null) {
-			dialog.dismiss();
 		}
 	}
 
@@ -137,7 +93,7 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 		nm.cancel(period_pref_id);
 	}
-	
+
 	private void stopSound() {
 		if (mMediaPlayer != null) {
 			mMediaPlayer.stop();
@@ -147,21 +103,22 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	}
 
 	private void cancelAlarm() {
-		dismissNotification();
-		dismisDialog();
 		stopSound();
 		finish();
 	}
 
 	private void snoozeAlarm() {
-		Settings settings = new Settings(getApplicationContext());
+		has_snoozed = true;
+		settings = new Settings(getApplicationContext());
 		Calendar alarm_time = settings.getCalendar(period_pref_id);
-		alarm_time.add(Calendar.MINUTE, 10);
+		Calendar snooze_increment = settings.getCalendar(R.string.key_snooze_increment);
+		alarm_time.add(Calendar.HOUR_OF_DAY, snooze_increment.get(Calendar.HOUR_OF_DAY));
+		alarm_time.add(Calendar.MINUTE, snooze_increment.get(Calendar.MINUTE));
 		Period period = Period.getFromPrefId(period_pref_id);
 		settings.setAlarm(period, alarm_time, true);
 		Toast.makeText(
 				this,
-				getResources().getString(R.string.snooze_set_to)
+				getResources().getString(R.string.snooze_set_to) + " "
 						+ settings.formatCalendar(alarm_time),
 				Toast.LENGTH_SHORT).show();
 		cancelAlarm();
@@ -169,40 +126,25 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 
 	private void showNotification() {
 		Period period = Period.getFromPrefId(period_pref_id);
-		
+
 		Intent intentAlarm = new Intent(this, AlarmMessageActivity.class);
 		intentAlarm.setAction(AlarmMessageActivity.ACTION_SHOW_ALARM);
-		intentAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_TIME, time);
-		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID,
-				period.pref_id);
+		intentAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 
 		PendingIntent notifySender = PendingIntent.getActivity(this,
-				period.pref_id, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT);
-
-		Intent intent_cancel = new Intent(this, AlarmMessageActivity.class);
-		intent_cancel.setAction(AlarmMessageActivity.ACTION_CANCEL);
-		PendingIntent cancel_alarm = PendingIntent.getActivity(this, 0,
-				intent_cancel, Intent.FLAG_ACTIVITY_NEW_TASK);
-		Intent intent_snooze = new Intent(this, AlarmMessageActivity.class);
-		intent_snooze.setAction(AlarmMessageActivity.ACTION_SNOOZE);
-		PendingIntent snooze_alarm = PendingIntent.getActivity(this, 1,
-				intent_snooze, Intent.FLAG_ACTIVITY_NEW_TASK);
+				period.pref_id, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
 
 		NotificationManager nm = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
+		
 		Notification notification = new NotificationCompat.Builder(this)
 				.setSmallIcon(R.drawable.ic_stat_notification)
 				.setContentTitle(this.getString(period.label_id))
 				.setTicker(this.getString(period.label_id))
-				.setWhen(Calendar.getInstance().getTimeInMillis())
+				.setWhen(settings.getCalendar(period_pref_id).getTimeInMillis())
 				.setOngoing(true)
 				.setOnlyAlertOnce(true)
 				.setContentIntent(notifySender)
-				.addAction(R.drawable.ic_snooze,
-						this.getString(R.string.snooze), snooze_alarm)
-				.addAction(R.drawable.ic_dismiss,
-						this.getString(R.string.dismiss), cancel_alarm)
 				.build();
 
 		nm.notify(period.pref_id, notification);
@@ -211,20 +153,27 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_alarm_message);
+		Log.i("alarm", "onCreate");
+		
+		has_snoozed = false;
 
-		time = getIntent().getStringExtra(EXTRA_TIME);
 		period_pref_id = getIntent().getIntExtra(EXTRA_PERIOD_ID,
-				R.string.sndp_entrance);
+				R.string.fstp_entrance);
+		settings = new Settings(getApplicationContext());
+		String time = settings.formatCalendar(settings.getCalendar(period_pref_id));
 
-		// Dismiss any previous dialogs
-		dismisDialog();
+		((TextView) findViewById(R.id.txt_alarm_label)).setText(Period
+				.getFromPrefId(period_pref_id).label_id);
+		((TextView) findViewById(R.id.txt_alarm_time)).setText(time);
 
-		AlarmDialog dialog = AlarmDialog.newInstance(period_pref_id, time);
-		dialog.show(getSupportFragmentManager(), "alarm");
+		text_snooze = (TextView) findViewById(R.id.txt_snooze);
+		text_dismiss = (TextView) findViewById(R.id.txt_dismiss);
+		text_snooze.setOnTouchListener(this);
+		text_dismiss.setOnTouchListener(this);
 
 		prepareSound(getApplicationContext(), getAlarmUri());
 
-		Log.i("alarm", "onCreate");
 	}
 
 	@Override
@@ -238,28 +187,108 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		super.onResume();
 		Log.i("alarm", "onResume");
 		dismissNotification();
-		mMediaPlayer.start();
-		Log.i(getApplication().getPackageName(), "action: " + getIntent().getAction());
+		if (!mMediaPlayer.isPlaying()) {
+			mMediaPlayer.start();
+		}
+		Log.i(getApplication().getPackageName(), "action: "
+				+ getIntent().getAction());
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
-		getIntent().setAction("none");
-		if (!isFinishing()) {
-			showNotification();
-		} else {
+		if (isFinishing()) {
 			cancelAlarm();
+		} else {
+			showNotification();
 		}
 	}
 
+	@SuppressLint("NewApi")
+	@SuppressWarnings("deprecation")
 	@Override
-	public void onClick(DialogInterface dialog, int which) {
-		switch (which) {
-		case AlertDialog.BUTTON_NEGATIVE:
-			snoozeAlarm();
-		case AlertDialog.BUTTON_POSITIVE:
-			cancelAlarm();
+	public boolean onTouch(View view, MotionEvent event) {
+		boolean is_snooze;
+
+		if ((view.getId() != R.id.txt_snooze) && (view.getId() != R.id.txt_dismiss)) {
+			return false;
+		}
+
+		is_snooze = view.getId() == R.id.txt_snooze;
+
+		View other_view;
+		if (is_snooze) {
+			other_view = text_dismiss;
+		} else {
+			other_view = text_snooze;
+		}
+		RelativeLayout.LayoutParams params = (LayoutParams) view.getLayoutParams();
+		RelativeLayout.LayoutParams other_params = (LayoutParams) other_view.getLayoutParams();
+		
+		final int rawY = (int) event.getRawY();
+
+		int action = MotionEventCompat.getActionMasked(event);
+		switch (action) {
+		case (MotionEvent.ACTION_DOWN):
+			deltaY = rawY;
+			Log.d(DEBUG_TAG, "deltaY: " + deltaY);
+			return true;
+		case (MotionEvent.ACTION_MOVE):
+			Log.d(DEBUG_TAG, "deltaY: " + deltaY);
+			Log.d(DEBUG_TAG, "rawY: " + rawY);
+
+			int screenHeight = 0;
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+				Point size = new Point();
+				getWindowManager().getDefaultDisplay().getSize(size);
+				screenHeight = size.y;
+			} else {
+				Display d = getWindowManager().getDefaultDisplay();
+				screenHeight = d.getHeight();
+			}
+			
+			if (is_snooze) {
+				params.topMargin = rawY - deltaY;
+				other_params.bottomMargin = deltaY - rawY;
+				
+				if (params.topMargin > (screenHeight / 3)) {
+					if (!has_snoozed) {
+						snoozeAlarm();
+					}
+				}
+				Log.d(DEBUG_TAG, "topMargin: " + (rawY - deltaY));
+			} else {
+				params.bottomMargin = deltaY - rawY;
+				other_params.topMargin = rawY - deltaY;
+				
+				if (params.bottomMargin > (screenHeight / 3)) {
+					cancelAlarm();
+				}
+				Log.d(DEBUG_TAG, "botomMargin: " + (deltaY - rawY));
+			}
+			
+			view.setLayoutParams(params);
+			findViewById(R.id.alarm_layout_root).invalidate();
+			return true;
+		case (MotionEvent.ACTION_UP):
+		case (MotionEvent.ACTION_CANCEL):
+			if (is_snooze) {
+				params.topMargin = 0;
+				other_params.bottomMargin = 0;
+				text_dismiss.setVisibility(View.VISIBLE);
+			} else {
+				params.bottomMargin = 0;
+				other_params.topMargin = 0;
+				text_snooze.setVisibility(View.VISIBLE);
+			}
+			view.setLayoutParams(params);
+			return true;
+		case (MotionEvent.ACTION_OUTSIDE):
+			Log.d(DEBUG_TAG, "Movement occurred outside bounds "
+					+ "of current screen element");
+			return true;
+		default:
+			return super.onTouchEvent(event);
 		}
 	}
 

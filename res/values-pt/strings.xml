@@ -41,4 +41,11 @@
     <string name="no">Não</string>
     
     <string name="author_name">Criado por Humberto Fraga, baseado em uma ideia de Marcos Lacerda</string>
+    
+    <string name="pref_category_intervals">Intervalos</string>
+    <string name="pref_category_alarm">Alarme</string>
+    <string name="pref_category_general">Geral</string>
+
+    <string name="lbl_snooze_increment">Incremento da soneca</string>
+    <string name="lbl_ringtone">Toque do alarme</string>
 </resources>

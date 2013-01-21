@@ -9,7 +9,7 @@
   Contributors:
       Humberto Fraga - initial API and implementation
 -->
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 	<style name="AppTheme" parent="Theme.Sherlock.Light.DarkActionBar">
         <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
         <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar</item>
@@ -23,6 +23,27 @@
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <style name="apptheme_SlideText" parent="@android:style/TextAppearance.Large">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:layout_width">match_parent</item>
+    </style>
+    
+    <style name="apptheme_SlideSnooze" parent="apptheme_SlideText">
+        <item name="android:background">@color/snooze</item>
+        <item name="android:drawableBottom">@drawable/ic_snooze</item>
+        <item name="android:drawableLeft">@drawable/ic_arrow_down</item>
+        <item name="android:drawableRight">@drawable/ic_arrow_down</item>
+    </style>
+    
+    <style name="apptheme_SlideDismiss" parent="apptheme_SlideText">
+        <item name="android:background">@color/dismiss</item>
+        <item name="android:drawableTop">@drawable/ic_dismiss</item>
+        <item name="android:drawableLeft">@drawable/ic_arrow_up</item>
+        <item name="android:drawableRight">@drawable/ic_arrow_up</item>
     </style>
 
 </resources>
