@@ -23,14 +23,6 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
 
-/**
- * @author 00790186373
- *
- */
-/**
- * @author 00790186373
- * 
- */
 public class Settings {
 	private Context context;
 	private SharedPreferences prefs;
@@ -284,4 +276,7 @@ public class Settings {
 		setAlarm(period, getCalendar(period.pref_id), false);
 	}
 
+	public String getRingtone() {
+		return prefs.getString(context.getResources().getString(R.string.key_ringtone), null);
+	}
 }

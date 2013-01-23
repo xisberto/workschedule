@@ -32,4 +32,7 @@
     <string name="key_snooze_increment">snooze_increment</string>
     <string name="key_ringtone">ringtone</string>
     
+    <string name="action_settings_intervals">net.xisberto.work_schedule.settings.intervals</string>
+    <string name="action_settings_alarm">net.xisberto.work_schedule.settings.alarm</string>
+    
 </resources>
