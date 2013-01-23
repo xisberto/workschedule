@@ -18,9 +18,9 @@
 
     <CheckBox
         android:id="@+id/check_alarm"
-        android:layout_width="0dp"
+        android:layout_width="48dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"
+        android:layout_weight="0"
         android:focusable="false"
         android:focusableInTouchMode="false" />
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <net.xisberto.work_schedule.TimePickerPreference
+        android:key="@string/key_snooze_increment"
+        android:title="@string/lbl_snooze_increment" />
+
+    <RingtonePreference
+        android:key="@string/key_ringtone"
+        android:ringtoneType="alarm"
+        android:showDefault="true"
+        android:showSilent="true"
+        android:title="@string/lbl_ringtone" />
+
+</PreferenceScreen>

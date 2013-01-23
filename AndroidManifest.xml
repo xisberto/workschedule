@@ -60,16 +60,11 @@
         <activity
             android:name="AboutActivity"
             android:label="@string/lbl_about"
-            android:parentActivityName="net.xisberto.work_schedule.SettingsActivity" >
-            <intent-filter>
-                <action android:name="net.xisberto.work_schedule.AboutActivity" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            android:parentActivityName="net.xisberto.work_schedule.MainActivity" >
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="net.xisberto.work_schedule.SettingsActivity" />
+                android:value="net.xisberto.work_schedule.MainActivity" />
         </activity>
     </application>
 
