@@ -56,16 +56,22 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	private boolean has_snoozed;
 	private Settings settings;
 
-	// Get an alarm sound. Try for an alarm. If none set, try notification,
-	// Otherwise, ringtone.
+	// Get an alarm sound. Try for saved user option. If none set, try default
+	// alarm, notification, or ringtone.
 	private Uri getAlarmUri() {
-		Uri alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-		if (alert == null) {
-			alert = RingtoneManager
-					.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+		String ringtone = settings.getRingtone();
+		Uri alert = null;
+		if (ringtone != null) {
+			alert = Uri.parse(ringtone);
+		} else {
+			alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
 			if (alert == null) {
 				alert = RingtoneManager
-						.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+						.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+				if (alert == null) {
+					alert = RingtoneManager
+							.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+				}
 			}
 		}
 		return alert;
@@ -111,8 +117,10 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		has_snoozed = true;
 		settings = new Settings(getApplicationContext());
 		Calendar alarm_time = settings.getCalendar(period_pref_id);
-		Calendar snooze_increment = settings.getCalendar(R.string.key_snooze_increment);
-		alarm_time.add(Calendar.HOUR_OF_DAY, snooze_increment.get(Calendar.HOUR_OF_DAY));
+		Calendar snooze_increment = settings
+				.getCalendar(R.string.key_snooze_increment);
+		alarm_time.add(Calendar.HOUR_OF_DAY,
+				snooze_increment.get(Calendar.HOUR_OF_DAY));
 		alarm_time.add(Calendar.MINUTE, snooze_increment.get(Calendar.MINUTE));
 		Period period = Period.getFromPrefId(period_pref_id);
 		settings.setAlarm(period, alarm_time, true);
@@ -129,23 +137,22 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 
 		Intent intentAlarm = new Intent(this, AlarmMessageActivity.class);
 		intentAlarm.setAction(AlarmMessageActivity.ACTION_SHOW_ALARM);
-		intentAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+		intentAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+				| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 
 		PendingIntent notifySender = PendingIntent.getActivity(this,
 				period.pref_id, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
 
 		NotificationManager nm = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
-		
+
 		Notification notification = new NotificationCompat.Builder(this)
 				.setSmallIcon(R.drawable.ic_stat_notification)
 				.setContentTitle(this.getString(period.label_id))
 				.setTicker(this.getString(period.label_id))
 				.setWhen(settings.getCalendar(period_pref_id).getTimeInMillis())
-				.setOngoing(true)
-				.setOnlyAlertOnce(true)
-				.setContentIntent(notifySender)
-				.build();
+				.setOngoing(true).setOnlyAlertOnce(true)
+				.setContentIntent(notifySender).build();
 
 		nm.notify(period.pref_id, notification);
 	}
@@ -155,13 +162,14 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_alarm_message);
 		Log.i("alarm", "onCreate");
-		
+
 		has_snoozed = false;
 
 		period_pref_id = getIntent().getIntExtra(EXTRA_PERIOD_ID,
 				R.string.fstp_entrance);
 		settings = new Settings(getApplicationContext());
-		String time = settings.formatCalendar(settings.getCalendar(period_pref_id));
+		String time = settings.formatCalendar(settings
+				.getCalendar(period_pref_id));
 
 		((TextView) findViewById(R.id.txt_alarm_label)).setText(Period
 				.getFromPrefId(period_pref_id).label_id);
@@ -210,7 +218,8 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	public boolean onTouch(View view, MotionEvent event) {
 		boolean is_snooze;
 
-		if ((view.getId() != R.id.txt_snooze) && (view.getId() != R.id.txt_dismiss)) {
+		if ((view.getId() != R.id.txt_snooze)
+				&& (view.getId() != R.id.txt_dismiss)) {
 			return false;
 		}
 
@@ -222,9 +231,11 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		} else {
 			other_view = text_snooze;
 		}
-		RelativeLayout.LayoutParams params = (LayoutParams) view.getLayoutParams();
-		RelativeLayout.LayoutParams other_params = (LayoutParams) other_view.getLayoutParams();
-		
+		RelativeLayout.LayoutParams params = (LayoutParams) view
+				.getLayoutParams();
+		RelativeLayout.LayoutParams other_params = (LayoutParams) other_view
+				.getLayoutParams();
+
 		final int rawY = (int) event.getRawY();
 
 		int action = MotionEventCompat.getActionMasked(event);
@@ -246,11 +257,16 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 				Display d = getWindowManager().getDefaultDisplay();
 				screenHeight = d.getHeight();
 			}
-			
+
 			if (is_snooze) {
+				if (rawY - deltaY < 0) {
+					params.topMargin = 0;
+					other_params.bottomMargin = 0;
+					return false;
+				}
 				params.topMargin = rawY - deltaY;
 				other_params.bottomMargin = deltaY - rawY;
-				
+
 				if (params.topMargin > (screenHeight / 3)) {
 					if (!has_snoozed) {
 						snoozeAlarm();
@@ -258,15 +274,20 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 				}
 				Log.d(DEBUG_TAG, "topMargin: " + (rawY - deltaY));
 			} else {
+				if (deltaY - rawY < 0) {
+					params.bottomMargin = 0;
+					other_params.topMargin = 0;
+					return false;
+				}
 				params.bottomMargin = deltaY - rawY;
 				other_params.topMargin = rawY - deltaY;
-				
+
 				if (params.bottomMargin > (screenHeight / 3)) {
 					cancelAlarm();
 				}
 				Log.d(DEBUG_TAG, "botomMargin: " + (deltaY - rawY));
 			}
-			
+
 			view.setLayoutParams(params);
 			findViewById(R.id.alarm_layout_root).invalidate();
 			return true;
@@ -275,11 +296,9 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 			if (is_snooze) {
 				params.topMargin = 0;
 				other_params.bottomMargin = 0;
-				text_dismiss.setVisibility(View.VISIBLE);
 			} else {
 				params.bottomMargin = 0;
 				other_params.topMargin = 0;
-				text_snooze.setVisibility(View.VISIBLE);
 			}
 			view.setLayoutParams(params);
 			return true;
