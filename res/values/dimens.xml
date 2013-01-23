@@ -11,5 +11,6 @@
 -->
 <resources>
     <dimen name="border_padding">5dp</dimen>
+    <dimen name="slider_margin">0dp</dimen>
     
 </resources>

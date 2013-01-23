@@ -20,15 +20,14 @@
     </style>
 
     <style name="AppTheme.NoActionBar" parent="Theme.Sherlock.NoActionBar">
-        <item name="android:colorBackgroundCacheHint">@null</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowContentOverlay">@null</item>
     </style>
 
     <style name="apptheme_SlideText" parent="@android:style/TextAppearance.Large">
         <item name="android:textColor">@android:color/black</item>
         <item name="android:gravity">center_horizontal</item>
         <item name="android:padding">5dp</item>
+        <item name="android:layout_marginLeft">@dimen/slider_margin</item>
+        <item name="android:layout_marginRight">@dimen/slider_margin</item>
         <item name="android:layout_width">match_parent</item>
     </style>
     
