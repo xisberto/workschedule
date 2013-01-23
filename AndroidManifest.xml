@@ -11,8 +11,8 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.xisberto.work_schedule"
-    android:versionCode="109"
-    android:versionName="1.1.0 beta" >
+    android:versionCode="100"
+    android:versionName="1.0.0" >
 
     <uses-sdk
         android:minSdkVersion="7"
@@ -61,6 +61,12 @@
             android:name="AboutActivity"
             android:label="@string/lbl_about"
             android:parentActivityName="net.xisberto.work_schedule.SettingsActivity" >
+            <intent-filter>
+                <action android:name="net.xisberto.work_schedule.AboutActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.xisberto.work_schedule.SettingsActivity" />
