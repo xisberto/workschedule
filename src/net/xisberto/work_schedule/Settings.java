@@ -237,21 +237,30 @@ public class Settings {
 	}
 
 	/**
-	 * Set a new alarm
+	 * Set a new alarm or cancel a existing one. The alarm won't be set if the
+	 * Calendar passed is before now.
 	 * 
-	 * @param context
-	 *            the {@link Context} in which the alarm will start
 	 * @param period
 	 *            the {@link Period} related to the alarm
 	 * @param cal
-	 *            the time when the alarm will start
+	 *            the time when the alarm will start. If it´s before now, no
+	 *            alarm will be set. If {@link enabled} is false, {@link cal}
+	 *            will be ignored.
+	 * @param enabled
+	 *            if true, the alarm will be set. If false, the alarm will be
+	 *            cancelled {@link AlarmManager.cancel}
 	 */
 	public void setAlarm(Period period, Calendar cal, boolean enabled) {
 		// Save the time and the status to the SharedPreferences
+		// Even if the alarm won't be set, we must show it for the user
 		Editor editor = prefs.edit();
 		saveCalendar(cal, context.getString(period.pref_id));
 		editor.putBoolean(context.getString(period.pref_id) + ".isset", enabled);
 		apply(editor);
+		
+		if (cal.before(Calendar.getInstance())) {
+			return;
+		}
 
 		// Set or cancel the alarm
 		String time = formatCalendar(cal);
@@ -277,6 +286,7 @@ public class Settings {
 	}
 
 	public String getRingtone() {
-		return prefs.getString(context.getResources().getString(R.string.key_ringtone), null);
+		return prefs.getString(
+				context.getResources().getString(R.string.key_ringtone), null);
 	}
 }
