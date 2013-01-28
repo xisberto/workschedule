@@ -16,7 +16,6 @@ import net.xisberto.work_schedule.Settings.Period;
 import net.xisberto.work_schedule.TimePickerFragment.OnTimePickerSetListener;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.AdapterView;
@@ -150,7 +149,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-		Log.i("", "OnItemClick view: "+v.getClass().getCanonicalName());
 		TimePickerFragment dialog = TimePickerFragment.newInstance(Period
 				.values()[position].pref_id);
 		dialog.show(getSupportFragmentManager(), "time_picker");
