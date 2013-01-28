@@ -255,11 +255,16 @@ public class Settings {
 		// Even if the alarm won't be set, we must show it for the user
 		Editor editor = prefs.edit();
 		saveCalendar(cal, context.getString(period.pref_id));
-		editor.putBoolean(context.getString(period.pref_id) + ".isset", enabled);
-		apply(editor);
-		
+		// If cal is before now, the alarm is'nt set and we just return
 		if (cal.before(Calendar.getInstance())) {
+			editor.putBoolean(context.getString(period.pref_id) + ".isset",
+					false);
+			apply(editor);
 			return;
+		} else {
+			editor.putBoolean(context.getString(period.pref_id) + ".isset",
+					enabled);
+			apply(editor);
 		}
 
 		// Set or cancel the alarm
