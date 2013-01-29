@@ -116,7 +116,8 @@ public class Settings {
 					key_fste_duration + TimePickerPreference.SUFIX_MINUTE, 0);
 		}
 
-		if (!prefs.contains(key_snooze_increment)) {
+		if (!prefs.contains(key_snooze_increment
+				+ TimePickerPreference.SUFIX_HOUR)) {
 			editor.putInt(key_snooze_increment
 					+ TimePickerPreference.SUFIX_HOUR, 0);
 			editor.putInt(key_snooze_increment
