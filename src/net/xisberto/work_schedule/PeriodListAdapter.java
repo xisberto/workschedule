@@ -19,8 +19,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
@@ -74,18 +72,13 @@ public class PeriodListAdapter implements ListAdapter {
 
 		CheckBox check_alarm = (CheckBox) view.findViewById(R.id.check_alarm);
 		check_alarm.setChecked(settings.isAlarmSet(period.pref_id));
-		check_alarm.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) {
-				settings.setAlarm(period,
-						settings.getCalendar(period_pref_key), isChecked);
-			}
-		});
 		check_alarm.setOnClickListener(new OnClickListener() {
 
 			@Override
-			public void onClick(View clicked_view) {
+			public void onClick(View view) {
+				settings.setAlarm(period,
+						settings.getCalendar(period_pref_key),
+						((CheckBox) view).isChecked());
 			}
 		});
 
