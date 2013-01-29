@@ -75,10 +75,10 @@ public class PeriodListAdapter implements ListAdapter {
 		check_alarm.setOnClickListener(new OnClickListener() {
 
 			@Override
-			public void onClick(View view) {
+			public void onClick(View check_box) {
 				settings.setAlarm(period,
 						settings.getCalendar(period_pref_key),
-						((CheckBox) view).isChecked());
+						((CheckBox) check_box).isChecked());
 			}
 		});
 
