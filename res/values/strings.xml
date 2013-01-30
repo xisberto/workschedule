@@ -48,5 +48,9 @@
 
     <string name="lbl_snooze_increment">Snooze increment</string>
     <string name="lbl_ringtone">Ringtone</string>
+    
+    <string name="text_source">Work Schedule is an open-source app. It\'s code can be accessed on Github</string>
+    <string name="btn_open_link">Open link</string>
+    <string name="btn_share_link">Share link</string>
 
 </resources>

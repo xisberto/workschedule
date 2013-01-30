@@ -33,6 +33,10 @@ public class AboutActivity extends SherlockActivity {
 			versionName= "";
 		}
 		((TextView)findViewById(R.id.text_app_version)).setText(versionName);
+		
+		AboutLinkClickListener click_listener = new AboutLinkClickListener(this);
+		findViewById(R.id.btn_open_link).setOnClickListener(click_listener);
+		findViewById(R.id.btn_share_link).setOnClickListener(click_listener);
 	}
 
 	@Override

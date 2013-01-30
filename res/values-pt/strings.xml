@@ -48,4 +48,9 @@
 
     <string name="lbl_snooze_increment">Incremento da soneca</string>
     <string name="lbl_ringtone">Toque do alarme</string>
+    
+    <string name="text_source">Work Schedule é um aplicativo de código aberto. Seu código pode ser acessado no Github</string>
+    <string name="btn_open_link">Abrir link</string>
+    <string name="btn_share_link">Compartilhar link</string>
+
 </resources>
