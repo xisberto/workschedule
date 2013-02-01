@@ -28,27 +28,26 @@
     <string name="snooze_set_to">Soneca para </string>
        
     <string name="title_activity_settings">Preferências</string>
+    <string name="pref_category_intervals">Intervalos</string>
+    <string name="pref_category_alarm">Alarme</string>
+    <string name="pref_category_about">Sobre</string>
+    
     <string name="lbl_work_time">Tempo total de trabalho</string>
     <string name="lbl_lunch_interval">Intervalo de almoço</string>
     <string name="lbl_extra_intetrval">Intervalo da hora extra</string>
     <string name="lbl_fstp_duration">Duração do 1º Período</string>
     <string name="lbl_fste_duration">Duração do 1º Extra</string>
-    <string name="lbl_about">Sobre</string>
-    
+    <string name="lbl_mark_extra">Marcar Período Extra</string>
+
+    <string name="lbl_snooze_increment">Incremento da soneca</string>
+    <string name="lbl_ringtone">Toque do alarme</string>
+        
     <string name="msg_rating">Você quer avaliar o Work Schedule na Play Store?</string>
     <string name="yes">Sim</string>
     <string name="later">Depois</string>
     <string name="no">Não</string>
     
     <string name="author_name">Criado por Humberto Fraga, baseado em uma ideia de Marcos Lacerda</string>
-    
-    <string name="pref_category_intervals">Intervalos</string>
-    <string name="pref_category_alarm">Alarme</string>
-    <string name="pref_category_general">Geral</string>
-
-    <string name="lbl_snooze_increment">Incremento da soneca</string>
-    <string name="lbl_ringtone">Toque do alarme</string>
-    
     <string name="text_source">Work Schedule é um aplicativo de código aberto. Seu código pode ser acessado no Github</string>
     <string name="btn_open_link">Abrir link</string>
     <string name="btn_share_link">Compartilhar link</string>

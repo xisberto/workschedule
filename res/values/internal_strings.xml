@@ -25,6 +25,8 @@
     <string name="key_extra_interval">extra_interval</string>
     <string name="key_fstp_duration">fstp_duration</string>
     <string name="key_fste_duration">fste_duration</string>
+    
+    <string name="key_mark_extra">mark_extra</string>
 
     <string name="key_ask_for_rating">ask_for_rating</string>
     <string name="key_ask_counter">ask_counter</string>

@@ -59,7 +59,7 @@
 
         <activity
             android:name="AboutActivity"
-            android:label="@string/lbl_about"
+            android:label="@string/pref_category_about"
             android:parentActivityName="net.xisberto.work_schedule.MainActivity" >
 
             <meta-data

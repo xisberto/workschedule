@@ -22,7 +22,7 @@
     </header>
     <header
         android:fragment="net.xisberto.work_schedule.SettingsActivity$AboutFragment"
-        android:title="@string/lbl_about" >
-        <extra android:name="category" android:value="@string/lbl_about" />
+        android:title="@string/pref_category_about" >
+        <extra android:name="category" android:value="@string/pref_category_about" />
     </header>
 </preference-headers>
