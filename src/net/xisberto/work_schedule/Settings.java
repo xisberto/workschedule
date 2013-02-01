@@ -296,11 +296,11 @@ public class Settings {
 	}
 
 	public String getRingtone() {
-		return prefs.getString(
-				context.getString(R.string.key_ringtone), null);
+		return prefs.getString(context.getString(R.string.key_ringtone), null);
 	}
-	
+
 	public boolean getMarkExtra() {
-		return prefs.getBoolean(context.getString(R.string.key_mark_extra), false);
+		return prefs.getBoolean(context.getString(R.string.key_mark_extra),
+				false);
 	}
 }
