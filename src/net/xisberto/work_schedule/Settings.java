@@ -269,11 +269,9 @@ public class Settings {
 		}
 
 		// Set or cancel the alarm
-		String time = formatCalendar(cal);
 		Intent intentAlarm = new Intent(context, AlarmReceiver.class);
 		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID,
 				period.pref_id);
-		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_TIME, time);
 		PendingIntent alarmSender = PendingIntent.getBroadcast(context,
 				period.pref_id, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
 

@@ -17,23 +17,19 @@ import android.content.Intent;
 import android.os.Bundle;
 
 public class AlarmReceiver extends BroadcastReceiver {
-	public AlarmReceiver() {
-	}
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Bundle extras = intent.getExtras();
 		int pref_id = extras.getInt(AlarmMessageActivity.EXTRA_PERIOD_ID);
 		Period p = Period.getFromPrefId(pref_id);
-		showAlarm(context, p, extras.getString(AlarmMessageActivity.EXTRA_TIME));
+		showAlarm(context, p);
 		new Settings(context).unsetAlarm(p);
 	}
 
-	private void showAlarm(Context context, Period period, String time) {
+	private void showAlarm(Context context, Period period) {
 		Intent intentAlarm = new Intent(context, AlarmMessageActivity.class);
-		intentAlarm.setAction(AlarmMessageActivity.ACTION_SHOW_ALARM);
 		intentAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_TIME, time);
 		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID,
 				period.pref_id);
 		context.startActivity(intentAlarm);
