@@ -33,11 +33,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	private Settings settings;
 
-	private void addCalendars(Calendar cal1, Calendar cal2) {
-		cal1.add(Calendar.HOUR_OF_DAY, cal2.get(Calendar.HOUR_OF_DAY));
-		cal1.add(Calendar.MINUTE, cal2.get(Calendar.MINUTE));
-	}
-
 	@Override
 	public void onTimeSet(int hour, int minute, int callerId) {
 		// This object will be incremented ad each step of the switch bellow
@@ -51,13 +46,13 @@ public class MainActivity extends SherlockFragmentActivity implements
 		switch (period) {
 		case FSTP_ENTRANCE:
 			next_period = Period.FSTP_EXIT;
-			addCalendars(
+			settings.addCalendars(
 					cal,
 					settings.getCalendar(getString(R.string.key_fstp_duration)));
 			settings.setAlarm(next_period, cal, true);
 		case FSTP_EXIT:
 			next_period = Period.SNDP_ENTRANCE;
-			addCalendars(
+			settings.addCalendars(
 					cal,
 					settings.getCalendar(getString(R.string.key_lunch_interval)));
 			settings.setAlarm(next_period, cal, true);
@@ -75,17 +70,17 @@ public class MainActivity extends SherlockFragmentActivity implements
 			Calendar sndp_duration = Calendar.getInstance();
 			sndp_duration.setTimeInMillis(mili_sndp_duration);
 
-			addCalendars(cal, sndp_duration);
+			settings.addCalendars(cal, sndp_duration);
 			settings.setAlarm(next_period, cal, true);
 		case SNDP_EXIT:
 			next_period = Period.FSTE_ENTRANCE;
-			addCalendars(
+			settings.addCalendars(
 					cal,
 					settings.getCalendar(getString(R.string.key_extra_interval)));
 			settings.setAlarm(next_period, cal, true);
 		case FSTE_ENTRANCE:
 			next_period = Period.FSTE_EXIT;
-			addCalendars(
+			settings.addCalendars(
 					cal,
 					settings.getCalendar(getString(R.string.key_fste_duration)));
 			settings.setAlarm(next_period, cal, false);

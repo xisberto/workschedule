@@ -30,7 +30,6 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.MotionEventCompat;
-import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
@@ -47,13 +46,11 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	public static final String EXTRA_TIME = "time",
 			EXTRA_PERIOD_ID = "period_id",
 			ACTION_SHOW_ALARM = "net.xisberto.workschedule.showalarm";
-	private static final String DEBUG_TAG = "net.xisberto.workschedule";
 	private MediaPlayer mMediaPlayer;
 	private int period_pref_id;
 	private TextView text_snooze;
 	private TextView text_dismiss;
 	private int deltaY;
-	private boolean has_snoozed;
 	private Settings settings;
 
 	// Get an alarm sound. Try for saved user option. If none set, try default
@@ -114,14 +111,13 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	}
 
 	private void snoozeAlarm() {
-		has_snoozed = true;
 		settings = new Settings(getApplicationContext());
+		
 		Calendar alarm_time = settings.getCalendar(period_pref_id);
 		Calendar snooze_increment = settings
 				.getCalendar(R.string.key_snooze_increment);
-		alarm_time.add(Calendar.HOUR_OF_DAY,
-				snooze_increment.get(Calendar.HOUR_OF_DAY));
-		alarm_time.add(Calendar.MINUTE, snooze_increment.get(Calendar.MINUTE));
+		settings.addCalendars(alarm_time, snooze_increment);
+
 		Period period = Period.getFromPrefId(period_pref_id);
 		settings.setAlarm(period, alarm_time, true);
 		Toast.makeText(
@@ -161,9 +157,6 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_alarm_message);
-		Log.i("alarm", "onCreate");
-
-		has_snoozed = false;
 
 		period_pref_id = getIntent().getIntExtra(EXTRA_PERIOD_ID,
 				R.string.fstp_entrance);
@@ -185,21 +178,12 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	}
 
 	@Override
-	protected void onStart() {
-		super.onStart();
-		Log.i("alarm", "onStart");
-	}
-
-	@Override
 	protected void onResume() {
 		super.onResume();
-		Log.i("alarm", "onResume");
 		dismissNotification();
 		if (!mMediaPlayer.isPlaying()) {
 			mMediaPlayer.start();
 		}
-		Log.i(getApplication().getPackageName(), "action: "
-				+ getIntent().getAction());
 	}
 
 	@Override
@@ -242,12 +226,8 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		switch (action) {
 		case (MotionEvent.ACTION_DOWN):
 			deltaY = rawY;
-			Log.d(DEBUG_TAG, "deltaY: " + deltaY);
 			return true;
 		case (MotionEvent.ACTION_MOVE):
-			Log.d(DEBUG_TAG, "deltaY: " + deltaY);
-			Log.d(DEBUG_TAG, "rawY: " + rawY);
-
 			int screenHeight = 0;
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
 				Point size = new Point();
@@ -268,11 +248,10 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 				other_params.bottomMargin = deltaY - rawY;
 
 				if (params.topMargin > (screenHeight / 3)) {
-					if (!has_snoozed) {
+					if (!isFinishing()) {
 						snoozeAlarm();
 					}
 				}
-				Log.d(DEBUG_TAG, "topMargin: " + (rawY - deltaY));
 			} else {
 				if (deltaY - rawY < 0) {
 					params.bottomMargin = 0;
@@ -283,9 +262,10 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 				other_params.topMargin = rawY - deltaY;
 
 				if (params.bottomMargin > (screenHeight / 3)) {
-					cancelAlarm();
+					if (!isFinishing()) {
+						cancelAlarm();
+					}
 				}
-				Log.d(DEBUG_TAG, "botomMargin: " + (deltaY - rawY));
 			}
 
 			view.setLayoutParams(params);
@@ -303,8 +283,6 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 			view.setLayoutParams(params);
 			return true;
 		case (MotionEvent.ACTION_OUTSIDE):
-			Log.d(DEBUG_TAG, "Movement occurred outside bounds "
-					+ "of current screen element");
 			return true;
 		default:
 			return super.onTouchEvent(event);
