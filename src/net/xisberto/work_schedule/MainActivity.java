@@ -77,7 +77,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			settings.addCalendars(
 					cal,
 					settings.getCalendar(getString(R.string.key_extra_interval)));
-			settings.setAlarm(next_period, cal, true);
+			settings.setAlarm(next_period, cal, settings.getMarkExtra());
 		case FSTE_ENTRANCE:
 			next_period = Period.FSTE_EXIT;
 			settings.addCalendars(

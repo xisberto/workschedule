@@ -20,6 +20,11 @@
     <net.xisberto.work_schedule.TimePickerPreference
         android:key="@string/key_lunch_interval"
         android:title="@string/lbl_lunch_interval" />
+
+    <CheckBoxPreference
+        android:key="@string/key_mark_extra"
+        android:title="@string/lbl_mark_extra" />
+
     <net.xisberto.work_schedule.TimePickerPreference
         android:key="@string/key_fste_duration"
         android:title="@string/lbl_fste_duration" />

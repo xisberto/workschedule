@@ -77,7 +77,8 @@ public class Settings {
 				.getString(R.string.key_lunch_interval), key_extra_interval = context
 				.getString(R.string.key_extra_interval), key_fste_duration = context
 				.getString(R.string.key_fste_duration), key_snooze_increment = context
-				.getString(R.string.key_snooze_increment);
+				.getString(R.string.key_snooze_increment), key_mark_extra = context
+				.getString(R.string.key_mark_extra);
 
 		if (!prefs.contains(key_work_time + TimePickerPreference.SUFIX_HOUR)) {
 			editor.putInt(key_work_time + TimePickerPreference.SUFIX_HOUR, 8);
@@ -122,6 +123,10 @@ public class Settings {
 					+ TimePickerPreference.SUFIX_HOUR, 0);
 			editor.putInt(key_snooze_increment
 					+ TimePickerPreference.SUFIX_MINUTE, 10);
+		}
+
+		if (!prefs.contains(key_mark_extra)) {
+			editor.putBoolean(key_mark_extra, false);
 		}
 
 		apply(editor);
@@ -292,6 +297,10 @@ public class Settings {
 
 	public String getRingtone() {
 		return prefs.getString(
-				context.getResources().getString(R.string.key_ringtone), null);
+				context.getString(R.string.key_ringtone), null);
+	}
+	
+	public boolean getMarkExtra() {
+		return prefs.getBoolean(context.getString(R.string.key_mark_extra), false);
 	}
 }
