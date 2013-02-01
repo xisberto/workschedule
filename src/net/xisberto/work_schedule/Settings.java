@@ -232,6 +232,11 @@ public class Settings {
 		apply(editor);
 	}
 
+	public void addCalendars(Calendar cal1, Calendar cal2) {
+		cal1.add(Calendar.HOUR_OF_DAY, cal2.get(Calendar.HOUR_OF_DAY));
+		cal1.add(Calendar.MINUTE, cal2.get(Calendar.MINUTE));
+	}
+
 	public boolean isAlarmSet(int period_pref_id) {
 		return prefs.getBoolean(context.getString(period_pref_id) + ".isset",
 				false);
@@ -256,17 +261,13 @@ public class Settings {
 		// Even if the alarm won't be set, we must show it for the user
 		Editor editor = prefs.edit();
 		saveCalendar(cal, context.getString(period.pref_id));
-		// If cal is before now, the alarm is'nt set and we just return
+		// If cal is before now, the alarm isn't set
+		// We continue with the function so we cancel a previously set alarm
 		if (cal.before(Calendar.getInstance())) {
-			editor.putBoolean(context.getString(period.pref_id) + ".isset",
-					false);
-			apply(editor);
-			return;
-		} else {
-			editor.putBoolean(context.getString(period.pref_id) + ".isset",
-					enabled);
-			apply(editor);
+			enabled = false;
 		}
+		editor.putBoolean(context.getString(period.pref_id) + ".isset", enabled);
+		apply(editor);
 
 		// Set or cancel the alarm
 		Intent intentAlarm = new Intent(context, AlarmReceiver.class);
