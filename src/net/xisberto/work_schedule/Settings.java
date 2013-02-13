@@ -12,14 +12,12 @@ package net.xisberto.work_schedule;
 
 import java.util.Calendar;
 
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
 
@@ -61,13 +59,8 @@ public class Settings {
 		prefs = PreferenceManager.getDefaultSharedPreferences(context);
 	}
 
-	@SuppressLint("NewApi")
 	public static void apply(Editor editor) {
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-			editor.commit();
-		} else {
-			editor.apply();
-		}
+		editor.commit();
 	}
 
 	public void setDefaultPreferenceValues() {

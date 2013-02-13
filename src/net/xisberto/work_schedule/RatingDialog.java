@@ -17,11 +17,10 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
-
-public class RatingDialog extends SherlockDialogFragment implements
+public class RatingDialog extends DialogFragment implements
 		OnClickListener {
 
 	@Override

@@ -12,20 +12,21 @@ package net.xisberto.work_schedule;
 
 import java.util.Calendar;
 
+import net.xisberto.work_schedule.Settings.Period;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TimePicker;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
-
-public class TimePickerFragment extends SherlockDialogFragment
+public class TimePickerFragment extends DialogFragment
 		implements OnClickListener {
 
 	private TimePicker timePicker;
@@ -56,10 +57,13 @@ public class TimePickerFragment extends SherlockDialogFragment
 				.setIs24HourView(DateFormat.is24HourFormat(getActivity()));
 		timePicker.setCurrentHour(hourOfDay);
 		timePicker.setCurrentMinute(minute);
+		
+		Period period = Period.getFromPrefId(getArguments().getInt("callerId"));
 
 		// Create a new instance of TimePickerDialog and return it
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
 				.setView(view)
+				.setTitle(period.label_id)
 				.setPositiveButton(android.R.string.ok, this)
 				.setNegativeButton(android.R.string.cancel, this);
 		return builder.create();

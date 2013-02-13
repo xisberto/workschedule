@@ -14,20 +14,18 @@ import java.io.IOException;
 import java.util.Calendar;
 
 import net.xisberto.work_schedule.Settings.Period;
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Point;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.view.Display;
@@ -39,9 +37,7 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
-public class AlarmMessageActivity extends SherlockFragmentActivity implements
+public class AlarmMessageActivity extends FragmentActivity implements
 		OnTouchListener {
 	public static final String EXTRA_TIME = "time",
 			EXTRA_PERIOD_ID = "period_id",
@@ -196,7 +192,6 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		}
 	}
 
-	@SuppressLint("NewApi")
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onTouch(View view, MotionEvent event) {
@@ -229,14 +224,8 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 			return true;
 		case (MotionEvent.ACTION_MOVE):
 			int screenHeight = 0;
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-				Point size = new Point();
-				getWindowManager().getDefaultDisplay().getSize(size);
-				screenHeight = size.y;
-			} else {
-				Display d = getWindowManager().getDefaultDisplay();
-				screenHeight = d.getHeight();
-			}
+			Display d = getWindowManager().getDefaultDisplay();
+			screenHeight = d.getHeight();
 
 			if (is_snooze) {
 				if (rawY - deltaY < 0) {

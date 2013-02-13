@@ -16,17 +16,16 @@ import net.xisberto.work_schedule.Settings.Period;
 import net.xisberto.work_schedule.TimePickerFragment.OnTimePickerSetListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.SparseArray;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-
-public class MainActivity extends SherlockFragmentActivity implements
+public class MainActivity extends FragmentActivity implements
 		OnItemClickListener, OnTimePickerSetListener {
 
 	private static final SparseArray<Period> PeriodIds = new SparseArray<Period>();
@@ -127,7 +126,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getSupportMenuInflater().inflate(R.menu.activity_main, menu);
+		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
 

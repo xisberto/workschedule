@@ -10,16 +10,10 @@
       Humberto Fraga - initial API and implementation
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-	<style name="AppTheme" parent="Theme.Sherlock.Light.DarkActionBar">
-        <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
-        <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar</item>
-    </style>
-    <style name="Widget.Styled.ActionBar" parent="Widget.Sherlock.Light.ActionBar.Solid.Inverse">
-        <item name="background">@drawable/bg_styled</item>
-        <item name="android:background">@drawable/bg_styled</item>
+	<style name="AppTheme" parent="@android:style/Theme.Light">
     </style>
 
-    <style name="AppTheme.NoActionBar" parent="Theme.Sherlock.NoActionBar">
+    <style name="AppTheme.NoActionBar" parent="@android:style/Theme.NoTitleBar">
     </style>
 
     <style name="apptheme_SlideText" parent="@android:style/TextAppearance.Large">

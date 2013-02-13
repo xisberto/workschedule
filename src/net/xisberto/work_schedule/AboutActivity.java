@@ -10,21 +10,17 @@
  ******************************************************************************/
 package net.xisberto.work_schedule;
 
+import android.app.Activity;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
-
-public class AboutActivity extends SherlockActivity {
+public class AboutActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_about);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		
 		String versionName = "";
 		try {
@@ -37,16 +33,6 @@ public class AboutActivity extends SherlockActivity {
 		AboutLinkClickListener click_listener = new AboutLinkClickListener(this);
 		findViewById(R.id.btn_open_link).setOnClickListener(click_listener);
 		findViewById(R.id.btn_share_link).setOnClickListener(click_listener);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case android.R.id.home:
-			NavUtils.navigateUpFromSameTask(this);
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
 	}
 
 }
