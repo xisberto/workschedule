@@ -1,7 +1,7 @@
 Android App Work Schedule Open-source Project
 =============================================
 
-This app is published on Play Store (https://play.google.com/store/apps/details?id=net.xisberto.works_chedule)
+This app is published on Play Store (https://play.google.com/store/apps/details?id=net.xisberto.work_schedule)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
