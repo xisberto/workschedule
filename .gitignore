@@ -1,5 +1,6 @@
 gen
 bin
 libs
+proguard
 *.apk
 *.zip

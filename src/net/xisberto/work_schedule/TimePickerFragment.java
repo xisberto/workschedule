@@ -60,6 +60,7 @@ public class TimePickerFragment extends SherlockDialogFragment
 		// Create a new instance of TimePickerDialog and return it
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
 				.setView(view)
+				.setTitle(R.string.app_name)
 				.setPositiveButton(android.R.string.ok, this)
 				.setNegativeButton(android.R.string.cancel, this);
 		return builder.create();
