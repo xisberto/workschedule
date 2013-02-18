@@ -49,7 +49,7 @@
     
     <string name="author_name">Criado por Humberto Fraga, baseado em uma ideia de Marcos Lacerda</string>
     <string name="text_source">Work Schedule é um aplicativo de código aberto. Seu código pode ser acessado no Github</string>
-    <string name="btn_open_link">Abrir link</string>
+    <string name="text_sherlock">Work Schedule usa a ActionBarSherlock</string>
     <string name="btn_share_link">Compartilhar link</string>
 
 </resources>

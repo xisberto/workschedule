@@ -37,6 +37,7 @@
     <string name="action_settings_intervals">net.xisberto.work_schedule.settings.intervals</string>
     <string name="action_settings_alarm">net.xisberto.work_schedule.settings.alarm</string>
     
-    <string name="github_address">https://github.com/xisberto/workschedule</string>
+    <string name="github_link">https://github.com/xisberto/workschedule</string>
+    <string name="sherlock_link">http://actionbarsherlock.com</string>
     
 </resources>

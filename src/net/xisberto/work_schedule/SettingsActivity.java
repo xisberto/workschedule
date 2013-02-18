@@ -99,10 +99,6 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 			((TextView) view.findViewById(R.id.text_app_version))
 					.setText(versionName);
 
-			AboutLinkClickListener click_listener = new AboutLinkClickListener(getActivity());
-			view.findViewById(R.id.btn_open_link).setOnClickListener(click_listener);
-			view.findViewById(R.id.btn_share_link).setOnClickListener(click_listener);
-			
 			return view;
 		}
 
