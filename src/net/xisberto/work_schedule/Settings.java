@@ -20,10 +20,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Build;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
+import android.util.Log;
 
 public class Settings {
+	public static final String EXTRA_PERIOD_LABEL = "period_label",
+			EXTRA_PERIOD_TIME = "period_time";
+
 	private Context context;
 	private SharedPreferences prefs;
 
@@ -248,6 +253,35 @@ public class Settings {
 	}
 
 	/**
+	 * Get the next alarm set in a Bundle object.
+	 * 
+	 * The result contains an extra {@link Settings.EXTRA_PERIOD_LABEL} with the
+	 * period label and an extra {@link Settings.EXTRA_PERIOD_TIME} with the
+	 * formated time for the alarm.
+	 * 
+	 * @return a {@link Bundle} containing a string with the alarm label and a
+	 *         string with the formated time
+	 */
+	public Bundle getNextAlarm() {
+		for (Period period : Period.values()) {
+			Log.d(getClass().getCanonicalName(), "Looping Period: "+period.pref_id);
+			if (isAlarmSet(period.pref_id)) {
+				Log.d(getClass().getCanonicalName(), " alarm set");
+				Calendar period_time = getCalendar(period.pref_id);
+				if (period_time.after(Calendar.getInstance())) {
+					Bundle result = new Bundle();
+					result.putString(EXTRA_PERIOD_LABEL,
+							context.getString(period.label_id));
+					result.putString(EXTRA_PERIOD_TIME,
+							formatCalendar(period_time));
+					return result;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Set a new alarm or cancel a existing one. The alarm won't be set if the
 	 * Calendar passed is before now.
 	 * 
@@ -288,6 +322,10 @@ public class Settings {
 		} else {
 			am.cancel(alarmSender);
 		}
+		
+		Intent updateIntent = new Intent(context, WidgetNextProvider.class);
+	    updateIntent.setAction(WidgetNextProvider.ACTION_UPDATE);
+	    context.sendBroadcast(updateIntent);
 
 	}
 

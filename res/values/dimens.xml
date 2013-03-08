@@ -12,5 +12,6 @@
 <resources>
     <dimen name="border_padding">8dp</dimen>
     <dimen name="slider_margin">0dp</dimen>
+    <dimen name="widget_margin">8dp</dimen>
     
 </resources>

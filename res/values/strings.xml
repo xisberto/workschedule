@@ -50,6 +50,10 @@
     <string name="author_name">Created by Humberto Fraga, based on an idea by Marcos Lacerda</string>
     <string name="text_source">Work Schedule is an open-source app. It\'s code can be accessed on Github</string>
     <string name="text_sherlock">Work Schedule uses ActionBarSherlock</string>
-    <string name="btn_share_link">Compartilhar link</string>
+    <string name="btn_share_link">Share link</string>
+    
+    <string name="widget_icon_desc">Work Schedule next alarm</string>
+    <string name="widget_title">Next alarm</string>
+    <string name="no_alarm">No alarm defined</string>
 
 </resources>
