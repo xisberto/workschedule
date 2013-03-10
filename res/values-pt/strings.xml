@@ -55,4 +55,5 @@
     <string name="widget_title">Próximo alarme:</string>
     <string name="no_alarm">Nenhum alarme definido</string>
 
+    <string name="dashclock_description">Mostra o próximo alarme do Work Schedule</string>
 </resources>

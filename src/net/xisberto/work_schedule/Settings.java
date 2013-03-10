@@ -263,13 +263,14 @@ public class Settings {
 	 *         string with the formated time
 	 */
 	public Bundle getNextAlarm() {
+		Bundle result = new Bundle();
 		for (Period period : Period.values()) {
-			Log.d(getClass().getCanonicalName(), "Looping Period: "+period.pref_id);
+			Log.d(getClass().getCanonicalName(), "Looping Period: "
+					+ period.pref_id);
 			if (isAlarmSet(period.pref_id)) {
 				Log.d(getClass().getCanonicalName(), " alarm set");
 				Calendar period_time = getCalendar(period.pref_id);
 				if (period_time.after(Calendar.getInstance())) {
-					Bundle result = new Bundle();
 					result.putString(EXTRA_PERIOD_LABEL,
 							context.getString(period.label_id));
 					result.putString(EXTRA_PERIOD_TIME,
@@ -278,7 +279,10 @@ public class Settings {
 				}
 			}
 		}
-		return null;
+		result.putString(EXTRA_PERIOD_LABEL,
+				context.getString(R.string.no_alarm));
+		result.putString(EXTRA_PERIOD_TIME, "");
+		return result;
 	}
 
 	/**
@@ -322,10 +326,12 @@ public class Settings {
 		} else {
 			am.cancel(alarmSender);
 		}
-		
+
 		Intent updateIntent = new Intent(context, WidgetNextProvider.class);
-	    updateIntent.setAction(WidgetNextProvider.ACTION_UPDATE);
-	    context.sendBroadcast(updateIntent);
+		updateIntent.setAction(WidgetNextProvider.ACTION_UPDATE);
+		context.sendBroadcast(updateIntent);
+		
+		context.sendBroadcast(new Intent(DashClockExtensionService.ACTION_UPDATE_ALARM));
 
 	}
 

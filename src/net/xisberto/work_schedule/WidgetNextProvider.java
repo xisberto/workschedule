@@ -12,10 +12,10 @@ import android.widget.RemoteViews;
 
 public class WidgetNextProvider extends AppWidgetProvider {
 	public static final String ACTION_UPDATE = "net.xisberto.work_schedule.update_widgets";
-
+	
 	public WidgetNextProvider() {
 	}
-
+	
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		if (intent.getAction().equals(ACTION_UPDATE)) {
@@ -46,17 +46,12 @@ public class WidgetNextProvider extends AppWidgetProvider {
 
 		Settings settings = new Settings(context.getApplicationContext());
 		Bundle info = settings.getNextAlarm();
-		if (info != null) {
-			String period_label = info.getString(Settings.EXTRA_PERIOD_LABEL);
-			String time = info.getString(Settings.EXTRA_PERIOD_TIME);
-			Log.d(getClass().getCanonicalName(), "Title: " + period_label + "; Time: "
-					+ time);
-			views.setTextViewText(R.id.text_period_label, period_label);
-			views.setTextViewText(R.id.text_time, time);
-		} else {
-			views.setTextViewText(R.id.text_period_label, context.getString(R.string.no_alarm));
-			views.setTextViewText(R.id.text_time, "");
-		}
+		String period_label = info.getString(Settings.EXTRA_PERIOD_LABEL);
+		String time = info.getString(Settings.EXTRA_PERIOD_TIME);
+		Log.d(getClass().getCanonicalName(), "Title: " + period_label
+				+ "; Time: " + time);
+		views.setTextViewText(R.id.text_period_label, period_label);
+		views.setTextViewText(R.id.text_time, time);
 
 		appWidgetManager.updateAppWidget(appWidgetIds, views);
 	}
