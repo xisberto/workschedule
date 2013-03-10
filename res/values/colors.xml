@@ -13,5 +13,7 @@
 
     <color name="snooze">#FF8800</color>
     <color name="dismiss">#CC0000</color>
+    <color name="blue">#88093456</color>
+    <color name="gray">#dddddd</color>
 
 </resources>
