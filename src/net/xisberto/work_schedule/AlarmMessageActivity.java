@@ -20,6 +20,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -30,6 +31,8 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.MotionEventCompat;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
@@ -152,6 +155,22 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 
 		nm.notify(period.pref_id, notification);
 	}
+	
+	private boolean isLargeScreen() {
+		DisplayMetrics metrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		Log.d(getPackageName(), "X size: "+metrics.widthPixels / metrics.density);
+		Log.d(getPackageName(), "Y size: "+metrics.heightPixels / metrics.density);
+		return (metrics.widthPixels / metrics.density > 600f);
+	}
+	
+	private void setOrientation() {
+		if (isLargeScreen()) {
+			setRequestedOrientation(Configuration.ORIENTATION_LANDSCAPE);
+		} else {
+			setRequestedOrientation(Configuration.ORIENTATION_PORTRAIT);
+		}
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -172,6 +191,8 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		text_dismiss = (TextView) findViewById(R.id.txt_dismiss);
 		text_snooze.setOnTouchListener(this);
 		text_dismiss.setOnTouchListener(this);
+		
+		setOrientation();
 
 		prepareSound(getApplicationContext(), getAlarmUri());
 
@@ -194,6 +215,12 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		} else {
 			showNotification();
 		}
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		setOrientation();
 	}
 
 	@SuppressLint("NewApi")
