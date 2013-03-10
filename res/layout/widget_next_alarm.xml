@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:layout_margin="@dimen/widget_margin"
     android:background="@drawable/widget_next_background"
-    android:padding="8dp" >
+    android:paddingLeft="4dp" >
 
     <ImageView
         android:id="@+id/image_icon"
@@ -14,34 +14,35 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="8dp"
-        android:contentDescription="@string/widget_icon_desc"
+        android:contentDescription="@string/app_name"
         android:src="@drawable/ic_launcher" />
-
-    <TextView
-        android:id="@+id/text_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/image_icon"
-        android:text="@string/widget_title"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
         android:id="@+id/text_period_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/text_title"
+        android:layout_alignBottom="@+id/image_icon"
         android:layout_toRightOf="@+id/image_icon"
         android:text="@string/lbl_fstp_entrance"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/text_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/image_icon"
+        android:layout_toRightOf="@+id/image_icon"
+        android:text="@string/widget_title"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
         android:id="@+id/text_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/text_period_label"
-        android:layout_toRightOf="@+id/image_icon"
+        android:layout_alignBottom="@+id/text_title"
+        android:layout_marginLeft="4dp"
+        android:layout_toRightOf="@+id/text_title"
         android:text="@string/time_zero"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>
