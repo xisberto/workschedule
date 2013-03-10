@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android" android:resizeMode="none" android:minWidth="250dp" android:widgetCategory="home_screen" android:minHeight="48dp" android:updatePeriodMillis="3600000" android:initialLayout="@layout/widget_next_alarm">
-    
+<!--
+  Copyright (c) 2013 Humberto Fraga <xisberto@gmail.com>.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the GNU Public License v3.0
+  which accompanies this distribution, and is available at
+  http://www.gnu.org/licenses/gpl.html
+  
+  Contributors:
+      Humberto Fraga <xisberto@gmail.com> - initial API and implementation
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialLayout="@layout/widget_next_alarm"
+    android:minHeight="48dp"
+    android:minWidth="250dp"
+    android:resizeMode="none"
+    android:updatePeriodMillis="3600000"
+    android:widgetCategory="home_screen" >
 
 </appwidget-provider>
