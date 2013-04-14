@@ -41,6 +41,7 @@
     
     <string name="lbl_snooze_increment">Snooze increment</string>
     <string name="lbl_ringtone">Ringtone</string>
+    <string name="lbl_vibrate">Vibrate</string>
     
     <string name="msg_rating">Do you want to rate Work Schedule on Play Store?</string>
     <string name="yes">Yes</string>
