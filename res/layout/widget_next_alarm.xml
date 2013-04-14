@@ -15,7 +15,8 @@
     android:layout_height="match_parent"
     android:layout_margin="@dimen/widget_margin"
     android:background="@drawable/widget_next_background"
-    android:paddingLeft="4dp" >
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp" >
 
     <ImageView
         android:id="@+id/image_icon"
@@ -23,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="8dp"
+        android:layout_marginRight="16dp"
         android:contentDescription="@string/app_name"
         android:src="@drawable/ic_launcher" />
 

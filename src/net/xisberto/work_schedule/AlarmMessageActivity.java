@@ -29,6 +29,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.util.DisplayMetrics;
@@ -37,6 +38,7 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
@@ -110,12 +112,15 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 
 	private void cancelAlarm() {
 		stopSound();
-		finish();
+		((Vibrator) getSystemService(VIBRATOR_SERVICE)).cancel();
+		if (!isFinishing()) {
+			finish();
+		}
 	}
 
 	private void snoozeAlarm() {
 		settings = new Settings(getApplicationContext());
-		
+
 		Calendar alarm_time = settings.getCalendar(period_pref_id);
 		Calendar snooze_increment = settings
 				.getCalendar(R.string.key_snooze_increment);
@@ -155,15 +160,17 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 
 		nm.notify(period.pref_id, notification);
 	}
-	
+
 	private boolean isLargeScreen() {
 		DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
-		Log.d(getPackageName(), "X size: "+metrics.widthPixels / metrics.density);
-		Log.d(getPackageName(), "Y size: "+metrics.heightPixels / metrics.density);
+		Log.d(getPackageName(), "X size: " + metrics.widthPixels
+				/ metrics.density);
+		Log.d(getPackageName(), "Y size: " + metrics.heightPixels
+				/ metrics.density);
 		return (metrics.widthPixels / metrics.density > 600f);
 	}
-	
+
 	private void setOrientation() {
 		if (isLargeScreen()) {
 			setRequestedOrientation(Configuration.ORIENTATION_LANDSCAPE);
@@ -175,6 +182,14 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		overridePendingTransition(R.anim.show, android.R.anim.fade_out);
+		
+		getWindow().addFlags(
+				WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+						| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+						| WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+		
 		setContentView(R.layout.activity_alarm_message);
 
 		period_pref_id = getIntent().getIntExtra(EXTRA_PERIOD_ID,
@@ -191,10 +206,15 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		text_dismiss = (TextView) findViewById(R.id.txt_dismiss);
 		text_snooze.setOnTouchListener(this);
 		text_dismiss.setOnTouchListener(this);
-		
+
 		setOrientation();
 
 		prepareSound(getApplicationContext(), getAlarmUri());
+
+		if (settings.getVibrate()) {
+			((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(new long[] {
+					500, 500 }, 0);
+		}
 
 	}
 
@@ -204,6 +224,14 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		dismissNotification();
 		if (!mMediaPlayer.isPlaying()) {
 			mMediaPlayer.start();
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if (isFinishing()) {
+			overridePendingTransition(android.R.anim.fade_in, R.anim.hide);
 		}
 	}
 

@@ -83,7 +83,8 @@ public class Settings {
 				.getString(R.string.key_extra_interval), key_fste_duration = context
 				.getString(R.string.key_fste_duration), key_snooze_increment = context
 				.getString(R.string.key_snooze_increment), key_mark_extra = context
-				.getString(R.string.key_mark_extra);
+				.getString(R.string.key_mark_extra), key_vibrate = context
+				.getString(R.string.key_vibrate);
 
 		if (!prefs.contains(key_work_time + TimePickerPreference.SUFIX_HOUR)) {
 			editor.putInt(key_work_time + TimePickerPreference.SUFIX_HOUR, 8);
@@ -132,6 +133,10 @@ public class Settings {
 
 		if (!prefs.contains(key_mark_extra)) {
 			editor.putBoolean(key_mark_extra, false);
+		}
+
+		if (!prefs.contains(key_vibrate)) {
+			editor.putBoolean(key_vibrate, true);
 		}
 
 		apply(editor);
@@ -330,8 +335,9 @@ public class Settings {
 		Intent updateIntent = new Intent(context, WidgetNextProvider.class);
 		updateIntent.setAction(WidgetNextProvider.ACTION_UPDATE);
 		context.sendBroadcast(updateIntent);
-		
-		context.sendBroadcast(new Intent(DashClockExtensionService.ACTION_UPDATE_ALARM));
+
+		context.sendBroadcast(new Intent(
+				DashClockExtensionService.ACTION_UPDATE_ALARM));
 
 	}
 
@@ -346,5 +352,9 @@ public class Settings {
 	public boolean getMarkExtra() {
 		return prefs.getBoolean(context.getString(R.string.key_mark_extra),
 				false);
+	}
+
+	public boolean getVibrate() {
+		return prefs.getBoolean(context.getString(R.string.key_vibrate), true);
 	}
 }

@@ -41,6 +41,7 @@
 
     <string name="lbl_snooze_increment">Incremento da soneca</string>
     <string name="lbl_ringtone">Toque do alarme</string>
+    <string name="lbl_vibrate">Vibrar</string>
         
     <string name="msg_rating">Você quer avaliar o Work Schedule na Play Store?</string>
     <string name="yes">Sim</string>
