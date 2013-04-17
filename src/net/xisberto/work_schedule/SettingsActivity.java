@@ -14,7 +14,6 @@ import java.util.List;
 
 import android.annotation.TargetApi;
 import android.app.Fragment;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
@@ -22,7 +21,6 @@ import android.support.v4.app.NavUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
@@ -87,19 +85,7 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
-			View view = inflater.inflate(R.layout.activity_about, null);
-
-			String versionName = "";
-			try {
-				versionName = getActivity().getPackageManager().getPackageInfo(
-						getActivity().getPackageName(), 0).versionName;
-			} catch (NameNotFoundException e) {
-				versionName = "";
-			}
-			((TextView) view.findViewById(R.id.text_app_version))
-					.setText(versionName);
-
-			return view;
+			return new AboutView(getActivity());
 		}
 
 	}
