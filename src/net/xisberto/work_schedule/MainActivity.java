@@ -41,7 +41,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		Period period = PeriodIds.get(callerId);
 		Period next_period = Period.SNDE_EXIT;
 
-		settings.setAlarm(period, cal, false);
+		settings.setAlarm(period, cal, true);
 
 		switch (period) {
 		case FSTP_ENTRANCE:
