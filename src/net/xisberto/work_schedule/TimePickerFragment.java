@@ -22,13 +22,15 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TimePicker;
+import android.widget.TimePicker.OnTimeChangedListener;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 
-public class TimePickerFragment extends SherlockDialogFragment
-		implements OnClickListener {
+public class TimePickerFragment extends SherlockDialogFragment implements
+		OnClickListener {
 
 	private TimePicker timePicker;
+	private Dialog dialog;
 
 	public static TimePickerFragment newInstance(int callerId) {
 		TimePickerFragment dialog_fragment = new TimePickerFragment();
@@ -41,9 +43,10 @@ public class TimePickerFragment extends SherlockDialogFragment
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		if (!(getActivity() instanceof OnTimePickerSetListener)) {
-			throw new ClassCastException("Activity must implement OnTimePickerSetListener");
+			throw new ClassCastException(
+					"Activity must implement OnTimePickerSetListener");
 		}
-		
+
 		final Calendar c = Calendar.getInstance();
 		int hourOfDay = c.get(Calendar.HOUR_OF_DAY);
 		int minute = c.get(Calendar.MINUTE);
@@ -52,18 +55,27 @@ public class TimePickerFragment extends SherlockDialogFragment
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View view = inflater.inflate(R.layout.time_picker_dialog, null);
 		timePicker = (TimePicker) view.findViewById(R.id.timePicker);
-		timePicker
-				.setIs24HourView(DateFormat.is24HourFormat(getActivity()));
+		timePicker.setIs24HourView(DateFormat.is24HourFormat(getActivity()));
 		timePicker.setCurrentHour(hourOfDay);
 		timePicker.setCurrentMinute(minute);
+		timePicker.setOnTimeChangedListener(new OnTimeChangedListener() {
+
+			@Override
+			public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+				dialog.setTitle(formatTitle(hourOfDay, minute));
+			}
+		});
 
 		// Create a new instance of TimePickerDialog and return it
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
 				.setView(view)
-				.setTitle(R.string.app_name)
+				.setTitle(
+						formatTitle(timePicker.getCurrentHour(),
+								timePicker.getCurrentMinute()))
 				.setPositiveButton(android.R.string.ok, this)
 				.setNegativeButton(android.R.string.cancel, this);
-		return builder.create();
+		dialog = builder.create();
+		return dialog;
 	}
 
 	@Override
@@ -73,8 +85,8 @@ public class TimePickerFragment extends SherlockDialogFragment
 		case AlertDialog.BUTTON_POSITIVE:
 			int callerId = getArguments().getInt("callerId");
 			((MainActivity) getActivity()).onTimeSet(
-					timePicker.getCurrentHour(),
-					timePicker.getCurrentMinute(), callerId);
+					timePicker.getCurrentHour(), timePicker.getCurrentMinute(),
+					callerId);
 			break;
 		case AlertDialog.BUTTON_NEGATIVE:
 		default:
@@ -82,8 +94,24 @@ public class TimePickerFragment extends SherlockDialogFragment
 		}
 	}
 
+	private String formatTitle(int hourOfDay, int minute) {
+		if (timePicker.is24HourView()) {
+			return hourOfDay + ":" + minute;
+		} else {
+			if (hourOfDay == 0) {
+				return "12" + ":" + minute + " AM";
+			} else if (hourOfDay < 12) {
+				return hourOfDay + ":" + minute + " AM";
+			} else if (hourOfDay == 12) {
+				return "12" + ":" + minute + " PM";
+			} else {
+				return (hourOfDay-12) + ":" + minute + " PM";
+			}
+		}
+	}
+
 	public interface OnTimePickerSetListener {
 		public void onTimeSet(int hour, int minute, int callerId);
 	}
-	
+
 }
