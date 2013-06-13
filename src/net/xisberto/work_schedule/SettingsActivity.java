@@ -76,9 +76,8 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 				addPreferencesFromResource(R.xml.settings_alarm);
 			}
 		}
-
 	}
-
+	
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public static class AboutFragment extends Fragment {
 

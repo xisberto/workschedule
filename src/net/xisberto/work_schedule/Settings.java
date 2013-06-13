@@ -344,6 +344,22 @@ public class Settings {
 	public void unsetAlarm(Period period) {
 		setAlarm(period, getCalendar(period.pref_id), false);
 	}
+	
+	public void resetAllAlarms() {
+		for (Period period : Period.values()) {
+			if (getMarkExtra() == false 
+					&& period == Period.FSTE_ENTRANCE) {
+				//Respects user option to don't mark extra
+				return;
+			}
+			if (period == Period.SNDE_ENTRANCE) {
+				//We never mark this as default
+				return;
+			}
+			Calendar cal = getCalendar(period.pref_id);
+			setAlarm(period, cal, true);
+		}
+	}
 
 	public String getRingtone() {
 		return prefs.getString(context.getString(R.string.key_ringtone), null);
