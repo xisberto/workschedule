@@ -43,7 +43,9 @@ public class DashClockExtensionService extends DashClockExtension {
 		Log.d(getPackageName(), "Updating Dash Clock Extension");
 		
 		if (next_alarm.getString(Settings.EXTRA_PERIOD_TIME).equals("")) {
-			publishUpdate(null);
+			publishUpdate(new ExtensionData()
+				.visible(false));
+			return;
 		}
 		
 		publishUpdate(new ExtensionData()
