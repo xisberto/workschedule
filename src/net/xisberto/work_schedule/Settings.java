@@ -357,7 +357,7 @@ public class Settings {
 				return;
 			}
 			Calendar cal = getCalendar(period.pref_id);
-			setAlarm(period, cal, true);
+			setAlarm(period, cal, isAlarmSet(period.pref_id));
 		}
 	}
 
