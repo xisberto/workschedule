@@ -338,7 +338,7 @@ public class Settings {
 		}
 
 		Intent updateIntent = new Intent(context, WidgetNextProvider.class);
-		updateIntent.setAction(WidgetNextProvider.ACTION_UPDATE);
+		updateIntent.setAction(WidgetNextProvider.MY_ACTION_UPDATE);
 		context.sendBroadcast(updateIntent);
 
 		context.sendBroadcast(new Intent(
