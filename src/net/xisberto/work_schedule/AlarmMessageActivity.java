@@ -183,7 +183,7 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		overridePendingTransition(R.anim.show, android.R.anim.fade_out);
+		overridePendingTransition(R.anim.activity_open_enter, R.anim.activity_close_exit);
 		
 		getWindow().addFlags(
 				WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
@@ -231,7 +231,7 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	protected void onPause() {
 		super.onPause();
 		if (isFinishing()) {
-			overridePendingTransition(android.R.anim.fade_in, R.anim.hide);
+			overridePendingTransition(R.anim.activity_open_enter, R.anim.activity_close_exit);
 		}
 	}
 
