@@ -35,6 +35,7 @@ import android.support.v4.view.MotionEventCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -249,6 +250,20 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 		setOrientation();
+	}
+
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent event) {
+		switch (event.getKeyCode()) {
+		case KeyEvent.KEYCODE_VOLUME_DOWN:
+		case KeyEvent.KEYCODE_VOLUME_MUTE:
+			mMediaPlayer.setVolume(0f, 0f);
+			((Vibrator)getSystemService(VIBRATOR_SERVICE)).cancel();
+			return true;
+
+		default:
+			return super.dispatchKeyEvent(event);
+		}
 	}
 
 	@SuppressLint("NewApi")
