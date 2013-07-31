@@ -13,7 +13,11 @@
 
     <color name="snooze">#FF8800</color>
     <color name="dismiss">#CC0000</color>
-    <color name="blue">#88093456</color>
-    <color name="gray">#dddddd</color>
+    <color name="blue">#0A5577</color>
+    <color name="blue_transparent">#880A5577</color>
+    <color name="blue_dark">#0A3557</color>
+    <color name="blue_light">#5Aa5c7</color>
+    <color name="gray_light">#F2F1ED</color>
+    <color name="gray_dark">#B0AEAF</color>
 
 </resources>

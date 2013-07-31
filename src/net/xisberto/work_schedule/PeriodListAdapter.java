@@ -18,7 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
@@ -70,7 +70,7 @@ public class PeriodListAdapter implements ListAdapter {
 		((TextView) view.findViewById(R.id.period_time)).setText(settings
 				.formatCalendar(settings.getCalendar(period_pref_key)));
 
-		CheckBox check_alarm = (CheckBox) view.findViewById(R.id.check_alarm);
+		CompoundButton check_alarm = (CompoundButton) view.findViewById(R.id.check_alarm);
 		check_alarm.setChecked(settings.isAlarmSet(period.pref_id));
 		check_alarm.setOnClickListener(new OnClickListener() {
 
@@ -78,7 +78,7 @@ public class PeriodListAdapter implements ListAdapter {
 			public void onClick(View check_box) {
 				settings.setAlarm(period,
 						settings.getCalendar(period_pref_key),
-						((CheckBox) check_box).isChecked());
+						((CompoundButton) check_box).isChecked());
 			}
 		});
 
