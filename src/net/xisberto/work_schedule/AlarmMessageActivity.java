@@ -14,19 +14,16 @@ import java.io.IOException;
 import java.util.Calendar;
 
 import net.xisberto.work_schedule.Settings.Period;
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Point;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.Vibrator;
@@ -34,14 +31,13 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.WindowManager;
+import android.view.animation.TranslateAnimation;
 import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,10 +50,11 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 			ACTION_SHOW_ALARM = "net.xisberto.workschedule.showalarm";
 	private MediaPlayer mMediaPlayer;
 	private int period_pref_id;
-	private TextView text_snooze;
-	private TextView text_dismiss;
-	private int deltaY;
 	private Settings settings;
+	private float initialPoint;
+	private float currentPoint;
+	private boolean moving;
+	private HinterThread hinter;
 
 	// Get an alarm sound. Try for saved user option. If none set, try default
 	// alarm, notification, or ringtone.
@@ -179,6 +176,14 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 			setRequestedOrientation(Configuration.ORIENTATION_PORTRAIT);
 		}
 	}
+	
+	private void startHinter() {
+        View hinter_top = findViewById(R.id.hinter_top);
+        View hinter_bottom = findViewById(R.id.hinter_bottom);
+
+        hinter = new HinterThread(hinter_top, hinter_bottom);
+        hinter.start();
+    }
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -203,10 +208,12 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 				.getFromPrefId(period_pref_id).label_id);
 		((TextView) findViewById(R.id.txt_alarm_time)).setText(time);
 
-		text_snooze = (TextView) findViewById(R.id.txt_snooze);
-		text_dismiss = (TextView) findViewById(R.id.txt_dismiss);
-		text_snooze.setOnTouchListener(this);
-		text_dismiss.setOnTouchListener(this);
+		initialPoint = 0f;
+        currentPoint = 0f;
+        moving = false;
+
+        findViewById(R.id.frame_top).setOnTouchListener(this);
+        findViewById(R.id.frame_bottom).setOnTouchListener(this);
 
 		setOrientation();
 
@@ -226,11 +233,13 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		if (!mMediaPlayer.isPlaying()) {
 			mMediaPlayer.start();
 		}
+        startHinter();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
+        hinter.interrupt();
 		if (isFinishing()) {
 			overridePendingTransition(R.anim.activity_open_enter, R.anim.activity_close_exit);
 		}
@@ -266,97 +275,72 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		}
 	}
 
-	@SuppressLint("NewApi")
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onTouch(View view, MotionEvent event) {
-		boolean is_snooze;
+		if (event.getPointerCount() > 1) {
+            return super.onTouchEvent(event);
+        }
 
-		if ((view.getId() != R.id.txt_snooze)
-				&& (view.getId() != R.id.txt_dismiss)) {
-			return false;
-		}
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) view.getLayoutParams();
 
-		is_snooze = view.getId() == R.id.txt_snooze;
+        int action = MotionEventCompat.getActionMasked(event);
+        if (view.getId() == R.id.frame_bottom || view.getId() == R.id.frame_top) {
+            switch (action) {
+                case MotionEvent.ACTION_DOWN:
+                    initialPoint = event.getRawY();
+                    moving = true;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    if (moving) {
+                        hinter.interrupt();
+                        currentPoint = event.getRawY();
+                        
+                        DisplayMetrics displayMetrics = new DisplayMetrics();
+                        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                        int screenHeight = displayMetrics.heightPixels;
 
-		View other_view;
-		if (is_snooze) {
-			other_view = text_dismiss;
-		} else {
-			other_view = text_snooze;
-		}
-		RelativeLayout.LayoutParams params = (LayoutParams) view
-				.getLayoutParams();
-		RelativeLayout.LayoutParams other_params = (LayoutParams) other_view
-				.getLayoutParams();
-
-		final int rawY = (int) event.getRawY();
-
-		int action = MotionEventCompat.getActionMasked(event);
-		switch (action) {
-		case (MotionEvent.ACTION_DOWN):
-			deltaY = rawY;
-			return true;
-		case (MotionEvent.ACTION_MOVE):
-			int screenHeight = 0;
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-				Point size = new Point();
-				getWindowManager().getDefaultDisplay().getSize(size);
-				screenHeight = size.y;
-			} else {
-				Display d = getWindowManager().getDefaultDisplay();
-				screenHeight = d.getHeight();
-			}
-
-			if (is_snooze) {
-				if (rawY - deltaY < 0) {
-					params.topMargin = 0;
-					other_params.bottomMargin = 0;
-					return false;
-				}
-				params.topMargin = rawY - deltaY;
-				other_params.bottomMargin = deltaY - rawY;
-
-				if (params.topMargin > (screenHeight / 3)) {
-					if (!isFinishing()) {
-						snoozeAlarm();
-					}
-				}
-			} else {
-				if (deltaY - rawY < 0) {
-					params.bottomMargin = 0;
-					other_params.topMargin = 0;
-					return false;
-				}
-				params.bottomMargin = deltaY - rawY;
-				other_params.topMargin = rawY - deltaY;
-
-				if (params.bottomMargin > (screenHeight / 3)) {
-					if (!isFinishing()) {
-						cancelAlarm();
-					}
-				}
-			}
-
-			view.setLayoutParams(params);
-			findViewById(R.id.alarm_layout_root).invalidate();
-			return true;
-		case (MotionEvent.ACTION_UP):
-		case (MotionEvent.ACTION_CANCEL):
-			if (is_snooze) {
-				params.topMargin = 0;
-				other_params.bottomMargin = 0;
-			} else {
-				params.bottomMargin = 0;
-				other_params.topMargin = 0;
-			}
-			view.setLayoutParams(params);
-			return true;
-		case (MotionEvent.ACTION_OUTSIDE):
-			return true;
-		default:
-			return super.onTouchEvent(event);
-		}
+                        if (view.getId() == R.id.frame_top) {
+                            int new_margin = (int) (currentPoint - initialPoint);
+                            params.topMargin = (new_margin > 0) ? new_margin : 0;
+                            if ( (new_margin > (screenHeight / 3)) 
+                            		&& (!isFinishing()) ) {
+                            	snoozeAlarm();
+                            	break;
+                            }
+                        } else {
+                            int new_margin = (int) (initialPoint - currentPoint);
+                            params.bottomMargin = (new_margin > 0) ? new_margin : 0;
+                            if ( (new_margin > (screenHeight / 3)) 
+                            		&& (!isFinishing()) ) {
+                            	cancelAlarm();
+                            	break;
+                            }
+                        }
+                        view.setLayoutParams(params);
+                        view.invalidate();
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                    initialPoint = 0;
+                    TranslateAnimation ta;
+                    if (view.getId() == R.id.frame_top) {
+                        ta = new TranslateAnimation(0, 0, params.topMargin, 0);
+                        params.topMargin = 0;
+                    } else {
+                        ta = new TranslateAnimation(0, 0, -params.bottomMargin, 0);
+                        params.bottomMargin = 0;
+                    }
+                    ta.setDuration(100);
+                    view.setLayoutParams(params);
+                    view.startAnimation(ta);
+                    moving = false;
+                    startHinter();
+                    break;
+                default:
+                    return super.onTouchEvent(event);
+            }
+        }
+        return true;
 	}
 
 }

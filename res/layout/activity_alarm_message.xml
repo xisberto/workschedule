@@ -13,14 +13,12 @@
     android:id="@+id/alarm_layout_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".AlarmMessageActivity" >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:layout_centerInParent="true"
         android:orientation="vertical" >
 
         <TextView
@@ -42,20 +40,88 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/txt_snooze"
-        style="@style/apptheme_SlideSnooze"
+    <View
+        android:id="@+id/hinter_top"
+        android:layout_width="match_parent"
+        android:layout_height="9dp"
+        android:background="@drawable/slidehint_orange"
+        android:layout_centerHorizontal="true"
+        android:layout_alignBottom="@+id/frame_top"/>
+
+    <FrameLayout
+        android:id="@+id/frame_top"
+        style="@style/AppTheme.Slider"
+        android:background="@color/snooze"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/snooze" />
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:layout_centerHorizontal="true">
 
-    <TextView
-        android:id="@+id/txt_dismiss"
-        style="@style/apptheme_SlideDismiss"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLargeInverse"
+            android:text="@string/snooze"
+            android:id="@+id/text_top"
+            android:layout_gravity="center"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:src="@drawable/ic_arrow_down"
+            android:contentDescription="@string/snooze"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:src="@drawable/ic_arrow_down"
+            android:contentDescription="@string/snooze"/>
+    </FrameLayout>
+
+    <View
+        android:id="@+id/hinter_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="9dp"
+        android:background="@drawable/slidehint_red"
+        android:layout_centerHorizontal="true"
+        android:layout_alignTop="@+id/frame_bottom"/>
+
+    <FrameLayout
+        android:id="@+id/frame_bottom"
+        style="@style/AppTheme.Slider"
+        android:background="@color/dismiss"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/dismiss" />
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:layout_centerHorizontal="true">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLargeInverse"
+            android:text="@string/dismiss"
+            android:id="@+id/text_bottom"
+            android:layout_gravity="center"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:src="@drawable/ic_arrow_up"
+            android:contentDescription="@string/dismiss"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:src="@drawable/ic_arrow_up"
+            android:contentDescription="@string/dismiss"/>
+    </FrameLayout>
+    
 </RelativeLayout>
