@@ -16,6 +16,7 @@ import net.xisberto.work_schedule.Settings.Period;
 import net.xisberto.work_schedule.TimePickerFragment.OnTimePickerSetListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.AdapterView;
@@ -30,12 +31,13 @@ public class MainActivity extends SherlockFragmentActivity implements
 		OnItemClickListener, OnTimePickerSetListener {
 	
 	public static final String 
-			ACTION_SET_PERIOD = "net.xisberto.work_schedule.set_period",
-			EXTRA_PREF_ID = "pref_id";
+			ACTION_SET_PERIOD = "net.xisberto.work_schedule.set_period";
 
 	private static final SparseArray<Period> PeriodIds = new SparseArray<Period>();
 
 	private Settings settings;
+
+	private boolean showDialogOnResume;
 
 	@Override
 	public void onTimeSet(int hour, int minute, int callerId) {
@@ -125,6 +127,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 		for (Period period : Period.values()) {
 			PeriodIds.put(period.pref_id, period);
 		}
+		
+		if (getIntent().getAction() != null && getIntent().getAction().equals(ACTION_SET_PERIOD)) {
+			showDialogOnResume = true;
+		}
 
 	}
 
@@ -132,10 +138,14 @@ public class MainActivity extends SherlockFragmentActivity implements
 	protected void onResume() {
 		super.onResume();
 		updateLayout();
-		if (getIntent().getAction() != null && getIntent().getAction().equals(ACTION_SET_PERIOD)) {
-			int pref_id = getIntent().getIntExtra(EXTRA_PREF_ID, 0);
-			if (PeriodIds.get(pref_id) != null) {
-				showTimePickerDialog(pref_id);
+		if (showDialogOnResume) {
+			showDialogOnResume = false;
+			Bundle info = settings.getNextAlarm();
+			if (info.containsKey(Settings.EXTRA_PREF_ID)) {
+				if (BuildConfig.DEBUG) {
+					Log.d(getPackageName(), "period.pref_id: "+info.getInt(Settings.EXTRA_PREF_ID));
+				}
+				showTimePickerDialog(info.getInt(Settings.EXTRA_PREF_ID));
 			}
 		}
 	}
