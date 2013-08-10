@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.RemoteViews;
 
 public class WidgetConfigActivity extends Activity {
 
@@ -39,9 +38,9 @@ public class WidgetConfigActivity extends Activity {
 			mAppWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
 					AppWidgetManager.INVALID_APPWIDGET_ID);
 			//TODO: Configure here theme
-			AppWidgetManager widgetManager = AppWidgetManager.getInstance(this);
-			RemoteViews views = new RemoteViews(getPackageName(), R.layout.widget_next_alarm);
-			widgetManager.updateAppWidget(mAppWidgetId, views);
+			Intent updateIntent = new Intent(this, WidgetNextProvider.class);
+			updateIntent.setAction(WidgetNextProvider.MY_ACTION_UPDATE);
+			sendBroadcast(updateIntent);
 		}
 	}
 
