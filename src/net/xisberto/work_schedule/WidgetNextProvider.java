@@ -55,6 +55,7 @@ public class WidgetNextProvider extends AppWidgetProvider {
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
 				intent, 0);
+		views.setOnClickPendingIntent(R.id.widget_layout, pendingIntent);
 		views.setOnClickPendingIntent(R.id.image_icon, pendingIntent);
 
 		// Set an intent to open MainActivity setting a period
