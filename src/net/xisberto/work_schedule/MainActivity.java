@@ -28,6 +28,10 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class MainActivity extends SherlockFragmentActivity implements
 		OnItemClickListener, OnTimePickerSetListener {
+	
+	public static final String 
+			ACTION_SET_PERIOD = "net.xisberto.work_schedule.set_period",
+			EXTRA_PREF_ID = "pref_id";
 
 	private static final SparseArray<Period> PeriodIds = new SparseArray<Period>();
 
@@ -105,6 +109,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 		list.setOnItemClickListener(this);
 	}
 
+	private void showTimePickerDialog(int pref_id) {
+		TimePickerFragment dialog = TimePickerFragment.newInstance(pref_id);
+		dialog.show(getSupportFragmentManager(), "time_picker");
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -123,6 +132,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 	protected void onResume() {
 		super.onResume();
 		updateLayout();
+		if (getIntent().getAction() != null && getIntent().getAction().equals(ACTION_SET_PERIOD)) {
+			int pref_id = getIntent().getIntExtra(EXTRA_PREF_ID, 0);
+			if (PeriodIds.get(pref_id) != null) {
+				showTimePickerDialog(pref_id);
+			}
+		}
 	}
 
 	@Override
@@ -144,9 +159,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-		TimePickerFragment dialog = TimePickerFragment.newInstance(Period
-				.values()[position].pref_id);
-		dialog.show(getSupportFragmentManager(), "time_picker");
+		showTimePickerDialog(Period.values()[position].pref_id);
 	}
 
 }
