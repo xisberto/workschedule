@@ -27,6 +27,7 @@ import android.util.Log;
 
 public class Settings {
 	public static final String EXTRA_PERIOD_LABEL = "period_label",
+			EXTRA_PREF_ID = "pref_id",
 			EXTRA_PERIOD_TIME = "period_time";
 
 	private Context context;
@@ -283,6 +284,7 @@ public class Settings {
 				if (period_time.after(Calendar.getInstance())) {
 					result.putString(EXTRA_PERIOD_LABEL,
 							context.getString(period.label_id));
+					result.putInt(EXTRA_PREF_ID, period.pref_id);
 					result.putString(EXTRA_PERIOD_TIME,
 							formatCalendar(period_time));
 					return result;
