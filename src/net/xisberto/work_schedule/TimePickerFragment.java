@@ -12,6 +12,7 @@ package net.xisberto.work_schedule;
 
 import java.util.Calendar;
 
+import net.xisberto.work_schedule.Settings.Period;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -22,7 +23,6 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TimePicker;
-import android.widget.TimePicker.OnTimeChangedListener;
 
 import com.actionbarsherlock.app.SherlockDialogFragment;
 
@@ -31,6 +31,7 @@ public class TimePickerFragment extends SherlockDialogFragment implements
 
 	private TimePicker timePicker;
 	private Dialog dialog;
+	private OnTimePickerSetListener listener;
 
 	public static TimePickerFragment newInstance(int callerId) {
 		TimePickerFragment dialog_fragment = new TimePickerFragment();
@@ -45,6 +46,8 @@ public class TimePickerFragment extends SherlockDialogFragment implements
 		if (!(getActivity() instanceof OnTimePickerSetListener)) {
 			throw new ClassCastException(
 					"Activity must implement OnTimePickerSetListener");
+		} else {
+			listener = (OnTimePickerSetListener)getActivity();
 		}
 
 		final Calendar c = Calendar.getInstance();
@@ -58,20 +61,14 @@ public class TimePickerFragment extends SherlockDialogFragment implements
 		timePicker.setIs24HourView(DateFormat.is24HourFormat(getActivity()));
 		timePicker.setCurrentHour(hourOfDay);
 		timePicker.setCurrentMinute(minute);
-		timePicker.setOnTimeChangedListener(new OnTimeChangedListener() {
 
-			@Override
-			public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-				dialog.setTitle(formatTitle(hourOfDay, minute));
-			}
-		});
-
+		int callerId = getArguments().getInt("callerId");
+		Period period = Period.getFromPrefId(callerId);
+		
 		// Create a new instance of TimePickerDialog and return it
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
 				.setView(view)
-				.setTitle(
-						formatTitle(timePicker.getCurrentHour(),
-								timePicker.getCurrentMinute()))
+				.setTitle(getResources().getString(period.label_id))
 				.setPositiveButton(android.R.string.ok, this)
 				.setNegativeButton(android.R.string.cancel, this);
 		dialog = builder.create();
@@ -84,29 +81,13 @@ public class TimePickerFragment extends SherlockDialogFragment implements
 		switch (which) {
 		case AlertDialog.BUTTON_POSITIVE:
 			int callerId = getArguments().getInt("callerId");
-			((MainActivity) getActivity()).onTimeSet(
+			listener.onTimeSet(
 					timePicker.getCurrentHour(), timePicker.getCurrentMinute(),
 					callerId);
 			break;
 		case AlertDialog.BUTTON_NEGATIVE:
 		default:
 			break;
-		}
-	}
-
-	private String formatTitle(int hourOfDay, int minute) {
-		if (timePicker.is24HourView()) {
-			return hourOfDay + ":" + minute;
-		} else {
-			if (hourOfDay == 0) {
-				return "12" + ":" + minute + " AM";
-			} else if (hourOfDay < 12) {
-				return hourOfDay + ":" + minute + " AM";
-			} else if (hourOfDay == 12) {
-				return "12" + ":" + minute + " PM";
-			} else {
-				return (hourOfDay-12) + ":" + minute + " PM";
-			}
 		}
 	}
 
