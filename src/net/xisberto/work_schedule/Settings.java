@@ -276,10 +276,14 @@ public class Settings {
 	public Bundle getNextAlarm() {
 		Bundle result = new Bundle();
 		for (Period period : Period.values()) {
-			Log.d(getClass().getCanonicalName(), "Looping Period: "
-					+ period.pref_id);
+			if (BuildConfig.DEBUG) {
+				Log.d(getClass().getCanonicalName(), "Looping Period: "
+						+ period.pref_id);
+			}
 			if (isAlarmSet(period.pref_id)) {
-				Log.d(getClass().getCanonicalName(), " alarm set");
+				if (BuildConfig.DEBUG) {
+					Log.d(getClass().getCanonicalName(), " alarm set");
+				}
 				Calendar period_time = getCalendar(period.pref_id);
 				if (period_time.after(Calendar.getInstance())) {
 					result.putString(EXTRA_PERIOD_LABEL,
