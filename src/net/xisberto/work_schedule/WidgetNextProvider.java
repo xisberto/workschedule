@@ -57,10 +57,18 @@ public class WidgetNextProvider extends AppWidgetProvider {
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
 				intent, 0);
-		views.setOnClickPendingIntent(R.id.widget_layout, pendingIntent);
+		views.setOnClickPendingIntent(R.id.image_icon, pendingIntent);
 
 		Settings settings = new Settings(context.getApplicationContext());
 		Bundle info = settings.getNextAlarm();
+		
+		// Set an intent to open MainActivity setting a period
+		Intent intentAction = new Intent(context, MainActivity.class);
+		intentAction.setAction(MainActivity.ACTION_SET_PERIOD);
+		intentAction.putExtra(MainActivity.EXTRA_PREF_ID, info.getInt(Settings.EXTRA_PREF_ID));
+		PendingIntent pendingIntentAction = PendingIntent.getActivity(context, 0, intentAction, 0);
+		views.setOnClickPendingIntent(R.id.text_label, pendingIntentAction);
+
 		String period_label = info.getString(Settings.EXTRA_PERIOD_LABEL);
 		String time = info.getString(Settings.EXTRA_PERIOD_TIME);
 		if (! time.equals("")) {
@@ -68,7 +76,7 @@ public class WidgetNextProvider extends AppWidgetProvider {
 		}
 		Log.d(getClass().getCanonicalName(), "Title: " + period_label
 				+ "; Time: " + time);
-		views.setTextViewText(R.id.text_period_label, period_label);
+		views.setTextViewText(R.id.text_label, period_label);
 
 		appWidgetManager.updateAppWidget(appWidgetIds, views);
 	}
