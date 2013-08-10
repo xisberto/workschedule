@@ -17,7 +17,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 public class WidgetNextProvider extends AppWidgetProvider {
@@ -48,7 +47,6 @@ public class WidgetNextProvider extends AppWidgetProvider {
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager,
 			int[] appWidgetIds) {
-		Log.d(getClass().getCanonicalName(), "Updating widgets");
 		RemoteViews views = new RemoteViews(context.getPackageName(),
 				R.layout.widget_next_alarm);
 
@@ -57,7 +55,14 @@ public class WidgetNextProvider extends AppWidgetProvider {
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
 				intent, 0);
-		views.setOnClickPendingIntent(R.id.widget_layout, pendingIntent);
+		views.setOnClickPendingIntent(R.id.image_icon, pendingIntent);
+
+		// Set an intent to open MainActivity setting a period
+		Intent intentAction = new Intent(MainActivity.ACTION_SET_PERIOD);
+		intentAction.setComponent(new ComponentName(context, MainActivity.class));
+		intentAction.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		PendingIntent pendingIntentAction = PendingIntent.getActivity(context, 1, intentAction, 0);
+		views.setOnClickPendingIntent(R.id.text_label, pendingIntentAction);
 
 		Settings settings = new Settings(context.getApplicationContext());
 		Bundle info = settings.getNextAlarm();
@@ -66,9 +71,7 @@ public class WidgetNextProvider extends AppWidgetProvider {
 		if (! time.equals("")) {
 				period_label += "\n" + time;
 		}
-		Log.d(getClass().getCanonicalName(), "Title: " + period_label
-				+ "; Time: " + time);
-		views.setTextViewText(R.id.text_period_label, period_label);
+		views.setTextViewText(R.id.text_label, period_label);
 
 		appWidgetManager.updateAppWidget(appWidgetIds, views);
 	}

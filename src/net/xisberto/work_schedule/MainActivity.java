@@ -16,6 +16,7 @@ import net.xisberto.work_schedule.Settings.Period;
 import net.xisberto.work_schedule.TimePickerFragment.OnTimePickerSetListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,10 +29,15 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class MainActivity extends SherlockFragmentActivity implements
 		OnItemClickListener, OnTimePickerSetListener {
+	
+	public static final String 
+			ACTION_SET_PERIOD = "net.xisberto.work_schedule.set_period";
 
 	private static final SparseArray<Period> PeriodIds = new SparseArray<Period>();
 
 	private Settings settings;
+
+	private boolean showDialogOnResume;
 
 	@Override
 	public void onTimeSet(int hour, int minute, int callerId) {
@@ -105,6 +111,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 		list.setOnItemClickListener(this);
 	}
 
+	private void showTimePickerDialog(int pref_id) {
+		TimePickerFragment dialog = TimePickerFragment.newInstance(pref_id);
+		dialog.show(getSupportFragmentManager(), "time_picker");
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -116,6 +127,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 		for (Period period : Period.values()) {
 			PeriodIds.put(period.pref_id, period);
 		}
+		
+		if (getIntent().getAction() != null && getIntent().getAction().equals(ACTION_SET_PERIOD)) {
+			showDialogOnResume = true;
+		}
 
 	}
 
@@ -123,6 +138,16 @@ public class MainActivity extends SherlockFragmentActivity implements
 	protected void onResume() {
 		super.onResume();
 		updateLayout();
+		if (showDialogOnResume) {
+			showDialogOnResume = false;
+			Bundle info = settings.getNextAlarm();
+			if (info.containsKey(Settings.EXTRA_PREF_ID)) {
+				if (BuildConfig.DEBUG) {
+					Log.d(getPackageName(), "period.pref_id: "+info.getInt(Settings.EXTRA_PREF_ID));
+				}
+				showTimePickerDialog(info.getInt(Settings.EXTRA_PREF_ID));
+			}
+		}
 	}
 
 	@Override
@@ -144,9 +169,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-		TimePickerFragment dialog = TimePickerFragment.newInstance(Period
-				.values()[position].pref_id);
-		dialog.show(getSupportFragmentManager(), "time_picker");
+		showTimePickerDialog(Period.values()[position].pref_id);
 	}
 
 }
