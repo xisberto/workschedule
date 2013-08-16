@@ -38,8 +38,8 @@ public class WidgetConfigActivity extends Activity {
 			mAppWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
 					AppWidgetManager.INVALID_APPWIDGET_ID);
 			//TODO: Configure here theme
-			Intent updateIntent = new Intent(this, WidgetNextProvider.class);
-			updateIntent.setAction(WidgetNextProvider.MY_ACTION_UPDATE);
+			Intent updateIntent = new Intent(this, WidgetNextMinimalProvider.class);
+			updateIntent.setAction(WidgetNextMinimalProvider.MY_ACTION_UPDATE);
 			sendBroadcast(updateIntent);
 		}
 	}

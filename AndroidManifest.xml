@@ -80,6 +80,19 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_next_alarm" />
         </receiver>
+        
+        <receiver
+            android:name="net.xisberto.work_schedule.WidgetNextMinimalProvider"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_next_alarm_minimal" />
+        </receiver>
 
         <service
             android:name="net.xisberto.work_schedule.DashClockExtensionService"

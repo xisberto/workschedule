@@ -339,8 +339,8 @@ public class Settings {
 			am.cancel(alarmSender);
 		}
 
-		Intent updateIntent = new Intent(context, WidgetNextProvider.class);
-		updateIntent.setAction(WidgetNextProvider.MY_ACTION_UPDATE);
+		Intent updateIntent = new Intent(context, WidgetNextMinimalProvider.class);
+		updateIntent.setAction(WidgetNextMinimalProvider.MY_ACTION_UPDATE);
 		context.sendBroadcast(updateIntent);
 
 		context.sendBroadcast(new Intent(
