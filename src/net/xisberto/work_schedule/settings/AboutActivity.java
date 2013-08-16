@@ -8,7 +8,7 @@
  * Contributors:
  *     Humberto Fraga - initial API and implementation
  ******************************************************************************/
-package net.xisberto.work_schedule;
+package net.xisberto.work_schedule.settings;
 
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;

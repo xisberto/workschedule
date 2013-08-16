@@ -12,7 +12,7 @@ package net.xisberto.work_schedule;
 
 import java.util.Calendar;
 
-import net.xisberto.work_schedule.Settings.Period;
+import net.xisberto.work_schedule.settings.Settings.Period;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;

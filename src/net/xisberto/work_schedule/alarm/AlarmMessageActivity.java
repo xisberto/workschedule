@@ -8,12 +8,14 @@
  * Contributors:
  *     Humberto Fraga - initial API and implementation
  ******************************************************************************/
-package net.xisberto.work_schedule;
+package net.xisberto.work_schedule.alarm;
 
 import java.io.IOException;
 import java.util.Calendar;
 
-import net.xisberto.work_schedule.Settings.Period;
+import net.xisberto.work_schedule.R;
+import net.xisberto.work_schedule.settings.Settings;
+import net.xisberto.work_schedule.settings.Settings.Period;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;

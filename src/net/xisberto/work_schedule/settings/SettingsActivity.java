@@ -8,10 +8,11 @@
  * Contributors:
  *     Humberto Fraga - initial API and implementation
  ******************************************************************************/
-package net.xisberto.work_schedule;
+package net.xisberto.work_schedule.settings;
 
 import java.util.List;
 
+import net.xisberto.work_schedule.R;
 import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.os.Build;

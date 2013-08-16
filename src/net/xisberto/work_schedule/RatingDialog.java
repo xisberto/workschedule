@@ -10,6 +10,7 @@
  ******************************************************************************/
 package net.xisberto.work_schedule;
 
+import net.xisberto.work_schedule.settings.Settings;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;

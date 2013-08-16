@@ -1,4 +1,4 @@
-package net.xisberto.work_schedule;
+package net.xisberto.work_schedule.alarm;
 
 import android.util.Log;
 import android.view.View;

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package net.xisberto.work_schedule;
 
+import net.xisberto.work_schedule.settings.Settings;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

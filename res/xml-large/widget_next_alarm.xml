@@ -18,6 +18,6 @@
     android:updatePeriodMillis="3600000"
     android:widgetCategory="home_screen"
     android:previewImage="@drawable/widget_preview"
-    android:configure="net.xisberto.work_schedule.WidgetConfigActivity" >
+    android:configure="net.xisberto.work_schedule.widget.WidgetConfigActivity" >
 
 </appwidget-provider>

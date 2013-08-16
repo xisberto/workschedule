@@ -11,7 +11,7 @@
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <net.xisberto.work_schedule.TimePickerPreference
+    <net.xisberto.work_schedule.settings.TimePickerPreference
         android:key="@string/key_snooze_increment"
         android:title="@string/lbl_snooze_increment" />
 

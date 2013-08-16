@@ -8,10 +8,16 @@
  * Contributors:
  *     Humberto Fraga <xisberto@gmail.com> - initial API and implementation
  ******************************************************************************/
-package net.xisberto.work_schedule;
+package net.xisberto.work_schedule.settings;
 
 import java.util.Calendar;
 
+import net.xisberto.work_schedule.BuildConfig;
+import net.xisberto.work_schedule.DashClockExtensionService;
+import net.xisberto.work_schedule.R;
+import net.xisberto.work_schedule.alarm.AlarmMessageActivity;
+import net.xisberto.work_schedule.alarm.AlarmReceiver;
+import net.xisberto.work_schedule.widget.WidgetNextMinimalProvider;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;

@@ -8,9 +8,10 @@
  * Contributors:
  *     Humberto Fraga - initial API and implementation
  ******************************************************************************/
-package net.xisberto.work_schedule;
+package net.xisberto.work_schedule.alarm;
 
-import net.xisberto.work_schedule.Settings.Period;
+import net.xisberto.work_schedule.settings.Settings;
+import net.xisberto.work_schedule.settings.Settings.Period;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

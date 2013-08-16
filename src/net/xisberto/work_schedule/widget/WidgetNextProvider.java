@@ -1,5 +1,8 @@
-package net.xisberto.work_schedule;
+package net.xisberto.work_schedule.widget;
 
+import net.xisberto.work_schedule.MainActivity;
+import net.xisberto.work_schedule.R;
+import net.xisberto.work_schedule.settings.Settings;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;

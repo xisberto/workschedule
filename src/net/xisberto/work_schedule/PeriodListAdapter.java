@@ -10,7 +10,8 @@
  ******************************************************************************/
 package net.xisberto.work_schedule;
 
-import net.xisberto.work_schedule.Settings.Period;
+import net.xisberto.work_schedule.settings.Settings;
+import net.xisberto.work_schedule.settings.Settings.Period;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.util.SparseArray;

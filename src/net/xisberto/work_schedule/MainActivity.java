@@ -12,8 +12,10 @@ package net.xisberto.work_schedule;
 
 import java.util.Calendar;
 
-import net.xisberto.work_schedule.Settings.Period;
 import net.xisberto.work_schedule.TimePickerFragment.OnTimePickerSetListener;
+import net.xisberto.work_schedule.settings.Settings;
+import net.xisberto.work_schedule.settings.SettingsActivity;
+import net.xisberto.work_schedule.settings.Settings.Period;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;

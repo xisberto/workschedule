@@ -8,7 +8,7 @@
  * Contributors:
  *     Humberto Fraga <xisberto@gmail.com> - initial API and implementation
  ******************************************************************************/
-package net.xisberto.work_schedule;
+package net.xisberto.work_schedule.settings;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

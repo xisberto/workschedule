@@ -14,19 +14,19 @@
     <Preference android:title="@string/pref_category_intervals" >
         <intent
             android:action="@string/action_settings_intervals"
-            android:targetClass="net.xisberto.work_schedule.SettingsActivity"
+            android:targetClass="net.xisberto.work_schedule.settings.SettingsActivity"
             android:targetPackage="net.xisberto.work_schedule" />
     </Preference>
     <Preference android:title="@string/pref_category_alarm" >
         <intent
             android:action="@string/action_settings_alarm"
-            android:targetClass="net.xisberto.work_schedule.SettingsActivity"
+            android:targetClass="net.xisberto.work_schedule.settings.SettingsActivity"
             android:targetPackage="net.xisberto.work_schedule" />
     </Preference>
     <Preference android:title="@string/pref_category_about" >
         <intent
             android:action="net.xisberto.work_schedule.AboutActivity"
-            android:targetClass="net.xisberto.work_schedule.AboutActivity"
+            android:targetClass="net.xisberto.work_schedule.settings.AboutActivity"
             android:targetPackage="net.xisberto.work_schedule" />
     </Preference>
 
