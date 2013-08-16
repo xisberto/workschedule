@@ -10,10 +10,9 @@
       Humberto Fraga - initial API and implementation
 -->
 <resources>
+
     <dimen name="border_padding">8dp</dimen>
     <dimen name="slider_margin">0dp</dimen>
     <dimen name="widget_margin">8dp</dimen>
-    
-    <dimen name="slider_margin_large">240dp</dimen>
-    <dimen name="slider_margin_large_portrait">120dp</dimen>
+
 </resources>

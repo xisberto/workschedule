@@ -29,11 +29,12 @@
 
     <TextView
         android:id="@+id/text_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/image_icon"
-        android:text="@string/no_alarm"
+        android:gravity="center_vertical|start"
+        android:text="@string/widget_updating"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>
