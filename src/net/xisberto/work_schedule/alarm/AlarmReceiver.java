@@ -10,8 +10,6 @@
  ******************************************************************************/
 package net.xisberto.work_schedule.alarm;
 
-import net.xisberto.work_schedule.settings.Settings;
-import net.xisberto.work_schedule.settings.Settings.Period;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,16 +21,15 @@ public class AlarmReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		Bundle extras = intent.getExtras();
 		int pref_id = extras.getInt(AlarmMessageActivity.EXTRA_PERIOD_ID);
-		Period p = Period.getFromPrefId(pref_id);
-		showAlarm(context, p);
-		new Settings(context).unsetAlarm(p);
+		showAlarm(context, pref_id);
+//		Settings.getInstance(context.getApplicationContext()).unsetAlarm(p);
 	}
 
-	private void showAlarm(Context context, Period period) {
+	private void showAlarm(Context context, int pref_id) {
 		Intent intentAlarm = new Intent(context, AlarmMessageActivity.class);
 		intentAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID,
-				period.pref_id);
+				pref_id);
 		context.startActivity(intentAlarm);
 	}
 

@@ -50,7 +50,7 @@ public class DashClockExtensionService extends DashClockExtension {
 
 	@Override
 	protected void onUpdateData(int arg0) {
-		Bundle next_alarm = new Settings(getApplicationContext()).getNextAlarm();
+		Bundle next_alarm = Settings.getInstance(getApplicationContext()).getNextAlarm();
 		Log.d(getPackageName(), "Updating Dash Clock Extension");
 		
 		if (next_alarm.getString(Settings.EXTRA_PERIOD_TIME).equals("")) {

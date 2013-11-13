@@ -10,11 +10,12 @@
  ******************************************************************************/
 package net.xisberto.work_schedule;
 
+import net.xisberto.work_schedule.database.Period;
 import net.xisberto.work_schedule.settings.Settings;
-import net.xisberto.work_schedule.settings.Settings.Period;
 import android.content.Context;
 import android.database.DataSetObserver;
-import android.util.SparseArray;
+import android.support.v4.util.SparseArrayCompat;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,27 +25,27 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 public class PeriodListAdapter implements ListAdapter {
-	Context context;
-	private SparseArray<Period> list;
+	private Context context;
+	private SparseArrayCompat<Period> periods;
 
-	public PeriodListAdapter(Context context, SparseArray<Period> periods) {
+	public PeriodListAdapter(Context context, SparseArrayCompat<Period> periods) {
 		this.context = context;
-		list = periods;
+		this.periods = periods;
 	}
 
 	@Override
 	public int getCount() {
-		return list.size();
+		return periods.size();
 	}
 
 	@Override
 	public Object getItem(int position) {
-		return list.valueAt(position);
+		return periods.valueAt(position);
 	}
 
 	@Override
 	public long getItemId(int position) {
-		return (Integer) list.keyAt(position);
+		return periods.keyAt(position);
 	}
 
 	@Override
@@ -54,36 +55,37 @@ public class PeriodListAdapter implements ListAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		View view = convertView;
-		if (view == null) {
+		if (convertView == null) {
 			LayoutInflater inflater = (LayoutInflater) context
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			view = inflater.inflate(R.layout.period_list_item, null);
+			convertView = inflater.inflate(R.layout.period_list_item, null);
 		}
 
 		final Period period = (Period) getItem(position);
-		final Settings settings = new Settings(context);
-		final String period_pref_key = context.getString(period.pref_id);
+		final Settings settings = Settings.getInstance(context);
 
-		((TextView) view.findViewById(R.id.period_label)).setText(context
-				.getString(period.label_id));
+		((TextView) convertView.findViewById(R.id.period_label)).setText(context
+				.getString(period.getLabel()));
 
-		((TextView) view.findViewById(R.id.period_time)).setText(settings
-				.formatCalendar(settings.getCalendar(period_pref_key)));
 
-		CompoundButton check_alarm = (CompoundButton) view.findViewById(R.id.check_alarm);
-		check_alarm.setChecked(settings.isAlarmSet(period.pref_id));
+		String inFormat = "hh:mm aa";
+		if (DateFormat.is24HourFormat(context)) {
+			inFormat = "kk:mm";
+		}
+		((TextView) convertView.findViewById(R.id.period_time)).setText(
+				DateFormat.format(inFormat, period.time));
+
+		CompoundButton check_alarm = (CompoundButton) convertView.findViewById(R.id.check_alarm);
+		check_alarm.setChecked(settings.isAlarmSet(period.getId()));
 		check_alarm.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View check_box) {
-				settings.setAlarm(period,
-						settings.getCalendar(period_pref_key),
-						((CompoundButton) check_box).isChecked());
+				settings.setAlarm(period);
 			}
 		});
 
-		return view;
+		return convertView;
 	}
 
 	@Override

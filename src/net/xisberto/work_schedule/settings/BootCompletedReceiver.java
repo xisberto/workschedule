@@ -22,7 +22,7 @@ public class BootCompletedReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Log.d(context.getPackageName(), intent.getAction());
-		Settings settings = new Settings(context);
+		Settings settings = Settings.getInstance(context);
 		settings.resetAllAlarms();
 	}
 }

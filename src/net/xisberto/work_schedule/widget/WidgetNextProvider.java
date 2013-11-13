@@ -28,7 +28,7 @@ public class WidgetNextProvider extends WidgetNextMinimalProvider {
 				1, intentAction, 0);
 		views.setOnClickPendingIntent(R.id.text_label, pendingIntentAction);
 
-		Settings settings = new Settings(context.getApplicationContext());
+		Settings settings = Settings.getInstance(context.getApplicationContext());
 		Bundle info = settings.getNextAlarm();
 		String period_label = info.getString(Settings.EXTRA_PERIOD_LABEL);
 		String time = info.getString(Settings.EXTRA_PERIOD_TIME);

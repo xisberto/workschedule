@@ -17,6 +17,7 @@ import net.xisberto.work_schedule.DashClockExtensionService;
 import net.xisberto.work_schedule.R;
 import net.xisberto.work_schedule.alarm.AlarmMessageActivity;
 import net.xisberto.work_schedule.alarm.AlarmReceiver;
+import net.xisberto.work_schedule.database.Period;
 import net.xisberto.work_schedule.widget.WidgetNextMinimalProvider;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
@@ -29,48 +30,56 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
-import android.util.Log;
 
 public class Settings {
 	public static final String EXTRA_PERIOD_LABEL = "period_label",
-			EXTRA_PREF_ID = "pref_id",
-			EXTRA_PERIOD_TIME = "period_time";
+			EXTRA_PREF_ID = "pref_id", EXTRA_PERIOD_TIME = "period_time";
+
+	private static Settings instance = null;
 
 	private Context context;
 	private SharedPreferences prefs;
 
-	public enum Period {
-		FSTP_ENTRANCE(R.string.fstp_entrance, R.string.lbl_fstp_entrance), FSTP_EXIT(
-				R.string.fstp_exit, R.string.lbl_fstp_exit), SNDP_ENTRANCE(
-				R.string.sndp_entrance, R.string.lbl_sndp_entrance), SNDP_EXIT(
-				R.string.sndp_exit, R.string.lbl_sndp_exit), FSTE_ENTRANCE(
-				R.string.fste_entrance, R.string.lbl_fste_entrance), FSTE_EXIT(
-				R.string.fste_exit, R.string.lbl_fste_exit), SNDE_ENTRANCE(
-				R.string.snde_entrance, R.string.lbl_snde_entrance), SNDE_EXIT(
-				R.string.snde_exit, R.string.lbl_snde_exit);
+	// public enum Period {
+	// FSTP_ENTRANCE(R.string.fstp_entrance, R.string.lbl_fstp_entrance),
+	// FSTP_EXIT(
+	// R.string.fstp_exit, R.string.lbl_fstp_exit), SNDP_ENTRANCE(
+	// R.string.sndp_entrance, R.string.lbl_sndp_entrance), SNDP_EXIT(
+	// R.string.sndp_exit, R.string.lbl_sndp_exit), FSTE_ENTRANCE(
+	// R.string.fste_entrance, R.string.lbl_fste_entrance), FSTE_EXIT(
+	// R.string.fste_exit, R.string.lbl_fste_exit), SNDE_ENTRANCE(
+	// R.string.snde_entrance, R.string.lbl_snde_entrance), SNDE_EXIT(
+	// R.string.snde_exit, R.string.lbl_snde_exit);
+	//
+	// public int pref_id;
+	// public int label_id;
+	//
+	// private Period(int pref_id, int label_id) {
+	// this.pref_id = pref_id;
+	// this.label_id = label_id;
+	// }
+	//
+	// public static Period getFromPrefId(int pref_id) {
+	// for (Period period : Period.values()) {
+	// if (period.pref_id == pref_id) {
+	// return period;
+	// }
+	// }
+	// return null;
+	// }
+	//
+	// }
 
-		public int pref_id;
-		public int label_id;
-
-		private Period(int pref_id, int label_id) {
-			this.pref_id = pref_id;
-			this.label_id = label_id;
-		}
-
-		public static Period getFromPrefId(int pref_id) {
-			for (Period period : Period.values()) {
-				if (period.pref_id == pref_id) {
-					return period;
-				}
-			}
-			return null;
-		}
-
-	}
-
-	public Settings(Context context) {
+	private Settings(Context context) {
 		this.context = context;
 		prefs = PreferenceManager.getDefaultSharedPreferences(context);
+	}
+
+	public static Settings getInstance(Context context) {
+		if (instance == null) {
+			instance = new Settings(context);
+		}
+		return instance;
 	}
 
 	@SuppressLint("NewApi")
@@ -179,8 +188,8 @@ public class Settings {
 
 	/**
 	 * Builds a {@link Calendar} with date equals as the actual day, hour and
-	 * minute as specified and seconds and milliseconds set to zero.
-	 * When on debug (BuildConfig.DEBUG), seconds are set to the next value.
+	 * minute as specified and seconds and milliseconds set to zero. When on
+	 * debug (BuildConfig.DEBUG), seconds are set to the next value.
 	 * 
 	 * @param hour
 	 *            the hour for the {@link Calendar}
@@ -192,11 +201,11 @@ public class Settings {
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.HOUR_OF_DAY, hour);
 		cal.set(Calendar.MINUTE, minute);
-		if (! BuildConfig.DEBUG) {
+		if (!BuildConfig.DEBUG) {
 			cal.set(Calendar.SECOND, 0);
 			cal.set(Calendar.MILLISECOND, 0);
 		} else {
-			cal.set(Calendar.SECOND, cal.get(Calendar.SECOND)+1);
+			cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) + 1);
 		}
 		return cal;
 	}
@@ -281,26 +290,26 @@ public class Settings {
 	 */
 	public Bundle getNextAlarm() {
 		Bundle result = new Bundle();
-		for (Period period : Period.values()) {
-			if (BuildConfig.DEBUG) {
-				Log.d(getClass().getCanonicalName(), "Looping Period: "
-						+ period.pref_id);
-			}
-			if (isAlarmSet(period.pref_id)) {
-				if (BuildConfig.DEBUG) {
-					Log.d(getClass().getCanonicalName(), " alarm set");
-				}
-				Calendar period_time = getCalendar(period.pref_id);
-				if (period_time.after(Calendar.getInstance())) {
-					result.putString(EXTRA_PERIOD_LABEL,
-							context.getString(period.label_id));
-					result.putInt(EXTRA_PREF_ID, period.pref_id);
-					result.putString(EXTRA_PERIOD_TIME,
-							formatCalendar(period_time));
-					return result;
-				}
-			}
-		}
+//		for (Period period : Period.values()) {
+//			if (BuildConfig.DEBUG) {
+//				Log.d(getClass().getCanonicalName(), "Looping Period: "
+//						+ period.pref_id);
+//			}
+//			if (isAlarmSet(period.pref_id)) {
+//				if (BuildConfig.DEBUG) {
+//					Log.d(getClass().getCanonicalName(), " alarm set");
+//				}
+//				Calendar period_time = getCalendar(period.pref_id);
+//				if (period_time.after(Calendar.getInstance())) {
+//					result.putString(EXTRA_PERIOD_LABEL,
+//							context.getString(period.label_id));
+//					result.putInt(EXTRA_PREF_ID, period.pref_id);
+//					result.putString(EXTRA_PERIOD_TIME,
+//							formatCalendar(period_time));
+//					return result;
+//				}
+//			}
+//		}
 		result.putString(EXTRA_PERIOD_LABEL,
 				context.getString(R.string.no_alarm));
 		result.putString(EXTRA_PERIOD_TIME, "");
@@ -321,35 +330,24 @@ public class Settings {
 	 *            if true, the alarm will be set. If false, the alarm will be
 	 *            cancelled {@link AlarmManager.cancel}
 	 */
-	public void setAlarm(Period period, Calendar cal, boolean enabled) {
-		// Save the time and the status to the SharedPreferences
-		// Even if the alarm won't be set, we must show it for the user
-		Editor editor = prefs.edit();
-		saveCalendar(cal, context.getString(period.pref_id));
-		// If cal is before now, the alarm isn't set
-		// We continue with the function so we cancel a previously set alarm
-		if (cal.before(Calendar.getInstance())) {
-			enabled = false;
-		}
-		editor.putBoolean(context.getString(period.pref_id) + ".isset", enabled);
-		apply(editor);
-
+	public void setAlarm(Period period) {
 		// Set or cancel the alarm
 		Intent intentAlarm = new Intent(context, AlarmReceiver.class);
 		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID,
-				period.pref_id);
+				period.getId());
 		PendingIntent alarmSender = PendingIntent.getBroadcast(context,
-				period.pref_id, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
+				period.getId(), intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
 
 		AlarmManager am = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
-		if (enabled) {
-			am.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), alarmSender);
+		if (period.enabled) {
+			am.set(AlarmManager.RTC_WAKEUP, period.time.getTimeInMillis(), alarmSender);
 		} else {
 			am.cancel(alarmSender);
 		}
 
-		Intent updateIntent = new Intent(context, WidgetNextMinimalProvider.class);
+		Intent updateIntent = new Intent(context,
+				WidgetNextMinimalProvider.class);
 		updateIntent.setAction(WidgetNextMinimalProvider.MY_ACTION_UPDATE);
 		context.sendBroadcast(updateIntent);
 
@@ -359,23 +357,23 @@ public class Settings {
 	}
 
 	public void unsetAlarm(Period period) {
-		setAlarm(period, getCalendar(period.pref_id), false);
+		period.enabled = false;
+		setAlarm(period);
 	}
-	
+
 	public void resetAllAlarms() {
-		for (Period period : Period.values()) {
-			if (getMarkExtra() == false 
-					&& period == Period.FSTE_ENTRANCE) {
-				//Respects user option to don't mark extra
-				return;
-			}
-			if (period == Period.SNDE_ENTRANCE) {
-				//We never mark this as default
-				return;
-			}
-			Calendar cal = getCalendar(period.pref_id);
-			setAlarm(period, cal, isAlarmSet(period.pref_id));
-		}
+//		for (Period period : Period.values()) {
+//			if (getMarkExtra() == false && period == Period.FSTE_ENTRANCE) {
+//				// Respects user option to don't mark extra
+//				return;
+//			}
+//			if (period == Period.SNDE_ENTRANCE) {
+//				// We never mark this as default
+//				return;
+//			}
+//			Calendar cal = getCalendar(period.pref_id);
+//			setAlarm(period, cal, isAlarmSet(period.pref_id));
+//		}
 	}
 
 	public String getRingtone() {
