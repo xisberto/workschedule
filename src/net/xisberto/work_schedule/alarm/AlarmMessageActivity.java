@@ -148,8 +148,8 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 
 		Notification notification = new NotificationCompat.Builder(this)
 				.setSmallIcon(R.drawable.ic_stat_notification)
-				.setContentTitle(this.getString(period.getLabel()))
-				.setTicker(this.getString(period.getLabel()))
+				.setContentTitle(this.getString(period.getLabelId()))
+				.setTicker(this.getString(period.getLabelId()))
 				.setWhen(settings.getCalendar(period_pref_id).getTimeInMillis())
 				.setOngoing(true).setOnlyAlertOnce(true)
 				.setContentIntent(notifySender).build();

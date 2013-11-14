@@ -65,7 +65,7 @@ public class PeriodListAdapter implements ListAdapter {
 		final Settings settings = Settings.getInstance(context);
 
 		((TextView) convertView.findViewById(R.id.period_label)).setText(context
-				.getString(period.getLabel()));
+				.getString(period.getLabelId()));
 
 
 		String inFormat = "hh:mm aa";
@@ -76,7 +76,7 @@ public class PeriodListAdapter implements ListAdapter {
 				DateFormat.format(inFormat, period.time));
 
 		CompoundButton check_alarm = (CompoundButton) convertView.findViewById(R.id.check_alarm);
-		check_alarm.setChecked(settings.isAlarmSet(period.getId()));
+		check_alarm.setChecked(period.enabled);
 		check_alarm.setOnClickListener(new OnClickListener() {
 
 			@Override

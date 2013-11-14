@@ -1,6 +1,5 @@
 package net.xisberto.work_schedule.database;
 
-import java.util.Arrays;
 import java.util.Calendar;
 
 import net.xisberto.work_schedule.R;
@@ -19,17 +18,9 @@ public class Period {
 			R.string.fste_entrance, R.string.fste_exit, R.string.snde_entrance,
 			R.string.snde_exit };
 
-//	public Period(int id) {
-//		this(id, null);
-//	}
-
 	public Period(int pref_id, Calendar time) {
 		this.id = -1;
-		if (Arrays.asList(ids).contains(pref_id)) {
-			this.pref_id = pref_id;
-		} else {
-			this.pref_id = -1;
-		}
+		this.pref_id = pref_id;
 		if (time == null) {
 			this.time = Calendar.getInstance();
 		} else {
@@ -37,12 +28,17 @@ public class Period {
 		}
 		this.enabled = false;
 	}
+	
+	public static Period getPeriod(int pref_id) {
+		//TODO check on database if we have such pref_id + calendar combination
+		return new Period(pref_id, Calendar.getInstance());
+	}
 
 	public int getId() {
 		return pref_id;
 	}
 
-	public int getLabel() {
+	public int getLabelId() {
 		int labelId;
 		switch (pref_id) {
 		case R.string.fstp_entrance:
@@ -81,6 +77,10 @@ public class Period {
 		time.set(Calendar.MINUTE, minute);
 	}
 
+	/**Sets the the hour and minute fields of this object's time to the hour
+	 * and minute fields of the parameter
+	 * @param time
+	 */
 	public void setTime(Calendar time) {
 		time.set(Calendar.HOUR_OF_DAY, time.get(Calendar.HOUR_OF_DAY));
 		time.set(Calendar.MINUTE, time.get(Calendar.MINUTE));

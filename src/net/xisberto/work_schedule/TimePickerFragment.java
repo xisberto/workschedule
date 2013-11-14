@@ -64,7 +64,7 @@ public class TimePickerFragment extends SherlockDialogFragment implements
 		// Create a new instance of TimePickerDialog and return it
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
 				.setView(view)
-				.setTitle(getResources().getString(period.getLabel()))
+				.setTitle(getResources().getString(period.getLabelId()))
 				.setPositiveButton(android.R.string.ok, this)
 				.setNegativeButton(android.R.string.cancel, this);
 		dialog = builder.create();
@@ -76,10 +76,9 @@ public class TimePickerFragment extends SherlockDialogFragment implements
 		timePicker.clearFocus();
 		switch (which) {
 		case AlertDialog.BUTTON_POSITIVE:
-			int callerId = getArguments().getInt("callerId");
 			listener.onTimeSet(
 					timePicker.getCurrentHour(), timePicker.getCurrentMinute(),
-					callerId);
+					period.getId());
 			break;
 		case AlertDialog.BUTTON_NEGATIVE:
 		default:

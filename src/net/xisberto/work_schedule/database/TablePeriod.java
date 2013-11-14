@@ -3,11 +3,12 @@ package net.xisberto.work_schedule.database;
 public abstract class TablePeriod {
 
 	public static final String TABLE_NAME = "Periods",
-			COLUMN_ID = "rowid as _id",
+			COLUMN_ID = "_id",
 			COLUMN_PREF_ID = "pref_id",
 			COLUMN_TIME = "time",
 			COLUMN_ENABLED = "enabled",
 			CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "( " +
+					COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 					COLUMN_PREF_ID + " INTEGER NOT NULL, " +
 					COLUMN_TIME + " TEXT NOT NULL, " +
 					COLUMN_ENABLED + " INTEGER NOT NULL DEFAULT 0 " +

@@ -19,6 +19,7 @@ import net.xisberto.work_schedule.settings.SettingsActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.util.SparseArrayCompat;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -33,9 +34,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	public static final String ACTION_SET_PERIOD = "net.xisberto.work_schedule.set_period";
 
-	// private static final SparseArray<Period> PeriodIds = new
-	// SparseArray<Period>();
-
 	private SparseArrayCompat<Period> periods;
 	private Settings settings;
 
@@ -46,44 +44,43 @@ public class MainActivity extends SherlockFragmentActivity implements
 	@Override
 	public void onTimeSet(int hour, int minute, int callerId) {
 		// First we set the alarm passed by the caller, using a Period from our
-		// WorkDay
+		// SparseArray
 		Period period = periods.get(callerId);
 		period.setTime(hour, minute);
 		period.enabled = true;
+		period.persist(this);
 		settings.setAlarm(period);
 
-		// We will use next_period to set all Periods remaining in he WorkDay
+		// We will use next_period to set all Periods remaining
 		Period next_period = null;
-		// We will use this Calendar to calculate the Periods' times
-		Calendar cal = (Calendar) period.time.clone();
 
 		// This switch is used as a loop. We will enter it in the period.getId
-		// point and go through every step (without breaks). At every step, we:
-		// 1. point next_period to the correct Period in our WorkDay,
-		// 2. calculate the correct hour and minute for the alarm, and
-		// 3. set the alarm.
+		// point and go through every step after (without breaks). At every
+		// step, we:
+		// 1. point next_period to the correct Period in our SparseArray,
+		// 2. calculate the correct hour and minute for next_period, and
+		// 3. persist the period and set the alarm.
 		switch (period.getId()) {
 		case R.string.fstp_entrance:
 			next_period = periods.get(R.string.fstp_exit);
 
-			// In this point, cal = period.time
 			// fstp_exit = fstp_entrance + key_fstp_duration
-			settings.addCalendars(cal,
-					settings.getCalendar(R.string.key_fstp_duration));
-			next_period.time = (Calendar) cal.clone();
-
+			next_period.setTime(period.time);
+			next_period.addTime(settings.getCalendar(R.string.key_fstp_duration));
+			
+			next_period.enabled = true;
+			next_period.persist(this);
 			settings.setAlarm(next_period);
 
 		case R.string.fstp_exit:
 			next_period = periods.get(R.string.sndp_entrance);
 
-			// From this point and in the remaining, cal is a clone of
-			// period.time or a result of previous calculations
 			// sndp_entrance = fstp_exit + key_lunch_interval
-			settings.addCalendars(cal,
-					settings.getCalendar(R.string.key_lunch_interval));
-			next_period.time = (Calendar) cal.clone();
+			next_period.setTime(period.time);
+			next_period.addTime(settings.getCalendar(R.string.key_lunch_interval));
 
+			next_period.enabled = true;
+			next_period.persist(this);
 			settings.setAlarm(next_period);
 
 		case R.string.sndp_entrance:
@@ -103,39 +100,43 @@ public class MainActivity extends SherlockFragmentActivity implements
 							.getTimeInMillis());
 
 			// We set this Calendar to the duration calculated above. It will be
-			// added to cal
+			// added to next_period
 			Calendar sndp_duration = Calendar.getInstance();
 			sndp_duration.setTimeInMillis(mili_sndp_duration);
 
 			// sndp_exit = sndp_entrance + sndp_duration
-			settings.addCalendars(cal, sndp_duration);
-			next_period.time = (Calendar) cal.clone();
-			
+			next_period.setTime(period.time);
+			next_period.addTime(sndp_duration);
+
+			next_period.enabled = true;
+			next_period.persist(this);
 			settings.setAlarm(next_period);
-			
+
 		case R.string.sndp_exit:
 			next_period = periods.get(R.string.fste_entrance);
-			
+
 			// fste_entrance = sndp_exis + key_extra_interval
-			settings.addCalendars(cal, settings
-					.getCalendar(getString(R.string.key_extra_interval)));
-			next_period.time = (Calendar) cal.clone();
-			
+			next_period.setTime(period.time);
+			next_period.addTime(settings.getCalendar(R.string.key_extra_interval));
+
+			next_period.enabled = true;
+			next_period.persist(this);
 			settings.setAlarm(next_period);
-			
+
 		case R.string.fste_entrance:
 			next_period = periods.get(R.string.fste_exit);
-			
+
 			// fste_exit = fste_entrance + key_fste_duration
-			settings.addCalendars(cal,
-					settings.getCalendar(getString(R.string.key_fste_duration)));
-			next_period.time = (Calendar) cal.clone();
-			
+			next_period.setTime(period.time);
+			next_period.addTime(settings.getCalendar(R.string.key_fste_duration));
+
+			next_period.enabled = true;
+			next_period.persist(this);
 			settings.setAlarm(next_period);
 		default:
 			break;
 		}
-		
+
 		updateLayout();
 	}
 
@@ -150,25 +151,19 @@ public class MainActivity extends SherlockFragmentActivity implements
 		TimePickerFragment dialog = TimePickerFragment.newInstance(period);
 		dialog.show(getSupportFragmentManager(), "time_picker");
 	}
-	
-	private void insertPeriod(Period p) {
-		if (periods == null) {
-			periods = new SparseArrayCompat<Period>(8);
+
+	/**
+	 * Generates the {@link SparseArray} with the {@link Period}s for today.
+	 * Each {@link Period} will be set to this moment.
+	 * 
+	 */
+	private void buildPeriods() {
+		periods = new SparseArrayCompat<Period>(Period.ids.length);
+		for (int pref_id : Period.ids) {
+			periods.put(pref_id, Period.getPeriod(pref_id));
 		}
-		periods.put(p.getId(), p);
 	}
-	
-	private void getPeriods() {
-		insertPeriod(new Period(R.string.fstp_entrance, Calendar.getInstance()));
-		insertPeriod(new Period(R.string.fstp_exit, Calendar.getInstance()));
-		insertPeriod(new Period(R.string.sndp_entrance, Calendar.getInstance()));
-		insertPeriod(new Period(R.string.sndp_exit, Calendar.getInstance()));
-		insertPeriod(new Period(R.string.fste_entrance, Calendar.getInstance()));
-		insertPeriod(new Period(R.string.fste_exit, Calendar.getInstance()));
-		insertPeriod(new Period(R.string.snde_entrance, Calendar.getInstance()));
-		insertPeriod(new Period(R.string.snde_exit, Calendar.getInstance()));
-	}
-	
+
 	public Period getNextAlarm() {
 		Calendar cal = Calendar.getInstance();
 		for (int i = 0; i < periods.size(); i++) {
@@ -188,7 +183,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		settings = Settings.getInstance(getApplicationContext());
 		settings.setDefaultPreferenceValues();
 
-		getPeriods();
+		buildPeriods();
 
 		if (getIntent().getAction() != null
 				&& getIntent().getAction().equals(ACTION_SET_PERIOD)) {
