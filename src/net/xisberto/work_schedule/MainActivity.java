@@ -43,17 +43,19 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	@Override
 	public void onTimeSet(int hour, int minute, int callerId) {
+		Calendar now = Calendar.getInstance();
+
 		// First we set the alarm passed by the caller, using a Period from our
 		// SparseArray
 		Period period = periods.get(callerId);
 		period.setTime(hour, minute);
-		period.enabled = true;
+		period.enabled = period.time.after(now);
 		period.persist(this);
 		settings.setAlarm(period);
 
 		// We will use next_period to set all Periods remaining
 		Period next_period = null;
-
+		
 		// This switch is used as a loop. We will enter it in the period.getId
 		// point and go through every step after (without breaks). At every
 		// step, we:
@@ -66,26 +68,30 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			// fstp_exit = fstp_entrance + key_fstp_duration
 			next_period.setTime(period.time);
-			next_period.addTime(settings.getCalendar(R.string.key_fstp_duration));
-			
-			next_period.enabled = true;
+			next_period.addTime(settings
+					.getCalendar(R.string.key_fstp_duration));
+
+			next_period.enabled = next_period.time.after(now);
 			next_period.persist(this);
 			settings.setAlarm(next_period);
+			period = next_period;
 
 		case R.string.fstp_exit:
 			next_period = periods.get(R.string.sndp_entrance);
-
+			
 			// sndp_entrance = fstp_exit + key_lunch_interval
 			next_period.setTime(period.time);
-			next_period.addTime(settings.getCalendar(R.string.key_lunch_interval));
+			next_period.addTime(settings
+					.getCalendar(R.string.key_lunch_interval));
 
-			next_period.enabled = true;
+			next_period.enabled = next_period.time.after(now);
 			next_period.persist(this);
 			settings.setAlarm(next_period);
+			period = next_period;
 
 		case R.string.sndp_entrance:
 			next_period = periods.get(R.string.sndp_exit);
-
+			
 			// Here we need more calculations. The duration of the second period
 			// is based on the total work time (key_work_time) minus the today's
 			// first period (fstp_exit - fstp_entrance). It's best calculated
@@ -108,31 +114,36 @@ public class MainActivity extends SherlockFragmentActivity implements
 			next_period.setTime(period.time);
 			next_period.addTime(sndp_duration);
 
-			next_period.enabled = true;
+			next_period.enabled = next_period.time.after(now);
 			next_period.persist(this);
 			settings.setAlarm(next_period);
+			period = next_period;
 
 		case R.string.sndp_exit:
 			next_period = periods.get(R.string.fste_entrance);
-
+			
 			// fste_entrance = sndp_exis + key_extra_interval
 			next_period.setTime(period.time);
-			next_period.addTime(settings.getCalendar(R.string.key_extra_interval));
+			next_period.addTime(settings
+					.getCalendar(R.string.key_extra_interval));
 
-			next_period.enabled = true;
+			next_period.enabled = next_period.time.after(now);
 			next_period.persist(this);
 			settings.setAlarm(next_period);
+			period = next_period;
 
 		case R.string.fste_entrance:
 			next_period = periods.get(R.string.fste_exit);
-
+			
 			// fste_exit = fste_entrance + key_fste_duration
 			next_period.setTime(period.time);
-			next_period.addTime(settings.getCalendar(R.string.key_fste_duration));
+			next_period.addTime(settings
+					.getCalendar(R.string.key_fste_duration));
 
-			next_period.enabled = true;
+			next_period.enabled = next_period.time.after(now);
 			next_period.persist(this);
 			settings.setAlarm(next_period);
+			period = next_period;
 		default:
 			break;
 		}
@@ -160,7 +171,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private void buildPeriods() {
 		periods = new SparseArrayCompat<Period>(Period.ids.length);
 		for (int pref_id : Period.ids) {
-			periods.put(pref_id, Period.getPeriod(pref_id));
+			periods.put(pref_id, Period.getPeriod(this, pref_id));
 		}
 	}
 
