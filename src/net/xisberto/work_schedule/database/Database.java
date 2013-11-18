@@ -17,8 +17,8 @@ public class Database extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "work_schedule";
 	private static final int DATABASE_VERSION = 1;
 
-	public static final String DATE_FORMAT = "YYYY-MM-DD",
-			TIME_FORMAT = "HH:MM:SS", DATETIME_FORMAT = "YYYY-MM-DDTHH:MM:SS";
+	public static final String DATE_FORMAT = "yyyy-MM-dd",
+			TIME_FORMAT = "HH:mm:ss", DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	private static Database instance;
 
@@ -79,6 +79,7 @@ public class Database extends SQLiteOpenHelper {
 
 	private Period periodFromCursor(Cursor c) {
 		Period period = new Period(c.getInt(1), parseCalendar(c.getString(2)));
+		period.id = c.getLong(0);
 		period.enabled = (c.getInt(3) == 1);
 		return period;
 	}
@@ -121,6 +122,7 @@ public class Database extends SQLiteOpenHelper {
 		cv.put(TablePeriod.COLUMN_PREF_ID, period.getId());
 		cv.put(TablePeriod.COLUMN_TIME,
 				DateFormat.format(DATETIME_FORMAT, period.time).toString());
+		cv.put(TablePeriod.COLUMN_ENABLED, period.enabled ? 1 : 0);
 		return cv;
 	}
 
@@ -131,21 +133,22 @@ public class Database extends SQLiteOpenHelper {
 
 	public void updatePeriod(Period period) {
 		db.update(TablePeriod.TABLE_NAME, contentValuesFromPeriod(period),
-				TablePeriod.COLUMN_ID,
+				TablePeriod.COLUMN_ID + " = ?",
 				new String[] { Long.toString(period.id) });
 	}
 
 	public Period getPeriodOfDay(int pref_id, Calendar day) {
+		day.set(Calendar.SECOND, 0);
 		Cursor cursor = db.query(
 				TablePeriod.TABLE_NAME,
 				TablePeriod.COLUMNS,
 				TablePeriod.COLUMN_PREF_ID + " = ? AND "
-						+ TablePeriod.COLUMN_TIME + " LIKE ?%",
+						+ TablePeriod.COLUMN_TIME + " LIKE ?",
 				new String[] { Integer.toString(pref_id),
-						DateFormat.format(DATE_FORMAT, day).toString() }, null,
-				null, null);
+						DateFormat.format(DATE_FORMAT, day).toString() + "%" },
+				null, null, null);
 
-		if (cursor == null || cursor.getCount() < 0) {
+		if (cursor == null || cursor.getCount() <= 0) {
 			return null;
 		}
 
@@ -159,7 +162,7 @@ public class Database extends SQLiteOpenHelper {
 						.format(DATE_FORMAT, day).toString() }, null, null,
 				TablePeriod.COLUMN_PREF_ID);
 
-		if (cursor == null || cursor.getCount() < 0) {
+		if (cursor == null || cursor.getCount() <= 0) {
 			return null;
 		}
 
