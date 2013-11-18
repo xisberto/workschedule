@@ -29,8 +29,12 @@ public class Period {
 		this.enabled = false;
 	}
 	
-	public static Period getPeriod(int pref_id) {
-		//TODO check on database if we have such pref_id + calendar combination
+	public static Period getPeriod(Context context, int pref_id) {
+		Database database = Database.getInstance(context);
+		Period p = database.getPeriodOfDay(pref_id, Calendar.getInstance());
+		if (p != null) {
+			return p;
+		}
 		return new Period(pref_id, Calendar.getInstance());
 	}
 
@@ -79,16 +83,16 @@ public class Period {
 
 	/**Sets the the hour and minute fields of this object's time to the hour
 	 * and minute fields of the parameter
-	 * @param time
+	 * @param reference
 	 */
-	public void setTime(Calendar time) {
-		time.set(Calendar.HOUR_OF_DAY, time.get(Calendar.HOUR_OF_DAY));
-		time.set(Calendar.MINUTE, time.get(Calendar.MINUTE));
+	public void setTime(Calendar reference) {
+		time.set(Calendar.HOUR_OF_DAY, reference.get(Calendar.HOUR_OF_DAY));
+		time.set(Calendar.MINUTE, reference.get(Calendar.MINUTE));
 	}
 
-	public void addTime(Calendar time) {
-		time.add(Calendar.HOUR_OF_DAY, time.get(Calendar.HOUR_OF_DAY));
-		time.add(Calendar.MINUTE, time.get(Calendar.MINUTE));
+	public void addTime(Calendar reference) {
+		time.add(Calendar.HOUR_OF_DAY, reference.get(Calendar.HOUR_OF_DAY));
+		time.add(Calendar.MINUTE, reference.get(Calendar.MINUTE));
 	}
 
 	public void persist(Context context, PersistCallback callback) {
