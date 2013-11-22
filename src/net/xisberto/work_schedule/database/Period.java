@@ -6,6 +6,7 @@ import net.xisberto.work_schedule.R;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Process;
+import android.text.format.DateFormat;
 
 public class Period {
 	protected long id;
@@ -93,6 +94,21 @@ public class Period {
 	public void addTime(Calendar reference) {
 		time.add(Calendar.HOUR_OF_DAY, reference.get(Calendar.HOUR_OF_DAY));
 		time.add(Calendar.MINUTE, reference.get(Calendar.MINUTE));
+	}
+
+	/**
+	 * Formats {@link time} in a simple time String using {@link DateFormat}.
+	 * 
+	 * @param is24HourFormat if the result should be formated as "kk:mm"
+	 * @return a string formated on 24h or 12h according to
+	 *         {@code is24HourFormat}
+	 */
+	public String formatTime(boolean is24HourFormat) {
+		String inFormat = "hh:mm aa";
+		if (is24HourFormat) {
+			inFormat = "kk:mm";
+		}
+		return DateFormat.format(inFormat, time).toString();
 	}
 
 	public void persist(Context context, PersistCallback callback) {

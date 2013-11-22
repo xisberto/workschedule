@@ -31,6 +31,7 @@ import android.os.PowerManager;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.MotionEventCompat;
+import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -122,14 +123,13 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	private void snoozeAlarm() {
 		settings = Settings.getInstance(getApplicationContext());
 
-		settings.addCalendars(period.time,
-				settings.getCalendar(R.string.key_snooze_increment));
+		period.addTime(settings.getCalendar(R.string.key_snooze_increment));
 		settings.setAlarm(period);
 
 		Toast.makeText(
 				this,
 				getResources().getString(R.string.snooze_set_to) + " "
-						+ settings.formatCalendar(period.time),
+						+ period.formatTime(DateFormat.is24HourFormat(this)),
 				Toast.LENGTH_SHORT).show();
 		cancelAlarm();
 	}
@@ -203,7 +203,7 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 				period_pref_id, Calendar.getInstance());
 
 		settings = Settings.getInstance(getApplicationContext());
-		String time = settings.formatCalendar(period.time);
+		String time = period.formatTime(DateFormat.is24HourFormat(this));
 
 		((TextView) findViewById(R.id.txt_alarm_label)).setText(period.getId());
 		((TextView) findViewById(R.id.txt_alarm_time)).setText(time);

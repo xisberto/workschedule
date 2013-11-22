@@ -156,6 +156,24 @@ public class Database extends SQLiteOpenHelper {
 		return periodFromCursor(cursor);
 	}
 
+	public Period getNextAlarm() {
+		Cursor cursor = db.query(
+				TablePeriod.TABLE_NAME,
+				TablePeriod.COLUMNS,
+				TablePeriod.COLUMN_ENABLED + " = 1 AND "
+						+ TablePeriod.COLUMN_TIME + " > DATETIME('NOW')",
+				null, null, null,
+				TablePeriod.COLUMN_TIME, "1");
+
+		if (cursor == null || cursor.getCount() <= 0) {
+			return null;
+		}
+
+		cursor.moveToFirst();
+		return periodFromCursor(cursor);
+
+	}
+
 	public SparseArrayCompat<Period> listPeriodsFromDay(Calendar day) {
 		Cursor cursor = db.query(TablePeriod.TABLE_NAME, TablePeriod.COLUMNS,
 				TablePeriod.COLUMN_TIME + " LIKE ?%", new String[] { DateFormat
