@@ -72,6 +72,9 @@ public class PeriodListAdapter implements ListAdapter {
 		if (DateFormat.is24HourFormat(context)) {
 			inFormat = "kk:mm";
 		}
+		if (BuildConfig.DEBUG) {
+			inFormat = "yyyy-MM-dd " + inFormat;
+		}
 		((TextView) convertView.findViewById(R.id.period_time)).setText(
 				DateFormat.format(inFormat, period.time));
 

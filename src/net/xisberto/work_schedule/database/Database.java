@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import net.xisberto.work_schedule.BuildConfig;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -12,11 +14,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v4.util.SparseArrayCompat;
 import android.text.format.DateFormat;
+import android.util.Log;
 
 public class Database extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "work_schedule";
 	private static final int DATABASE_VERSION = 1;
 
+	//TODO implement timezone differences
 	public static final String DATE_FORMAT = "yyyy-MM-dd",
 			TIME_FORMAT = "HH:mm:ss", DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
@@ -139,6 +143,7 @@ public class Database extends SQLiteOpenHelper {
 
 	public Period getPeriodOfDay(int pref_id, Calendar day) {
 		day.set(Calendar.SECOND, 0);
+		day.set(Calendar.MILLISECOND, 0);
 		Cursor cursor = db.query(
 				TablePeriod.TABLE_NAME,
 				TablePeriod.COLUMNS,
@@ -157,20 +162,30 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	public Period getNextAlarm() {
-		Cursor cursor = db.query(
-				TablePeriod.TABLE_NAME,
-				TablePeriod.COLUMNS,
+		Cursor cursor = db.query(TablePeriod.TABLE_NAME, TablePeriod.COLUMNS,
 				TablePeriod.COLUMN_ENABLED + " = 1 AND "
-						+ TablePeriod.COLUMN_TIME + " > DATETIME('NOW')",
-				null, null, null,
-				TablePeriod.COLUMN_TIME, "1");
+						+ TablePeriod.COLUMN_TIME + " > DATETIME('NOW')", null,
+				null, null, TablePeriod.COLUMN_TIME, null);
 
 		if (cursor == null || cursor.getCount() <= 0) {
 			return null;
 		}
 
 		cursor.moveToFirst();
-		return periodFromCursor(cursor);
+		Period result = periodFromCursor(cursor);
+
+		if (BuildConfig.DEBUG) {
+			Cursor now = db.rawQuery("select datetime('now')", null);
+			now.moveToFirst();
+			Log.d("next alarm", "database now: "+ now.getString(0));
+			Log.d("next alarm", "cursor items: " + cursor.getCount());
+			do {
+				Log.d("next alarm", cursor.getString(cursor
+						.getColumnIndex(TablePeriod.COLUMN_TIME)));
+			} while (cursor.moveToNext());
+		}
+
+		return result;
 
 	}
 

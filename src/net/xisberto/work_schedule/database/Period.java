@@ -27,6 +27,8 @@ public class Period {
 		} else {
 			this.time = time;
 		}
+		this.time.set(Calendar.SECOND, 0);
+		this.time.set(Calendar.MILLISECOND, 0);
 		this.enabled = false;
 	}
 	
