@@ -6,7 +6,6 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import net.xisberto.work_schedule.BuildConfig;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -17,12 +16,11 @@ import android.text.format.DateFormat;
 import android.util.Log;
 
 public class Database extends SQLiteOpenHelper {
-	private static final String DATABASE_NAME = "work_schedule";
+	private static final String DATABASE_NAME = "work_schedule.db";
 	private static final int DATABASE_VERSION = 1;
 
-	//TODO implement timezone differences
 	public static final String DATE_FORMAT = "yyyy-MM-dd",
-			TIME_FORMAT = "HH:mm:ss", DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+			TIME_FORMAT = "HH:mm", DATETIME_FORMAT = "yyyy-MM-dd HH:mmz";
 
 	private static Database instance;
 
@@ -31,6 +29,7 @@ public class Database extends SQLiteOpenHelper {
 	private Database(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		db = getWritableDatabase();
+		log(Locale.getDefault().getDisplayName());
 	}
 
 	public static synchronized Database getInstance(Context context) {
@@ -38,6 +37,12 @@ public class Database extends SQLiteOpenHelper {
 			instance = new Database(context.getApplicationContext());
 		}
 		return instance;
+	}
+	
+	private static void log(String message) {
+		if (BuildConfig.DEBUG) {
+			Log.d("Database", message);
+		}
 	}
 
 	@Override
@@ -52,13 +57,21 @@ public class Database extends SQLiteOpenHelper {
 
 	}
 
+	@Override
+	public synchronized void close() {
+		super.close();
+		log("Database closed");
+	}
+
 	private Calendar parseCalendar(String string) {
 		Calendar cal = Calendar.getInstance();
 		try {
+			log("formating "+string);
 			SimpleDateFormat dateFormat = new SimpleDateFormat(DATETIME_FORMAT,
 					Locale.getDefault());
 			cal.setTime(dateFormat.parse(string));
 		} catch (ParseException e) {
+			log(e.getLocalizedMessage());
 			cal.set(Calendar.HOUR_OF_DAY, 0);
 			cal.set(Calendar.MINUTE, 0);
 			cal.set(Calendar.SECOND, 0);
@@ -82,7 +95,9 @@ public class Database extends SQLiteOpenHelper {
 	// }
 
 	private Period periodFromCursor(Cursor c) {
+		log("loading time "+c.getString(2));
 		Period period = new Period(c.getInt(1), parseCalendar(c.getString(2)));
+		log("loaded time "+period.formatTime(true));
 		period.id = c.getLong(0);
 		period.enabled = (c.getInt(3) == 1);
 		return period;
@@ -124,8 +139,11 @@ public class Database extends SQLiteOpenHelper {
 	private ContentValues contentValuesFromPeriod(Period period) {
 		ContentValues cv = new ContentValues();
 		cv.put(TablePeriod.COLUMN_PREF_ID, period.getId());
+		log("saving time "+period.formatTime(true));
+		String formatted = DateFormat.format(DATETIME_FORMAT, period.time).toString();
+		log("formatted time "+formatted);
 		cv.put(TablePeriod.COLUMN_TIME,
-				DateFormat.format(DATETIME_FORMAT, period.time).toString());
+				formatted);
 		cv.put(TablePeriod.COLUMN_ENABLED, period.enabled ? 1 : 0);
 		return cv;
 	}
@@ -177,7 +195,7 @@ public class Database extends SQLiteOpenHelper {
 		if (BuildConfig.DEBUG) {
 			Cursor now = db.rawQuery("select datetime('now')", null);
 			now.moveToFirst();
-			Log.d("next alarm", "database now: "+ now.getString(0));
+			Log.d("next alarm", "database now: " + now.getString(0));
 			Log.d("next alarm", "cursor items: " + cursor.getCount());
 			do {
 				Log.d("next alarm", cursor.getString(cursor
