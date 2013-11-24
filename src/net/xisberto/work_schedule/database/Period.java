@@ -3,11 +3,19 @@ package net.xisberto.work_schedule.database;
 import java.util.Calendar;
 
 import net.xisberto.work_schedule.BuildConfig;
+import net.xisberto.work_schedule.DashClockExtensionService;
 import net.xisberto.work_schedule.R;
+import net.xisberto.work_schedule.alarm.AlarmMessageActivity;
+import net.xisberto.work_schedule.alarm.AlarmReceiver;
+import net.xisberto.work_schedule.widget.WidgetNextMinimalProvider;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Process;
 import android.text.format.DateFormat;
+import android.util.Log;
 
 public class Period {
 	protected long id;
@@ -118,6 +126,42 @@ public class Period {
 			inFormat = "yyyy-MM-dd " + inFormat;
 		}
 		return DateFormat.format(inFormat, time).toString();
+	}
+
+	/**
+	 * Set a new alarm or cancel a existing one, based on this object's
+	 * {@link enabled}. The alarm won't be set if this object's time is before
+	 * now.
+	 * 
+	 * @param context
+	 *            the {@link Context} to handle the need Intents
+	 */
+	public void setAlarm(Context context) {
+		Intent intentAlarm = new Intent(context.getApplicationContext(),
+				AlarmReceiver.class);
+		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID, pref_id);
+
+		Log.d("Period", "setting alarm to " + pref_id + ", " + enabled);
+
+		PendingIntent alarmSender = PendingIntent.getBroadcast(
+				context.getApplicationContext(), pref_id, intentAlarm,
+				PendingIntent.FLAG_CANCEL_CURRENT);
+
+		AlarmManager am = (AlarmManager) context
+				.getSystemService(Context.ALARM_SERVICE);
+		if (enabled) {
+			am.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), alarmSender);
+		} else {
+			am.cancel(alarmSender);
+		}
+
+		Intent updateIntent = new Intent(context.getApplicationContext(),
+				WidgetNextMinimalProvider.class);
+		updateIntent.setAction(WidgetNextMinimalProvider.MY_ACTION_UPDATE);
+		context.sendBroadcast(updateIntent);
+
+		context.sendBroadcast(new Intent(
+				DashClockExtensionService.ACTION_UPDATE_ALARM));
 	}
 
 	public void persist(Context context, PersistCallback callback) {

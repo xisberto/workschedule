@@ -13,17 +13,9 @@ package net.xisberto.work_schedule.settings;
 import java.util.Calendar;
 
 import net.xisberto.work_schedule.BuildConfig;
-import net.xisberto.work_schedule.DashClockExtensionService;
 import net.xisberto.work_schedule.R;
-import net.xisberto.work_schedule.alarm.AlarmMessageActivity;
-import net.xisberto.work_schedule.alarm.AlarmReceiver;
-import net.xisberto.work_schedule.database.Period;
-import net.xisberto.work_schedule.widget.WidgetNextMinimalProvider;
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Build;
@@ -224,66 +216,6 @@ public class Settings {
 	 */
 	public Calendar getCalendar(int pref_id) {
 		return getCalendar(context.getString(pref_id));
-	}
-
-	/**
-	 * Set a new alarm or cancel a existing one. The alarm won't be set if the
-	 * Calendar passed is before now.
-	 * 
-	 * @param period
-	 *            the {@link Period} related to the alarm
-	 * @param cal
-	 *            the time when the alarm will start. If it´s before now, no
-	 *            alarm will be set. If {@link enabled} is false, {@link cal}
-	 *            will be ignored.
-	 * @param enabled
-	 *            if true, the alarm will be set. If false, the alarm will be
-	 *            cancelled {@link AlarmManager.cancel}
-	 */
-	public void setAlarm(Period period) {
-		// Set or cancel the alarm
-		Intent intentAlarm = new Intent(context, AlarmReceiver.class);
-		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID,
-				period.getId());
-		PendingIntent alarmSender = PendingIntent.getBroadcast(context,
-				period.getId(), intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
-
-		AlarmManager am = (AlarmManager) context
-				.getSystemService(Context.ALARM_SERVICE);
-		if (period.enabled) {
-			am.set(AlarmManager.RTC_WAKEUP, period.time.getTimeInMillis(), alarmSender);
-		} else {
-			am.cancel(alarmSender);
-		}
-
-		Intent updateIntent = new Intent(context,
-				WidgetNextMinimalProvider.class);
-		updateIntent.setAction(WidgetNextMinimalProvider.MY_ACTION_UPDATE);
-		context.sendBroadcast(updateIntent);
-
-		context.sendBroadcast(new Intent(
-				DashClockExtensionService.ACTION_UPDATE_ALARM));
-
-	}
-
-	public void unsetAlarm(Period period) {
-		period.enabled = false;
-		setAlarm(period);
-	}
-
-	public void resetAllAlarms() {
-//		for (Period period : Period.values()) {
-//			if (getMarkExtra() == false && period == Period.FSTE_ENTRANCE) {
-//				// Respects user option to don't mark extra
-//				return;
-//			}
-//			if (period == Period.SNDE_ENTRANCE) {
-//				// We never mark this as default
-//				return;
-//			}
-//			Calendar cal = getCalendar(period.pref_id);
-//			setAlarm(period, cal, isAlarmSet(period.pref_id));
-//		}
 	}
 
 	public String getRingtone() {

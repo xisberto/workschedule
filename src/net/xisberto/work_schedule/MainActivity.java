@@ -51,7 +51,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		period.setTime(hour, minute);
 		period.enabled = period.time.after(now);
 		period.persist(this);
-		settings.setAlarm(period);
+		period.setAlarm(this);
 
 		// We will use next_period to set all Periods remaining
 		Period next_period = null;
@@ -73,7 +73,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			next_period.enabled = next_period.time.after(now);
 			next_period.persist(this);
-			settings.setAlarm(next_period);
+			next_period.setAlarm(this);
 			period = next_period;
 
 		case R.string.fstp_exit:
@@ -86,7 +86,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			next_period.enabled = next_period.time.after(now);
 			next_period.persist(this);
-			settings.setAlarm(next_period);
+			next_period.setAlarm(this);
 			period = next_period;
 
 		case R.string.sndp_entrance:
@@ -116,7 +116,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			next_period.enabled = next_period.time.after(now);
 			next_period.persist(this);
-			settings.setAlarm(next_period);
+			next_period.setAlarm(this);
 			period = next_period;
 
 		case R.string.sndp_exit:
@@ -129,7 +129,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			next_period.enabled = next_period.time.after(now);
 			next_period.persist(this);
-			settings.setAlarm(next_period);
+			next_period.setAlarm(this);
 			period = next_period;
 
 		case R.string.fste_entrance:
@@ -142,7 +142,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			next_period.enabled = next_period.time.after(now);
 			next_period.persist(this);
-			settings.setAlarm(next_period);
+			next_period.setAlarm(this);
 			period = next_period;
 		default:
 			break;

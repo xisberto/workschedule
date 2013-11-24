@@ -111,8 +111,8 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 			mMediaPlayer = null;
 		}
 	}
-
-	private void cancelAlarm() {
+	
+	private void stopSoundVibrator() {
 		stopSound();
 		((Vibrator) getSystemService(VIBRATOR_SERVICE)).cancel();
 		if (!isFinishing()) {
@@ -120,18 +120,25 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		}
 	}
 
+	private void cancelAlarm() {
+		period.enabled = false;
+		period.persist(this);
+		stopSoundVibrator();
+	}
+
 	private void snoozeAlarm() {
 		settings = Settings.getInstance(getApplicationContext());
 
 		period.addTime(settings.getCalendar(R.string.key_snooze_increment));
-		settings.setAlarm(period);
+		period.setAlarm(this);
+		period.persist(this);
 
 		Toast.makeText(
 				this,
 				getResources().getString(R.string.snooze_set_to) + " "
 						+ period.formatTime(DateFormat.is24HourFormat(this)),
 				Toast.LENGTH_SHORT).show();
-		cancelAlarm();
+		stopSoundVibrator();
 	}
 
 	private void showNotification() {
@@ -199,13 +206,15 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 
 		period_pref_id = getIntent().getIntExtra(EXTRA_PERIOD_ID,
 				R.string.fstp_entrance);
+		Log.d("AlarmMessage", "showing alarm for "+period_pref_id);
 		period = Database.getInstance(getApplicationContext()).getPeriodOfDay(
 				period_pref_id, Calendar.getInstance());
+		Log.d("AlarmMessage", "time is "+period.formatTime(true));
 
 		settings = Settings.getInstance(getApplicationContext());
 		String time = period.formatTime(DateFormat.is24HourFormat(this));
 
-		((TextView) findViewById(R.id.txt_alarm_label)).setText(period.getId());
+		((TextView) findViewById(R.id.txt_alarm_label)).setText(period.getLabelId());
 		((TextView) findViewById(R.id.txt_alarm_time)).setText(time);
 
 		initialPoint = 0f;

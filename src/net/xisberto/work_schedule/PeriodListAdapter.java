@@ -11,7 +11,6 @@
 package net.xisberto.work_schedule;
 
 import net.xisberto.work_schedule.database.Period;
-import net.xisberto.work_schedule.settings.Settings;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.support.v4.util.SparseArrayCompat;
@@ -62,7 +61,6 @@ public class PeriodListAdapter implements ListAdapter {
 		}
 
 		final Period period = (Period) getItem(position);
-		final Settings settings = Settings.getInstance(context);
 
 		((TextView) convertView.findViewById(R.id.period_label)).setText(context
 				.getString(period.getLabelId()));
@@ -77,7 +75,9 @@ public class PeriodListAdapter implements ListAdapter {
 
 			@Override
 			public void onClick(View check_box) {
-				settings.setAlarm(period);
+				period.enabled = ((CompoundButton)check_box).isChecked();
+				period.setAlarm(context);
+				period.persist(context);
 			}
 		});
 
