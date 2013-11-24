@@ -68,15 +68,8 @@ public class PeriodListAdapter implements ListAdapter {
 				.getString(period.getLabelId()));
 
 
-		String inFormat = "hh:mm aa";
-		if (DateFormat.is24HourFormat(context)) {
-			inFormat = "kk:mm";
-		}
-		if (BuildConfig.DEBUG) {
-			inFormat = "yyyy-MM-dd " + inFormat;
-		}
 		((TextView) convertView.findViewById(R.id.period_time)).setText(
-				DateFormat.format(inFormat, period.time));
+				period.formatTime(DateFormat.is24HourFormat(context)));
 
 		CompoundButton check_alarm = (CompoundButton) convertView.findViewById(R.id.check_alarm);
 		check_alarm.setChecked(period.enabled);

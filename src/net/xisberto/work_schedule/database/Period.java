@@ -2,6 +2,7 @@ package net.xisberto.work_schedule.database;
 
 import java.util.Calendar;
 
+import net.xisberto.work_schedule.BuildConfig;
 import net.xisberto.work_schedule.R;
 import android.content.Context;
 import android.os.Handler;
@@ -31,7 +32,7 @@ public class Period {
 		this.time.set(Calendar.MILLISECOND, 0);
 		this.enabled = false;
 	}
-	
+
 	public static Period getPeriod(Context context, int pref_id) {
 		Database database = Database.getInstance(context);
 		Period p = database.getPeriodOfDay(pref_id, Calendar.getInstance());
@@ -84,13 +85,15 @@ public class Period {
 		time.set(Calendar.MINUTE, minute);
 	}
 
-	/**Sets the the hour and minute fields of this object's time to the hour
-	 * and minute fields of the parameter
+	/**
+	 * Clones {@link reference} into this object's {@link time}
+	 * 
 	 * @param reference
 	 */
 	public void setTime(Calendar reference) {
-		time.set(Calendar.HOUR_OF_DAY, reference.get(Calendar.HOUR_OF_DAY));
-		time.set(Calendar.MINUTE, reference.get(Calendar.MINUTE));
+		time = (Calendar) reference.clone();
+		// time.set(Calendar.HOUR_OF_DAY, reference.get(Calendar.HOUR_OF_DAY));
+		// time.set(Calendar.MINUTE, reference.get(Calendar.MINUTE));
 	}
 
 	public void addTime(Calendar reference) {
@@ -101,7 +104,8 @@ public class Period {
 	/**
 	 * Formats {@link time} in a simple time String using {@link DateFormat}.
 	 * 
-	 * @param is24HourFormat if the result should be formated as "kk:mm"
+	 * @param is24HourFormat
+	 *            if the result should be formated as "kk:mm"
 	 * @return a string formated on 24h or 12h according to
 	 *         {@code is24HourFormat}
 	 */
@@ -109,6 +113,9 @@ public class Period {
 		String inFormat = "hh:mm aa";
 		if (is24HourFormat) {
 			inFormat = "kk:mm";
+		}
+		if (BuildConfig.DEBUG) {
+			inFormat = "yyyy-MM-dd " + inFormat;
 		}
 		return DateFormat.format(inFormat, time).toString();
 	}
