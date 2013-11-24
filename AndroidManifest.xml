@@ -54,7 +54,7 @@
         </activity>
 
         <receiver
-            android:name="net.xisberto.work_schedule.alarm.AlarmReceiverceiver"
+            android:name="net.xisberto.work_schedule.alarm.AlarmReceiver"
             android:enabled="true"
             android:exported="false" >
         </receiver>
