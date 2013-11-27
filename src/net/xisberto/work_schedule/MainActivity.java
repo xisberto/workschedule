@@ -169,10 +169,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	 * 
 	 */
 	private void buildPeriods() {
-		periods = new SparseArrayCompat<Period>(Period.ids.length);
-		for (int pref_id : Period.ids) {
-			periods.put(pref_id, Period.getPeriod(this, pref_id));
-		}
+		periods = Period.getPeriodsForToday(this);
 	}
 
 	public Period getNextAlarm() {
