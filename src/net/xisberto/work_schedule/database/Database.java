@@ -12,7 +12,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v4.util.SparseArrayCompat;
-import android.text.format.DateFormat;
 import android.util.Log;
 
 public class Database extends SQLiteOpenHelper {
@@ -20,16 +19,18 @@ public class Database extends SQLiteOpenHelper {
 	private static final int DATABASE_VERSION = 1;
 
 	public static final String DATE_FORMAT = "yyyy-MM-dd",
-			TIME_FORMAT = "HH:mm", DATETIME_FORMAT = "yyyy-MM-dd HH:mmz";
+			TIME_FORMAT = "HH:mm", DATETIME_FORMAT = "yyyy-MM-dd HH:mmZZZZZ";
 
 	private static Database instance;
 
 	private SQLiteDatabase db;
+	private SimpleDateFormat dateFormatter;
 
 	private Database(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		db = getWritableDatabase();
-		log(Locale.getDefault().getDisplayName());
+		dateFormatter = new SimpleDateFormat(DATETIME_FORMAT,
+				Locale.getDefault());
 	}
 
 	public static synchronized Database getInstance(Context context) {
@@ -38,7 +39,7 @@ public class Database extends SQLiteOpenHelper {
 		}
 		return instance;
 	}
-	
+
 	private static void log(String message) {
 		if (BuildConfig.DEBUG) {
 			Log.d("Database", message);
@@ -66,10 +67,8 @@ public class Database extends SQLiteOpenHelper {
 	private Calendar parseCalendar(String string) {
 		Calendar cal = Calendar.getInstance();
 		try {
-			log("formating "+string);
-			SimpleDateFormat dateFormat = new SimpleDateFormat(DATETIME_FORMAT,
-					Locale.getDefault());
-			cal.setTime(dateFormat.parse(string));
+			log("formating " + string);
+			cal.setTime(dateFormatter.parse(string));
 		} catch (ParseException e) {
 			log(e.getLocalizedMessage());
 			cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -95,9 +94,9 @@ public class Database extends SQLiteOpenHelper {
 	// }
 
 	private Period periodFromCursor(Cursor c) {
-		log("loading time "+c.getString(2));
+		log("loading time " + c.getString(2));
 		Period period = new Period(c.getInt(1), parseCalendar(c.getString(2)));
-		log("loaded time "+period.formatTime(true));
+		log("loaded time " + period.formatTime(true));
 		period.id = c.getLong(0);
 		period.enabled = (c.getInt(3) == 1);
 		return period;
@@ -139,11 +138,13 @@ public class Database extends SQLiteOpenHelper {
 	private ContentValues contentValuesFromPeriod(Period period) {
 		ContentValues cv = new ContentValues();
 		cv.put(TablePeriod.COLUMN_PREF_ID, period.getId());
-		log("saving time "+period.formatTime(true));
-		String formatted = DateFormat.format(DATETIME_FORMAT, period.time).toString();
-		log("formatted time "+formatted);
-		cv.put(TablePeriod.COLUMN_TIME,
-				formatted);
+		log("saving time " + period.formatTime(true));
+		String formatted = dateFormatter.format(period.time.getTime());
+		// String formatted = DateFormat.format(DATETIME_WRITE_FORMAT,
+		// period.time)
+		// .toString();
+		log("formatted time " + formatted);
+		cv.put(TablePeriod.COLUMN_TIME, formatted);
 		cv.put(TablePeriod.COLUMN_ENABLED, period.enabled ? 1 : 0);
 		return cv;
 	}
@@ -160,16 +161,16 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	public Period getPeriodOfDay(int pref_id, Calendar day) {
-		day.set(Calendar.SECOND, 0);
-		day.set(Calendar.MILLISECOND, 0);
+		SimpleDateFormat dayFormatter = new SimpleDateFormat(DATE_FORMAT,
+				Locale.getDefault());
 		Cursor cursor = db.query(
 				TablePeriod.TABLE_NAME,
 				TablePeriod.COLUMNS,
 				TablePeriod.COLUMN_PREF_ID + " = ? AND "
 						+ TablePeriod.COLUMN_TIME + " LIKE ?",
 				new String[] { Integer.toString(pref_id),
-						DateFormat.format(DATE_FORMAT, day).toString() + "%" },
-				null, null, null);
+						dayFormatter.format(day.getTime()) + "%" }, null, null,
+				null);
 
 		if (cursor == null || cursor.getCount() <= 0) {
 			return null;
@@ -208,9 +209,15 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	public SparseArrayCompat<Period> listPeriodsFromDay(Calendar day) {
-		Cursor cursor = db.query(TablePeriod.TABLE_NAME, TablePeriod.COLUMNS,
-				TablePeriod.COLUMN_TIME + " LIKE ?%", new String[] { DateFormat
-						.format(DATE_FORMAT, day).toString() }, null, null,
+		SimpleDateFormat dayFormatter = new SimpleDateFormat(DATE_FORMAT,
+				Locale.getDefault());
+		Log.d("Database",
+				"listing periods for " + dayFormatter.format(day.getTime()));
+		Cursor cursor = db.query(
+				TablePeriod.TABLE_NAME,
+				TablePeriod.COLUMNS,
+				TablePeriod.COLUMN_TIME + " LIKE "
+						+ dayFormatter.format(day.getTime()), null, null, null,
 				TablePeriod.COLUMN_PREF_ID);
 
 		if (cursor == null || cursor.getCount() <= 0) {
