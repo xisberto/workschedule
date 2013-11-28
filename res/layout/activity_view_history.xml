@@ -9,13 +9,13 @@
         android:layout_height="wrap_content" >
 
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/btn_prev"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Button" />
 
         <TextView
-            android:id="@+id/textView1"
+            android:id="@+id/text_date"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -24,7 +24,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/btn_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Button" />
