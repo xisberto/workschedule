@@ -24,13 +24,12 @@ public class Database extends SQLiteOpenHelper {
 	private static Database instance;
 
 	private SQLiteDatabase db;
-	private SimpleDateFormat dateFormatter;
+	private SimpleDateFormat dateFormat;
 
 	private Database(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		db = getWritableDatabase();
-		dateFormatter = new SimpleDateFormat(DATETIME_FORMAT,
-				Locale.getDefault());
+		dateFormat = new SimpleDateFormat(DATETIME_FORMAT, Locale.getDefault());
 	}
 
 	public static synchronized Database getInstance(Context context) {
@@ -68,7 +67,7 @@ public class Database extends SQLiteOpenHelper {
 		Calendar cal = Calendar.getInstance();
 		try {
 			log("formating " + string);
-			cal.setTime(dateFormatter.parse(string));
+			cal.setTime(dateFormat.parse(string));
 		} catch (ParseException e) {
 			log(e.getLocalizedMessage());
 			cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -139,7 +138,7 @@ public class Database extends SQLiteOpenHelper {
 		ContentValues cv = new ContentValues();
 		cv.put(TablePeriod.COLUMN_PREF_ID, period.getId());
 		log("saving time " + period.formatTime(true));
-		String formatted = dateFormatter.format(period.time.getTime());
+		String formatted = dateFormat.format(period.time.getTime());
 		// String formatted = DateFormat.format(DATETIME_WRITE_FORMAT,
 		// period.time)
 		// .toString();
@@ -161,7 +160,7 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	public Period getPeriodOfDay(int pref_id, Calendar day) {
-		SimpleDateFormat dayFormatter = new SimpleDateFormat(DATE_FORMAT,
+		SimpleDateFormat dayFormat = new SimpleDateFormat(DATE_FORMAT,
 				Locale.getDefault());
 		Cursor cursor = db.query(
 				TablePeriod.TABLE_NAME,
@@ -169,7 +168,7 @@ public class Database extends SQLiteOpenHelper {
 				TablePeriod.COLUMN_PREF_ID + " = ? AND "
 						+ TablePeriod.COLUMN_TIME + " LIKE ?",
 				new String[] { Integer.toString(pref_id),
-						dayFormatter.format(day.getTime()) + "%" }, null, null,
+						dayFormat.format(day.getTime()) + "%" }, null, null,
 				null);
 
 		if (cursor == null || cursor.getCount() <= 0) {
@@ -209,25 +208,24 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	public SparseArrayCompat<Period> listPeriodsFromDay(Calendar day) {
-		SimpleDateFormat dayFormatter = new SimpleDateFormat(DATE_FORMAT,
+		SimpleDateFormat dayFormat = new SimpleDateFormat(DATE_FORMAT,
 				Locale.getDefault());
-		Log.d("Database",
-				"listing periods for " + dayFormatter.format(day.getTime()));
+		Log.d("Database ",
+				"listing periods for " + dayFormat.format(day.getTime()));
 		Cursor cursor = db.query(
 				TablePeriod.TABLE_NAME,
 				TablePeriod.COLUMNS,
-				TablePeriod.COLUMN_TIME + " LIKE "
-						+ dayFormatter.format(day.getTime()), null, null, null,
-				TablePeriod.COLUMN_PREF_ID);
-
-		if (cursor == null || cursor.getCount() <= 0) {
-			return null;
-		}
+				TablePeriod.COLUMN_TIME + " LIKE '"
+						+ dayFormat.format(day.getTime()) + "%'", null, null,
+				null, TablePeriod.COLUMN_PREF_ID);
 
 		SparseArrayCompat<Period> result = new SparseArrayCompat<Period>(8);
-		while (cursor.moveToNext()) {
-			Period p = periodFromCursor(cursor);
-			result.put(p.getId(), p);
+
+		if (cursor != null && cursor.getCount() > 0) {
+			while (cursor.moveToNext()) {
+				Period p = periodFromCursor(cursor);
+				result.put(p.getId(), p);
+			}
 		}
 
 		return result;

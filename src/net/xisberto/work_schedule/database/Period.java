@@ -14,7 +14,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Process;
-import android.support.v4.util.SparseArrayCompat;
 import android.text.format.DateFormat;
 import android.util.Log;
 
@@ -49,21 +48,6 @@ public class Period {
 			return p;
 		}
 		return new Period(pref_id, Calendar.getInstance());
-	}
-
-	public static SparseArrayCompat<Period> getPeriodsForToday(Context context) {
-		Database database = Database.getInstance(context);
-		SparseArrayCompat<Period> result = database.listPeriodsFromDay(Calendar
-				.getInstance());
-
-		if (result == null) {
-			result = new SparseArrayCompat<Period>(ids.length);
-			for (int id : ids) {
-				result.put(id, getPeriod(context, id));
-			}
-		}
-		
-		return result;
 	}
 
 	public int getId() {

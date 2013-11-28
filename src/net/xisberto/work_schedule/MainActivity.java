@@ -127,7 +127,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			next_period.addTime(settings
 					.getCalendar(R.string.key_extra_interval));
 
-			next_period.enabled = next_period.time.after(now);
+			next_period.enabled = settings.getMarkExtra() && next_period.time.after(now);
 			next_period.persist(this);
 			next_period.setAlarm(this);
 			period = next_period;
@@ -140,7 +140,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			next_period.addTime(settings
 					.getCalendar(R.string.key_fste_duration));
 
-			next_period.enabled = next_period.time.after(now);
+			next_period.enabled = settings.getMarkExtra() && next_period.time.after(now);
 			next_period.persist(this);
 			next_period.setAlarm(this);
 			period = next_period;
@@ -165,11 +165,15 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	/**
 	 * Generates the {@link SparseArray} with the {@link Period}s for today.
-	 * Each {@link Period} will be set to this moment.
+	 * Each {@link Period} not saved on the database will be set to this
+	 * moment.
 	 * 
 	 */
 	private void buildPeriods() {
-		periods = Period.getPeriodsForToday(this);
+		periods = new SparseArrayCompat<Period>(Period.ids.length);
+		for (int id : Period.ids) {
+			periods.put(id, Period.getPeriod(this, id));
+		}
 	}
 
 	public Period getNextAlarm() {
@@ -223,8 +227,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_settings:
-			Intent settings = new Intent(this, SettingsActivity.class);
-			startActivity(settings);
+			startActivity(new Intent(this, SettingsActivity.class));
+			return true;
+		case R.id.menu_history:
+			startActivity(new Intent(this, ViewHistoryActivity.class));
+			return true;
 		default:
 			return false;
 		}
