@@ -23,7 +23,7 @@ public class ViewDayFragment extends SherlockListFragment {
 		super.onCreate(savedInstanceState);
 		Database database = Database.getInstance(getActivity());
 		SparseArrayCompat<Period> periods = database.listPeriodsFromDay(day);
-		setListAdapter(new PeriodListAdapter(getActivity(), periods));
+		setListAdapter(new PeriodListAdapter(getActivity(), periods, false));
 	}
 
 	@Override
