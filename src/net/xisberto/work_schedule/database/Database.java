@@ -66,7 +66,6 @@ public class Database extends SQLiteOpenHelper {
 	private Calendar parseCalendar(String string) {
 		Calendar cal = Calendar.getInstance();
 		try {
-			log("formating " + string);
 			cal.setTime(dateFormat.parse(string));
 		} catch (ParseException e) {
 			log(e.getLocalizedMessage());
@@ -93,9 +92,7 @@ public class Database extends SQLiteOpenHelper {
 	// }
 
 	private Period periodFromCursor(Cursor c) {
-		log("loading time " + c.getString(2));
 		Period period = new Period(c.getInt(1), parseCalendar(c.getString(2)));
-		log("loaded time " + period.formatTime(true));
 		period.id = c.getLong(0);
 		period.enabled = (c.getInt(3) == 1);
 		return period;
@@ -182,8 +179,8 @@ public class Database extends SQLiteOpenHelper {
 	public Period getNextAlarm() {
 		Cursor cursor = db.query(TablePeriod.TABLE_NAME, TablePeriod.COLUMNS,
 				TablePeriod.COLUMN_ENABLED + " = 1 AND "
-						+ TablePeriod.COLUMN_TIME + " > DATETIME('NOW')", null,
-				null, null, TablePeriod.COLUMN_TIME, null);
+						+ TablePeriod.COLUMN_TIME + " > datetime('now', 'localtime')", null,
+				null, null, TablePeriod.COLUMN_TIME, "1");
 
 		if (cursor == null || cursor.getCount() <= 0) {
 			return null;
@@ -191,18 +188,6 @@ public class Database extends SQLiteOpenHelper {
 
 		cursor.moveToFirst();
 		Period result = periodFromCursor(cursor);
-
-		if (BuildConfig.DEBUG) {
-			Cursor now = db.rawQuery("select datetime('now')", null);
-			now.moveToFirst();
-			Log.d("next alarm", "database now: " + now.getString(0));
-			Log.d("next alarm", "cursor items: " + cursor.getCount());
-			do {
-				Log.d("next alarm", cursor.getString(cursor
-						.getColumnIndex(TablePeriod.COLUMN_TIME)));
-			} while (cursor.moveToNext());
-		}
-
 		return result;
 
 	}
@@ -210,8 +195,7 @@ public class Database extends SQLiteOpenHelper {
 	public SparseArrayCompat<Period> listPeriodsFromDay(Calendar day) {
 		SimpleDateFormat dayFormat = new SimpleDateFormat(DATE_FORMAT,
 				Locale.getDefault());
-		Log.d("Database ",
-				"listing periods for " + dayFormat.format(day.getTime()));
+		log("listing periods for " + dayFormat.format(day.getTime()));
 		Cursor cursor = db.query(
 				TablePeriod.TABLE_NAME,
 				TablePeriod.COLUMNS,
