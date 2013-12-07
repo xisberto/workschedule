@@ -13,7 +13,9 @@
 	<style name="AppTheme" parent="Theme.Sherlock.Light.DarkActionBar">
         <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
         <item name="android:actionBarStyle" tools:ignore="NewApi">@style/Widget.Styled.ActionBar</item>
+        <item name="vpiTabPageIndicatorStyle">@style/AppTheme.TabPageIndicator</item>
     </style>
+    
     <style name="Widget.Styled.ActionBar" parent="Widget.Sherlock.Light.ActionBar.Solid.Inverse">
         <item name="background">@drawable/bg_styled</item>
         <item name="android:background">@drawable/bg_styled</item>
@@ -29,6 +31,22 @@
         <item name="android:layout_marginLeft">@dimen/slider_margin</item>
         <item name="android:layout_marginRight">@dimen/slider_margin</item>
         <item name="android:minHeight">?android:attr/listPreferredItemHeight</item>
+    </style>
+
+    <style name="AppTheme.TabPageIndicator" parent="Widget.TabPageIndicator">
+        <item name="android:background">@color/gray_light</item>
+        <item name="android:textAppearance">@style/AppTheme.TabPageIndicator.Text</item>
+        <item name="android:textColor">@color/gray_dark</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:divider">@color/gray_dark</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
+        <item name="android:fadingEdge">horizontal</item>
+        <item name="android:fadingEdgeLength">8dp</item>
+    </style>
+
+    <style name="AppTheme.TabPageIndicator.Text" parent="android:TextAppearance.Medium">
+        <item name="android:typeface">monospace</item>
     </style>
 
 </resources>
