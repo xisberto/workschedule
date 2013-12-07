@@ -10,11 +10,12 @@ import android.support.v4.util.SparseArrayCompat;
 import com.actionbarsherlock.app.SherlockListFragment;
 
 public class ViewDayFragment extends SherlockListFragment {
-	private Calendar day;
 
 	public static ViewDayFragment newInstance(Calendar calendar) {
 		ViewDayFragment fragment = new ViewDayFragment();
-		fragment.day = calendar;
+		Bundle args = new Bundle();
+		args.putSerializable("day", calendar);
+		fragment.setArguments(args);
 		return fragment;
 	}
 
@@ -22,6 +23,7 @@ public class ViewDayFragment extends SherlockListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Database database = Database.getInstance(getActivity());
+		Calendar day = (Calendar) getArguments().getSerializable("day");
 		SparseArrayCompat<Period> periods = database.listPeriodsFromDay(day);
 		setListAdapter(new PeriodListAdapter(getActivity(), periods, false));
 	}

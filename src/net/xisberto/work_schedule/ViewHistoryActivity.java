@@ -96,6 +96,12 @@ public class ViewHistoryActivity extends SherlockFragmentActivity {
 	}
 
 	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putSerializable(CURRENT_DAY, day);
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == android.R.id.home) {
 			NavUtils.navigateUpFromSameTask(this);
