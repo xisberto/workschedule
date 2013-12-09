@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.viewpagerindicator.TabPageIndicator;
@@ -43,7 +42,7 @@ public class ViewHistoryActivity extends SherlockFragmentActivity {
 		pager_indicator.setViewPager(view_pager);
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+//		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		setupTabs();
 
 	}

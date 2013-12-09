@@ -2,8 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="@dimen/border_padding"
-    android:layout_marginRight="@dimen/border_padding"
     android:orientation="vertical" >
 
     <com.viewpagerindicator.TabPageIndicator
@@ -15,6 +13,8 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/border_padding"
+        android:layout_marginRight="@dimen/border_padding" />
 
 </LinearLayout>
