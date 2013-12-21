@@ -20,15 +20,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.viewpagerindicator.TabPageIndicator;
 
 public class ViewHistoryActivity extends SherlockFragmentActivity {
-	private static final String CURRENT_DAY = "current_day";
-	private Calendar current_day;
 
-	private HistoryPageAdapter pager_adapter;
-	ViewPager view_pager;
-
-	private void setupTabs() {
-
-	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,33 +29,20 @@ public class ViewHistoryActivity extends SherlockFragmentActivity {
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-		if ((savedInstanceState != null && savedInstanceState
-				.containsKey(CURRENT_DAY))) {
-			current_day = (Calendar) savedInstanceState
-					.getSerializable(CURRENT_DAY);
-		} else {
-			current_day = Calendar.getInstance();
-		}
-
-		view_pager = (ViewPager) findViewById(R.id.pager);
+		ViewPager view_pager = (ViewPager) findViewById(R.id.pager);
 		TabPageIndicator pager_indicator = (TabPageIndicator) findViewById(R.id.pager_indicator);
 
-		pager_adapter = new HistoryPageAdapter(getSupportFragmentManager(),
-				pager_indicator);
+		HistoryPageAdapter pager_adapter = new HistoryPageAdapter(getSupportFragmentManager());
 		view_pager.setAdapter(pager_adapter);
 
 		pager_indicator.setViewPager(view_pager);
-		pager_indicator.setCurrentItem(4);
-		pager_indicator.setOnPageChangeListener(pager_adapter);
-
-		setupTabs();
+		pager_indicator.setCurrentItem(HistoryPageAdapter.SIZE);
 
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putSerializable(CURRENT_DAY, current_day);
 	}
 
 	@Override
