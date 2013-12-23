@@ -5,10 +5,10 @@ import java.util.Calendar;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 
-public class HistoryPageAdapter extends FragmentStatePagerAdapter {
+public class HistoryPageAdapter extends FragmentPagerAdapter {
 
 	public static final int SIZE = 120;
 
@@ -24,7 +24,7 @@ public class HistoryPageAdapter extends FragmentStatePagerAdapter {
 
 	@Override
 	public CharSequence getPageTitle(int position) {
-		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
+		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT);
 		return dateFormat.format(getSelectedDay(position).getTime());
 	}
 
@@ -34,15 +34,6 @@ public class HistoryPageAdapter extends FragmentStatePagerAdapter {
 				.newInstance(getSelectedDay(index));
 		Log.d("Pager", "fragment at " + index + " is " + fragment.toString());
 		return fragment;
-	}
-
-	public long getItemId(int position) {
-		return getSelectedDay(position).getTimeInMillis();
-	}
-
-	@Override
-	public int getItemPosition(Object object) {
-		return POSITION_NONE;
 	}
 
 	@Override

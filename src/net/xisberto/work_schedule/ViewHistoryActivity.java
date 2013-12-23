@@ -21,7 +21,6 @@ import com.viewpagerindicator.TabPageIndicator;
 
 public class ViewHistoryActivity extends SherlockFragmentActivity {
 
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -36,7 +35,7 @@ public class ViewHistoryActivity extends SherlockFragmentActivity {
 		view_pager.setAdapter(pager_adapter);
 
 		pager_indicator.setViewPager(view_pager);
-		pager_indicator.setCurrentItem(HistoryPageAdapter.SIZE);
+		view_pager.setCurrentItem(HistoryPageAdapter.SIZE);
 
 	}
 
@@ -66,6 +65,10 @@ public class ViewHistoryActivity extends SherlockFragmentActivity {
 			return true;
 		}
 		switch (item.getItemId()) {
+		case R.id.menu_go_today:
+			ViewPager view_pager = (ViewPager) findViewById(R.id.pager);
+			view_pager.setCurrentItem(HistoryPageAdapter.SIZE);
+			break;
 		case R.id.menu_fake_data:
 			DialogFragment dialog = new SelectDate();
 			dialog.show(getSupportFragmentManager(), "select_date");
