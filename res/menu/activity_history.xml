@@ -8,7 +8,8 @@
         android:title="@string/menu_go_today"/>
     <item
         android:id="@+id/menu_share"
-        android:showAsAction="never"
+        android:icon="@drawable/ic_action_share"
+        android:showAsAction="ifRoom"
         android:title="@string/menu_share"/>
     <item
         android:id="@+id/menu_fake_data"

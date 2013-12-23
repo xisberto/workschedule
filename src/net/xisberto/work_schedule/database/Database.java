@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import net.xisberto.work_schedule.BuildConfig;
+import net.xisberto.work_schedule.R;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -24,12 +25,15 @@ public class Database extends SQLiteOpenHelper {
 	private static Database instance;
 
 	private SQLiteDatabase db;
-	private SimpleDateFormat dateFormat;
+	private Context ctx;
+	private SimpleDateFormat dateTimeFormat;
 
 	private Database(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		ctx = context;
 		db = getWritableDatabase();
-		dateFormat = new SimpleDateFormat(DATETIME_FORMAT, Locale.getDefault());
+		dateTimeFormat = new SimpleDateFormat(DATETIME_FORMAT,
+				Locale.getDefault());
 	}
 
 	public static synchronized Database getInstance(Context context) {
@@ -66,7 +70,7 @@ public class Database extends SQLiteOpenHelper {
 	private Calendar parseCalendar(String string) {
 		Calendar cal = Calendar.getInstance();
 		try {
-			cal.setTime(dateFormat.parse(string));
+			cal.setTime(dateTimeFormat.parse(string));
 		} catch (ParseException e) {
 			log(e.getLocalizedMessage());
 			cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -135,7 +139,7 @@ public class Database extends SQLiteOpenHelper {
 		ContentValues cv = new ContentValues();
 		cv.put(TablePeriod.COLUMN_PREF_ID, period.getId());
 		log("saving time " + period.formatTime(true));
-		String formatted = dateFormat.format(period.time.getTime());
+		String formatted = dateTimeFormat.format(period.time.getTime());
 		// String formatted = DateFormat.format(DATETIME_WRITE_FORMAT,
 		// period.time)
 		// .toString();
@@ -179,8 +183,9 @@ public class Database extends SQLiteOpenHelper {
 	public Period getNextAlarm() {
 		Cursor cursor = db.query(TablePeriod.TABLE_NAME, TablePeriod.COLUMNS,
 				TablePeriod.COLUMN_ENABLED + " = 1 AND "
-						+ TablePeriod.COLUMN_TIME + " > datetime('now', 'localtime')", null,
-				null, null, TablePeriod.COLUMN_TIME, "1");
+						+ TablePeriod.COLUMN_TIME
+						+ " > datetime('now', 'localtime')", null, null, null,
+				TablePeriod.COLUMN_TIME, "1");
 
 		if (cursor == null || cursor.getCount() <= 0) {
 			return null;
@@ -215,6 +220,37 @@ public class Database extends SQLiteOpenHelper {
 		return result;
 	}
 
+	public String exportCSV(Calendar dateStart, Calendar dateEnd) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT,
+				Locale.getDefault());
+		String start = dateFormat.format(dateStart.getTime());
+		String end = dateFormat.format(dateEnd.getTime());
+
+		Cursor cursor = db.query(TablePeriod.TABLE_NAME, new String[] {
+				TablePeriod.COLUMN_PREF_ID, TablePeriod.COLUMN_TIME },
+				TablePeriod.COLUMN_TIME + " BETWEEN '" + start + "' AND '"
+						+ end + "'", null, null, null, TablePeriod.COLUMN_TIME);
+
+		if (cursor.getCount() > 0) {
+			String export = "";
+			String header = ctx.getString(R.string.header_date) + "\t"
+					+ ctx.getString(R.string.header_period) + "\t"
+					+ ctx.getString(R.string.header_time) + "\n";
+			export += header;
+			Log.d("Export CSV", header);
+			while (cursor.moveToNext()) {
+				String dateTime = cursor.getString(1);
+				String date = dateTime.substring(0, 10);
+				String time = dateTime.substring(11);
+				String line = "\"" + date + "\"\t\"" + cursor.getString(0)
+						+ "\"\t\"" + time + "\"\n";
+				export += line;
+				Log.d("Export CSV", line);
+			}
+			return export;
+		}
+		return null;
+	}
 	// public SparseArrayCompat<Period> listPeriodsFromDay(WorkDay day) {
 	// if (day.id > 0) {
 	// return listPeriodsFromDay(day.id);
