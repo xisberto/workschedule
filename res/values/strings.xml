@@ -32,6 +32,8 @@
     <string name="snooze_set_to">Snooze set to</string>
     
     <string name="title_activity_history">History</string>
+    <string name="menu_share">Share CSV file</string>
+    <string name="menu_go_today">Go to today</string>
     
     <string name="title_activity_settings">Settings</string>
     

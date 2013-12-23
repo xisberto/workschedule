@@ -61,7 +61,7 @@ public class Period {
 			labelId = R.string.lbl_fstp_entrance;
 			break;
 		case R.string.fstp_exit:
-			labelId = R.string.lbl_fste_exit;
+			labelId = R.string.lbl_fstp_exit;
 			break;
 		case R.string.sndp_entrance:
 			labelId = R.string.lbl_sndp_entrance;
