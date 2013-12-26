@@ -237,7 +237,7 @@ public class Database extends SQLiteOpenHelper {
 					+ ctx.getString(R.string.header_period) + "\t"
 					+ ctx.getString(R.string.header_time) + "\n";
 			export += header;
-			Log.d("Export CSV", header);
+//			Log.d("Export CSV", header);
 			while (cursor.moveToNext()) {
 				String dateTime = cursor.getString(1);
 				String date = dateTime.substring(0, 10);
@@ -245,7 +245,7 @@ public class Database extends SQLiteOpenHelper {
 				String line = "\"" + date + "\"\t\"" + cursor.getString(0)
 						+ "\"\t\"" + time + "\"\n";
 				export += line;
-				Log.d("Export CSV", line);
+//				Log.d("Export CSV", line);
 			}
 			return export;
 		}
