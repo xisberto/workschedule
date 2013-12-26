@@ -51,9 +51,7 @@ public class Database extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		// db.execSQL(TableWorkDays.CREATE_TABLE);
 		db.execSQL(TablePeriod.CREATE_TABLE);
-		// db.execSQL(TablePeriod.CREATE_VIEW);
 	}
 
 	@Override
@@ -81,59 +79,12 @@ public class Database extends SQLiteOpenHelper {
 		return cal;
 	}
 
-	// private WorkDay workdayFromCursor(Cursor c) {
-	// WorkDay day = new WorkDay();
-	// try {
-	// // try to get the id from the column used on TablePeriod.CREATE_VIEW
-	// day.id = c.getLong(c.getColumnIndexOrThrow(TablePeriod.COLUMN_DAY_ID));
-	// } catch (IllegalArgumentException e) {
-	// // if above column doesn't exists, the cursor refers to TableWorkDays
-	// day.id = c.getLong(c.getColumnIndex(TableWorkDays.COLUMN_ID));
-	// }
-	// day.day =
-	// parseCalendar(c.getString(c.getColumnIndex(TableWorkDays.COLUMN_DAY)));
-	// return day;
-	// }
-
 	private Period periodFromCursor(Cursor c) {
 		Period period = new Period(c.getInt(1), parseCalendar(c.getString(2)));
 		period.id = c.getLong(0);
 		period.enabled = (c.getInt(3) == 1);
 		return period;
 	}
-
-	// public long insertDay(WorkDay day) {
-	// ContentValues cv = new ContentValues();
-	// cv.put(TableWorkDays.COLUMN_DAY, DateFormat
-	// .format(DATE_FORMAT, day.day).toString());
-	// return db.insert(TableWorkDays.TABLE_NAME, null, cv);
-	// }
-
-	// public WorkDay getDay(Calendar calendar) {
-	// WorkDay result = null;
-	//
-	// Cursor cursor = db.query(TablePeriod.VIEW_NAME,
-	// null, TableWorkDays.COLUMN_DAY + " = ?",
-	// new String[] { DateFormat.format(DATE_FORMAT, calendar)
-	// .toString() }, null, null, null);
-	//
-	// if (cursor == null || cursor.getCount() < 0) {
-	// return null;
-	// }
-	//
-	// cursor.moveToFirst();
-	// result = workdayFromCursor(cursor);
-	// do {
-	// Period period = result.getPeriod(cursor.getInt(
-	// cursor.getColumnIndex(TablePeriod.COLUMN_PREF_ID)));
-	// period.enabled = (cursor.getInt(
-	// cursor.getColumnIndex(TablePeriod.COLUMN_ENABLED)) == 1);
-	// period.time = parseCalendar(cursor.getString(
-	// cursor.getColumnIndex(TablePeriod.COLUMN_HOUR)));
-	// } while (cursor.moveToNext());
-	//
-	// return result;
-	// }
 
 	private ContentValues contentValuesFromPeriod(Period period) {
 		ContentValues cv = new ContentValues();
@@ -242,7 +193,8 @@ public class Database extends SQLiteOpenHelper {
 				String dateTime = cursor.getString(1);
 				String date = dateTime.substring(0, 10);
 				String time = dateTime.substring(11);
-				String line = "\"" + date + "\"\t\"" + cursor.getString(0)
+				Period period = Period.getPeriod(ctx, cursor.getInt(0));
+				String line = "\"" + date + "\"\t\"" + ctx.getString(period.getLabelId())
 						+ "\"\t\"" + time + "\"\n";
 				export += line;
 //				Log.d("Export CSV", line);
@@ -251,12 +203,5 @@ public class Database extends SQLiteOpenHelper {
 		}
 		return null;
 	}
-	// public SparseArrayCompat<Period> listPeriodsFromDay(WorkDay day) {
-	// if (day.id > 0) {
-	// return listPeriodsFromDay(day.id);
-	// } else {
-	// return null;
-	// }
-	// }
 
 }
