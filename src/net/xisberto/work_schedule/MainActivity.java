@@ -12,13 +12,13 @@ package net.xisberto.work_schedule;
 
 import java.util.Calendar;
 
-import net.xisberto.work_schedule.TimePickerFragment.OnTimePickerSetListener;
 import net.xisberto.work_schedule.database.Period;
 import net.xisberto.work_schedule.settings.Settings;
 import net.xisberto.work_schedule.settings.SettingsActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.util.SparseArrayCompat;
+import android.text.format.DateFormat;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,9 +28,12 @@ import android.widget.ListView;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.doomonafireball.betterpickers.radialtimepicker.RadialPickerLayout;
+import com.doomonafireball.betterpickers.radialtimepicker.RadialTimePickerDialog;
+import com.doomonafireball.betterpickers.radialtimepicker.RadialTimePickerDialog.OnTimeSetListener;
 
 public class MainActivity extends SherlockFragmentActivity implements
-		OnItemClickListener, OnTimePickerSetListener {
+		OnItemClickListener, OnTimeSetListener {
 
 	public static final String ACTION_SET_PERIOD = "net.xisberto.work_schedule.set_period";
 
@@ -41,21 +44,23 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	private PeriodListAdapter adapter;
 
+	private int waiting_for = -1;
+
 	@Override
-	public void onTimeSet(int hour, int minute, int callerId) {
+	public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
 		Calendar now = Calendar.getInstance();
 
 		// First we set the alarm passed by the caller, using a Period from our
 		// SparseArray
-		Period period = periods.get(callerId);
-		period.setTime(hour, minute);
+		Period period = periods.get(waiting_for);
+		period.setTime(hourOfDay, minute);
 		period.enabled = period.time.after(now);
 		period.persist(this);
 		period.setAlarm(this);
 
 		// We will use next_period to set all Periods remaining
 		Period next_period = null;
-		
+
 		// This switch is used as a loop. We will enter it in the period.getId
 		// point and go through every step after (without breaks). At every
 		// step, we:
@@ -78,7 +83,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		case R.string.fstp_exit:
 			next_period = periods.get(R.string.sndp_entrance);
-			
+
 			// sndp_entrance = fstp_exit + key_lunch_interval
 			next_period.setTime(period.time);
 			next_period.addTime(settings
@@ -91,7 +96,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		case R.string.sndp_entrance:
 			next_period = periods.get(R.string.sndp_exit);
-			
+
 			// Here we need more calculations. The duration of the second period
 			// is based on the total work time (key_work_time) minus the today's
 			// first period (fstp_exit - fstp_entrance). It's best calculated
@@ -121,26 +126,28 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		case R.string.sndp_exit:
 			next_period = periods.get(R.string.fste_entrance);
-			
+
 			// fste_entrance = sndp_exis + key_extra_interval
 			next_period.setTime(period.time);
 			next_period.addTime(settings
 					.getCalendar(R.string.key_extra_interval));
 
-			next_period.enabled = settings.getMarkExtra() && next_period.time.after(now);
+			next_period.enabled = settings.getMarkExtra()
+					&& next_period.time.after(now);
 			next_period.persist(this);
 			next_period.setAlarm(this);
 			period = next_period;
 
 		case R.string.fste_entrance:
 			next_period = periods.get(R.string.fste_exit);
-			
+
 			// fste_exit = fste_entrance + key_fste_duration
 			next_period.setTime(period.time);
 			next_period.addTime(settings
 					.getCalendar(R.string.key_fste_duration));
 
-			next_period.enabled = settings.getMarkExtra() && next_period.time.after(now);
+			next_period.enabled = settings.getMarkExtra()
+					&& next_period.time.after(now);
 			next_period.persist(this);
 			next_period.setAlarm(this);
 			period = next_period;
@@ -148,6 +155,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			break;
 		}
 
+		waiting_for = -1;
 		updateLayout();
 	}
 
@@ -159,14 +167,17 @@ public class MainActivity extends SherlockFragmentActivity implements
 	}
 
 	private void showTimePickerDialog(Period period) {
-		TimePickerFragment dialog = TimePickerFragment.newInstance(period);
+		waiting_for = period.getId();
+		RadialTimePickerDialog dialog = RadialTimePickerDialog.newInstance(
+				this, period.time.get(Calendar.HOUR_OF_DAY),
+				period.time.get(Calendar.MINUTE),
+				DateFormat.is24HourFormat(this));
 		dialog.show(getSupportFragmentManager(), "time_picker");
 	}
 
 	/**
 	 * Generates the {@link SparseArray} with the {@link Period}s for today.
-	 * Each {@link Period} not saved on the database will be set to this
-	 * moment.
+	 * Each {@link Period} not saved on the database will be set to this moment.
 	 * 
 	 */
 	private void buildPeriods() {
