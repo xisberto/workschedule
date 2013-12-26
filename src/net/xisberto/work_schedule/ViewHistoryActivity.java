@@ -40,12 +40,12 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 		ViewPager view_pager = (ViewPager) findViewById(R.id.pager);
 		TabPageIndicator pager_indicator = (TabPageIndicator) findViewById(R.id.pager_indicator);
 
-		HistoryPageAdapter pager_adapter = new HistoryPageAdapter(
+		HistoryPagerAdapter pager_adapter = new HistoryPagerAdapter(
 				getSupportFragmentManager());
 		view_pager.setAdapter(pager_adapter);
 
 		pager_indicator.setViewPager(view_pager);
-		view_pager.setCurrentItem(HistoryPageAdapter.SIZE);
+		view_pager.setCurrentItem(HistoryPagerAdapter.SIZE);
 
 	}
 
@@ -79,11 +79,11 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 		switch (item.getItemId()) {
 		case R.id.menu_go_today:
 			view_pager = (ViewPager) findViewById(R.id.pager);
-			view_pager.setCurrentItem(HistoryPageAdapter.SIZE);
+			view_pager.setCurrentItem(HistoryPagerAdapter.SIZE);
 			break;
 		case R.id.menu_share:
 			view_pager = (ViewPager) findViewById(R.id.pager);
-			HistoryPageAdapter adapter = (HistoryPageAdapter) view_pager.getAdapter();
+			HistoryPagerAdapter adapter = (HistoryPagerAdapter) view_pager.getAdapter();
 			Calendar selected_day = adapter.getSelectedDay(view_pager.getCurrentItem());
 			dialog = DatePickerFragment.newInstance(this, selected_day);
 			dialog.show(getSupportFragmentManager(), "select_date");

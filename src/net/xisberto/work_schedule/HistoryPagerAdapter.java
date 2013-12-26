@@ -8,11 +8,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 
-public class HistoryPageAdapter extends FragmentPagerAdapter {
+public class HistoryPagerAdapter extends FragmentPagerAdapter {
 
 	public static final int SIZE = 120;
 
-	public HistoryPageAdapter(FragmentManager fm) {
+	public HistoryPagerAdapter(FragmentManager fm) {
 		super(fm);
 	}
 
