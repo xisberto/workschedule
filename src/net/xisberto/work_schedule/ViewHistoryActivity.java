@@ -75,13 +75,17 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 			return true;
 		}
 		DatePickerFragment dialog;
+		ViewPager view_pager;
 		switch (item.getItemId()) {
 		case R.id.menu_go_today:
-			ViewPager view_pager = (ViewPager) findViewById(R.id.pager);
+			view_pager = (ViewPager) findViewById(R.id.pager);
 			view_pager.setCurrentItem(HistoryPageAdapter.SIZE);
 			break;
 		case R.id.menu_share:
-			dialog = DatePickerFragment.newInstance(this);
+			view_pager = (ViewPager) findViewById(R.id.pager);
+			HistoryPageAdapter adapter = (HistoryPageAdapter) view_pager.getAdapter();
+			Calendar selected_day = adapter.getSelectedDay(view_pager.getCurrentItem());
+			dialog = DatePickerFragment.newInstance(this, selected_day);
 			dialog.show(getSupportFragmentManager(), "select_date");
 			break;
 		case R.id.menu_fake_data:
@@ -111,13 +115,14 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 			break;
 
 		default:
-			break;
+			return super.onOptionsItemSelected(item);
 		}
-		return super.onOptionsItemSelected(item);
+		return true;
 	}
 
 	@Override
 	public void onDateSelected(int year, int monthOfYear, int dayOfMonth) {
+		Log.d("History", "onDateSelected");
 		Calendar startDate = Calendar.getInstance();
 		startDate.set(Calendar.YEAR, year);
 		startDate.set(Calendar.MONTH, monthOfYear);
@@ -127,6 +132,7 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 	}
 
 	public void shareUri(Uri uri) {
+		Log.d("History", "shareURI");
 		Intent intentShare = new Intent(Intent.ACTION_SEND);
 		intentShare.setType("text/csv");
 		intentShare.putExtra(Intent.EXTRA_STREAM, uri);

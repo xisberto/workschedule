@@ -16,7 +16,7 @@ public class HistoryPageAdapter extends FragmentPagerAdapter {
 		super(fm);
 	}
 
-	private Calendar getSelectedDay(int position) {
+	public Calendar getSelectedDay(int position) {
 		Calendar selected_day = Calendar.getInstance();
 		selected_day.add(Calendar.DATE, -SIZE + position + 1);
 		return selected_day;

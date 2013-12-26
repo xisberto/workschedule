@@ -6,26 +6,41 @@ import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.widget.DatePicker;
 
-public class DatePickerFragment extends DialogFragment implements
+import com.actionbarsherlock.app.SherlockDialogFragment;
+
+public class DatePickerFragment extends SherlockDialogFragment implements
 		OnDateSetListener {
 	public static interface OnDateSelectedListener {
 		public void onDateSelected(int year, int monthOfYear, int dayOfMonth);
 	}
 
-	DatePickerFragment.OnDateSelectedListener callback;
+	OnDateSelectedListener callback;
 
-	public static DatePickerFragment newInstance(DatePickerFragment.OnDateSelectedListener callback) {
+	public static DatePickerFragment newInstance(OnDateSelectedListener callback) {
 		DatePickerFragment dialog = new DatePickerFragment();
 		dialog.callback = callback;
+		return dialog;
+	}
+	
+	public static DatePickerFragment newInstance(OnDateSelectedListener callback, Calendar cal) {
+		DatePickerFragment dialog = newInstance(callback);
+		Bundle args = new Bundle();
+		args.putSerializable("calendar", cal);
+		dialog.setArguments(args);
 		return dialog;
 	}
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		Calendar now = Calendar.getInstance();
+		Calendar now;
+		if (getArguments().containsKey("calendar")) {
+			now = (Calendar) getArguments().getSerializable("calendar");
+		} else {
+			now = Calendar.getInstance();
+		}
 		int year = now.get(Calendar.YEAR);
 		int month = now.get(Calendar.MONTH);
 		int day = now.get(Calendar.DAY_OF_MONTH);
@@ -36,6 +51,7 @@ public class DatePickerFragment extends DialogFragment implements
 	@Override
 	public void onDateSet(DatePicker view, int year, int monthOfYear,
 			int dayOfMonth) {
+		Log.d("DatePicker", "onDateSet");
 		if (callback != null) {
 			callback.onDateSelected(year, monthOfYear, dayOfMonth);
 		}
