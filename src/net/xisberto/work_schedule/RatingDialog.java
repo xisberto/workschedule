@@ -28,8 +28,7 @@ public class RatingDialog extends SherlockDialogFragment implements
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-				.setTitle(R.string.app_name)
-				.setMessage(R.string.msg_rating)
+				.setTitle(R.string.app_name).setMessage(R.string.msg_rating)
 				.setPositiveButton(R.string.yes, this)
 				.setNegativeButton(R.string.no, this)
 				.setNeutralButton(R.string.later, this);
@@ -38,15 +37,20 @@ public class RatingDialog extends SherlockDialogFragment implements
 
 	@Override
 	public void onClick(DialogInterface dialog, int which) {
-		Settings settings = new Settings(getActivity());		
+		Settings settings = Settings.getInstance(getActivity()
+				.getApplicationContext());
 		switch (which) {
 		case Dialog.BUTTON_POSITIVE:
 			String appName = getActivity().getPackageName();
 			Toast.makeText(getActivity(), appName, Toast.LENGTH_SHORT).show();
 			try {
-			    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id="+appName)));
+				startActivity(new Intent(Intent.ACTION_VIEW,
+						Uri.parse("market://details?id=" + appName)));
 			} catch (android.content.ActivityNotFoundException anfe) {
-			    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id="+appName)));
+				startActivity(new Intent(
+						Intent.ACTION_VIEW,
+						Uri.parse("http://play.google.com/store/apps/details?id="
+								+ appName)));
 			}
 		case Dialog.BUTTON_NEGATIVE:
 			settings.setAskForRating(false);

@@ -12,7 +12,7 @@ package net.xisberto.work_schedule;
 
 import java.util.Calendar;
 
-import net.xisberto.work_schedule.settings.Settings.Period;
+import net.xisberto.work_schedule.database.Period;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -32,12 +32,11 @@ public class TimePickerFragment extends SherlockDialogFragment implements
 	private TimePicker timePicker;
 	private Dialog dialog;
 	private OnTimePickerSetListener listener;
+	private Period period;
 
-	public static TimePickerFragment newInstance(int callerId) {
+	public static TimePickerFragment newInstance(Period period) {
 		TimePickerFragment dialog_fragment = new TimePickerFragment();
-		Bundle args = new Bundle();
-		args.putInt("callerId", callerId);
-		dialog_fragment.setArguments(args);
+		dialog_fragment.period = period;
 		return dialog_fragment;
 	}
 
@@ -62,13 +61,10 @@ public class TimePickerFragment extends SherlockDialogFragment implements
 		timePicker.setCurrentHour(hourOfDay);
 		timePicker.setCurrentMinute(minute);
 
-		int callerId = getArguments().getInt("callerId");
-		Period period = Period.getFromPrefId(callerId);
-		
 		// Create a new instance of TimePickerDialog and return it
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
 				.setView(view)
-				.setTitle(getResources().getString(period.label_id))
+				.setTitle(getResources().getString(period.getLabelId()))
 				.setPositiveButton(android.R.string.ok, this)
 				.setNegativeButton(android.R.string.cancel, this);
 		dialog = builder.create();
@@ -80,10 +76,9 @@ public class TimePickerFragment extends SherlockDialogFragment implements
 		timePicker.clearFocus();
 		switch (which) {
 		case AlertDialog.BUTTON_POSITIVE:
-			int callerId = getArguments().getInt("callerId");
 			listener.onTimeSet(
 					timePicker.getCurrentHour(), timePicker.getCurrentMinute(),
-					callerId);
+					period.getId());
 			break;
 		case AlertDialog.BUTTON_NEGATIVE:
 		default:
