@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import net.xisberto.work_schedule.database.Database;
+import net.xisberto.work_schedule.database.Period;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -72,50 +73,51 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		}
-		ViewPager view_pager;
+		ViewPager view_pager = (ViewPager) findViewById(R.id.pager);
+		HistoryPagerAdapter adapter = (HistoryPagerAdapter) view_pager
+				.getAdapter();
+		Calendar selected_day = adapter.getSelectedDay(view_pager
+				.getCurrentItem());
+		CalendarDatePickerDialog dialog;
 		switch (item.getItemId()) {
 		case R.id.menu_go_today:
 			view_pager = (ViewPager) findViewById(R.id.pager);
 			view_pager.setCurrentItem(HistoryPagerAdapter.SIZE);
 			break;
 		case R.id.menu_share:
-			view_pager = (ViewPager) findViewById(R.id.pager);
-			HistoryPagerAdapter adapter = (HistoryPagerAdapter) view_pager
-					.getAdapter();
-			Calendar selected_day = adapter.getSelectedDay(view_pager
-					.getCurrentItem());
-			CalendarDatePickerDialog dialog = CalendarDatePickerDialog
-					.newInstance(this, selected_day.get(Calendar.YEAR),
-							selected_day.get(Calendar.MONTH),
-							selected_day.get(Calendar.DAY_OF_MONTH));
+			dialog = CalendarDatePickerDialog.newInstance(this,
+					selected_day.get(Calendar.YEAR),
+					selected_day.get(Calendar.MONTH),
+					selected_day.get(Calendar.DAY_OF_MONTH));
 			dialog.show(getSupportFragmentManager(), "date_picker");
 			break;
 		case R.id.menu_fake_data:
-//			dialog = DatePickerFragment
-//					.newInstance(new DatePickerFragment.OnDateSelectedListener() {
-//						@Override
-//						public void onDateSelected(int year, int monthOfYear,
-//								int dayOfMonth) {
-//							Calendar date = Calendar.getInstance();
-//							date.set(Calendar.YEAR, year);
-//							date.set(Calendar.MONTH, monthOfYear);
-//							date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-//
-//							while (date.before(Calendar.getInstance())) {
-//								if ((date.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY)
-//										&& (date.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY)) {
-//									for (int id : Period.ids) {
-//										Period period = new Period(id, date);
-//										period.persist(ViewHistoryActivity.this);
-//									}
-//								}
-//								date.add(Calendar.DAY_OF_MONTH, 1);
-//							}
-//						}
-//					});
-//			dialog.show(getSupportFragmentManager(), "select_date");
-			break;
+			dialog = CalendarDatePickerDialog.newInstance(
+					new OnDateSetListener() {
+						@Override
+						public void onDateSet(CalendarDatePickerDialog dialog,
+								int year, int monthOfYear, int dayOfMonth) {
+							Calendar date = Calendar.getInstance();
+							date.set(Calendar.YEAR, year);
+							date.set(Calendar.MONTH, monthOfYear);
+							date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
+							while (date.before(Calendar.getInstance())) {
+								if ((date.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY)
+										&& (date.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY)) {
+									for (int id : Period.ids) {
+										Period period = new Period(id, date);
+										period.persist(ViewHistoryActivity.this);
+									}
+								}
+								date.add(Calendar.DAY_OF_MONTH, 1);
+							}
+						}
+					}, selected_day.get(Calendar.YEAR), selected_day
+							.get(Calendar.MONTH), selected_day
+							.get(Calendar.DAY_OF_MONTH));
+			dialog.show(getSupportFragmentManager(), "date_picker");
+			break;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
