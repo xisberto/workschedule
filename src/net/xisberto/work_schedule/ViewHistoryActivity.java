@@ -11,11 +11,9 @@ import java.util.Locale;
 import net.xisberto.work_schedule.DatePickerFragment.OnDateSelectedListener;
 import net.xisberto.work_schedule.database.Database;
 import net.xisberto.work_schedule.database.Period;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.NavUtils;
@@ -157,7 +155,6 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 			return false;
 		}
 
-		@SuppressLint("NewApi")
 		@Override
 		protected Uri doInBackground(Calendar... params) {
 			Database database = Database.getInstance(activity);
@@ -180,17 +177,13 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 						+ dateFormat.format(endDate.getTime()) + ".csv";
 				File file;
 				File dir;
-				if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ECLAIR_MR1) {
-					dir = activity.getExternalFilesDir(null);
-				} else {
-					dir = activity.getFilesDir();
-				}
+				dir = new File(Environment.getExternalStorageDirectory(), "WorkSchedule");
 				if (!dir.exists()) {
 					dir.mkdirs();
 				}
 				file = new File(dir, filename);
-
 				Log.d("CVSExporter", "saving file on " + file.getAbsolutePath());
+				
 				FileOutputStream outputStream;
 				try {
 					outputStream = new FileOutputStream(file);
