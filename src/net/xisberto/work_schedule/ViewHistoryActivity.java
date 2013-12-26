@@ -8,9 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-import net.xisberto.work_schedule.DatePickerFragment.OnDateSelectedListener;
 import net.xisberto.work_schedule.database.Database;
-import net.xisberto.work_schedule.database.Period;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -23,10 +21,12 @@ import android.util.Log;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.doomonafireball.betterpickers.calendardatepicker.CalendarDatePickerDialog;
+import com.doomonafireball.betterpickers.calendardatepicker.CalendarDatePickerDialog.OnDateSetListener;
 import com.viewpagerindicator.TabPageIndicator;
 
 public class ViewHistoryActivity extends SherlockFragmentActivity implements
-		OnDateSelectedListener {
+		OnDateSetListener {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +72,6 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		}
-		DatePickerFragment dialog;
 		ViewPager view_pager;
 		switch (item.getItemId()) {
 		case R.id.menu_go_today:
@@ -81,35 +80,40 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 			break;
 		case R.id.menu_share:
 			view_pager = (ViewPager) findViewById(R.id.pager);
-			HistoryPagerAdapter adapter = (HistoryPagerAdapter) view_pager.getAdapter();
-			Calendar selected_day = adapter.getSelectedDay(view_pager.getCurrentItem());
-			dialog = DatePickerFragment.newInstance(this, selected_day);
-			dialog.show(getSupportFragmentManager(), "select_date");
+			HistoryPagerAdapter adapter = (HistoryPagerAdapter) view_pager
+					.getAdapter();
+			Calendar selected_day = adapter.getSelectedDay(view_pager
+					.getCurrentItem());
+			CalendarDatePickerDialog dialog = CalendarDatePickerDialog
+					.newInstance(this, selected_day.get(Calendar.YEAR),
+							selected_day.get(Calendar.MONTH),
+							selected_day.get(Calendar.DAY_OF_MONTH));
+			dialog.show(getSupportFragmentManager(), "date_picker");
 			break;
 		case R.id.menu_fake_data:
-			dialog = DatePickerFragment
-					.newInstance(new DatePickerFragment.OnDateSelectedListener() {
-						@Override
-						public void onDateSelected(int year, int monthOfYear,
-								int dayOfMonth) {
-							Calendar date = Calendar.getInstance();
-							date.set(Calendar.YEAR, year);
-							date.set(Calendar.MONTH, monthOfYear);
-							date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-							while (date.before(Calendar.getInstance())) {
-								if ((date.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY)
-										&& (date.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY)) {
-									for (int id : Period.ids) {
-										Period period = new Period(id, date);
-										period.persist(ViewHistoryActivity.this);
-									}
-								}
-								date.add(Calendar.DAY_OF_MONTH, 1);
-							}
-						}
-					});
-			dialog.show(getSupportFragmentManager(), "select_date");
+//			dialog = DatePickerFragment
+//					.newInstance(new DatePickerFragment.OnDateSelectedListener() {
+//						@Override
+//						public void onDateSelected(int year, int monthOfYear,
+//								int dayOfMonth) {
+//							Calendar date = Calendar.getInstance();
+//							date.set(Calendar.YEAR, year);
+//							date.set(Calendar.MONTH, monthOfYear);
+//							date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+//
+//							while (date.before(Calendar.getInstance())) {
+//								if ((date.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY)
+//										&& (date.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY)) {
+//									for (int id : Period.ids) {
+//										Period period = new Period(id, date);
+//										period.persist(ViewHistoryActivity.this);
+//									}
+//								}
+//								date.add(Calendar.DAY_OF_MONTH, 1);
+//							}
+//						}
+//					});
+//			dialog.show(getSupportFragmentManager(), "select_date");
 			break;
 
 		default:
@@ -119,7 +123,8 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 	}
 
 	@Override
-	public void onDateSelected(int year, int monthOfYear, int dayOfMonth) {
+	public void onDateSet(CalendarDatePickerDialog dialog, int year,
+			int monthOfYear, int dayOfMonth) {
 		Log.d("History", "onDateSelected");
 		Calendar startDate = Calendar.getInstance();
 		startDate.set(Calendar.YEAR, year);
@@ -177,13 +182,14 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 						+ dateFormat.format(endDate.getTime()) + ".csv";
 				File file;
 				File dir;
-				dir = new File(Environment.getExternalStorageDirectory(), "WorkSchedule");
+				dir = new File(Environment.getExternalStorageDirectory(),
+						"WorkSchedule");
 				if (!dir.exists()) {
 					dir.mkdirs();
 				}
 				file = new File(dir, filename);
 				Log.d("CVSExporter", "saving file on " + file.getAbsolutePath());
-				
+
 				FileOutputStream outputStream;
 				try {
 					outputStream = new FileOutputStream(file);
