@@ -9,16 +9,16 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.widget.DatePicker;
 
-public class SelectDate extends DialogFragment implements
+public class DatePickerFragment extends DialogFragment implements
 		OnDateSetListener {
 	public static interface OnDateSelectedListener {
 		public void onDateSelected(int year, int monthOfYear, int dayOfMonth);
 	}
 
-	SelectDate.OnDateSelectedListener callback;
+	DatePickerFragment.OnDateSelectedListener callback;
 
-	public static SelectDate newInstance(SelectDate.OnDateSelectedListener callback) {
-		SelectDate dialog = new SelectDate();
+	public static DatePickerFragment newInstance(DatePickerFragment.OnDateSelectedListener callback) {
+		DatePickerFragment dialog = new DatePickerFragment();
 		dialog.callback = callback;
 		return dialog;
 	}

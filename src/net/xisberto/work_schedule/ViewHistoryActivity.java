@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-import net.xisberto.work_schedule.SelectDate.OnDateSelectedListener;
+import net.xisberto.work_schedule.DatePickerFragment.OnDateSelectedListener;
 import net.xisberto.work_schedule.database.Database;
 import net.xisberto.work_schedule.database.Period;
 import android.annotation.SuppressLint;
@@ -74,19 +74,19 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		}
-		SelectDate dialog;
+		DatePickerFragment dialog;
 		switch (item.getItemId()) {
 		case R.id.menu_go_today:
 			ViewPager view_pager = (ViewPager) findViewById(R.id.pager);
 			view_pager.setCurrentItem(HistoryPageAdapter.SIZE);
 			break;
 		case R.id.menu_share:
-			dialog = SelectDate.newInstance(this);
+			dialog = DatePickerFragment.newInstance(this);
 			dialog.show(getSupportFragmentManager(), "select_date");
 			break;
 		case R.id.menu_fake_data:
-			dialog = SelectDate
-					.newInstance(new SelectDate.OnDateSelectedListener() {
+			dialog = DatePickerFragment
+					.newInstance(new DatePickerFragment.OnDateSelectedListener() {
 						@Override
 						public void onDateSelected(int year, int monthOfYear,
 								int dayOfMonth) {
