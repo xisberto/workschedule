@@ -174,7 +174,10 @@ public class Database extends SQLiteOpenHelper {
 	public String exportCSV(Calendar dateStart, Calendar dateEnd) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT,
 				Locale.getDefault());
+
 		String start = dateFormat.format(dateStart.getTime());
+		// SQL's BETWEEN...AND don't include the end date
+		dateEnd.add(Calendar.DAY_OF_MONTH, 1);
 		String end = dateFormat.format(dateEnd.getTime());
 
 		Cursor cursor = db.query(TablePeriod.TABLE_NAME, new String[] {
@@ -188,16 +191,17 @@ public class Database extends SQLiteOpenHelper {
 					+ ctx.getString(R.string.header_period) + "\t"
 					+ ctx.getString(R.string.header_time) + "\n";
 			export += header;
-//			Log.d("Export CSV", header);
+			// Log.d("Export CSV", header);
 			while (cursor.moveToNext()) {
 				String dateTime = cursor.getString(1);
 				String date = dateTime.substring(0, 10);
 				String time = dateTime.substring(11);
 				Period period = Period.getPeriod(ctx, cursor.getInt(0));
-				String line = "\"" + date + "\"\t\"" + ctx.getString(period.getLabelId())
-						+ "\"\t\"" + time + "\"\n";
+				String line = "\"" + date + "\"\t\""
+						+ ctx.getString(period.getLabelId()) + "\"\t\"" + time
+						+ "\"\n";
 				export += line;
-//				Log.d("Export CSV", line);
+				// Log.d("Export CSV", line);
 			}
 			return export;
 		}
