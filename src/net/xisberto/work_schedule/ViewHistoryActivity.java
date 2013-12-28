@@ -13,6 +13,7 @@ import net.xisberto.work_schedule.database.Period;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.NavUtils;
@@ -24,10 +25,12 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.doomonafireball.betterpickers.calendardatepicker.CalendarDatePickerDialog;
 import com.doomonafireball.betterpickers.calendardatepicker.CalendarDatePickerDialog.OnDateSetListener;
+import com.doomonafireball.betterpickers.datepicker.DatePickerBuilder;
+import com.doomonafireball.betterpickers.datepicker.DatePickerDialogFragment.DatePickerDialogHandler;
 import com.viewpagerindicator.TabPageIndicator;
 
 public class ViewHistoryActivity extends SherlockFragmentActivity implements
-		OnDateSetListener {
+		OnDateSetListener, DatePickerDialogHandler {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,11 +88,21 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 			view_pager.setCurrentItem(HistoryPagerAdapter.SIZE);
 			break;
 		case R.id.menu_share:
-			dialog = CalendarDatePickerDialog.newInstance(this,
-					selected_day.get(Calendar.YEAR),
-					selected_day.get(Calendar.MONTH),
-					selected_day.get(Calendar.DAY_OF_MONTH));
-			dialog.show(getSupportFragmentManager(), "date_picker");
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+				dialog = CalendarDatePickerDialog.newInstance(this,
+						selected_day.get(Calendar.YEAR),
+						selected_day.get(Calendar.MONTH),
+						selected_day.get(Calendar.DAY_OF_MONTH));
+				dialog.show(getSupportFragmentManager(), "date_picker");
+			} else {
+				DatePickerBuilder builder = new DatePickerBuilder()
+						.setFragmentManager(getSupportFragmentManager())
+						.setStyleResId(R.style.BetterPickersDialogFragment_Light)
+						.setDayOfMonth(selected_day.get(Calendar.DAY_OF_MONTH))
+						.setMonthOfYear(selected_day.get(Calendar.MONTH))
+						.setYear(selected_day.get(Calendar.YEAR));
+				builder.show();
+			}
 			break;
 		case R.id.menu_fake_data:
 			dialog = CalendarDatePickerDialog.newInstance(
@@ -127,6 +140,16 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 	@Override
 	public void onDateSet(CalendarDatePickerDialog dialog, int year,
 			int monthOfYear, int dayOfMonth) {
+		startExporter(year, monthOfYear, dayOfMonth);
+	}
+
+	@Override
+	public void onDialogDateSet(int reference, int year, int monthOfYear,
+			int dayOfMonth) {
+		startExporter(year, monthOfYear, dayOfMonth);
+	}
+
+	private void startExporter(int year, int monthOfYear, int dayOfMonth) {
 		Log.d("History", "onDateSelected");
 		Calendar startDate = Calendar.getInstance();
 		startDate.set(Calendar.YEAR, year);
