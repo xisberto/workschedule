@@ -10,9 +10,11 @@ import java.util.Locale;
 
 import net.xisberto.work_schedule.database.Database;
 import net.xisberto.work_schedule.database.Period;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.NavUtils;
@@ -24,10 +26,12 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.doomonafireball.betterpickers.calendardatepicker.CalendarDatePickerDialog;
 import com.doomonafireball.betterpickers.calendardatepicker.CalendarDatePickerDialog.OnDateSetListener;
+import com.doomonafireball.betterpickers.datepicker.DatePickerBuilder;
+import com.doomonafireball.betterpickers.datepicker.DatePickerDialogFragment.DatePickerDialogHandler;
 import com.viewpagerindicator.TabPageIndicator;
 
 public class ViewHistoryActivity extends SherlockFragmentActivity implements
-		OnDateSetListener {
+		OnDateSetListener, DatePickerDialogHandler {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,11 +89,21 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 			view_pager.setCurrentItem(HistoryPagerAdapter.SIZE);
 			break;
 		case R.id.menu_share:
-			dialog = CalendarDatePickerDialog.newInstance(this,
-					selected_day.get(Calendar.YEAR),
-					selected_day.get(Calendar.MONTH),
-					selected_day.get(Calendar.DAY_OF_MONTH));
-			dialog.show(getSupportFragmentManager(), "date_picker");
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+				dialog = CalendarDatePickerDialog.newInstance(this,
+						selected_day.get(Calendar.YEAR),
+						selected_day.get(Calendar.MONTH),
+						selected_day.get(Calendar.DAY_OF_MONTH));
+				dialog.show(getSupportFragmentManager(), "date_picker");
+			} else {
+				DatePickerBuilder builder = new DatePickerBuilder()
+						.setFragmentManager(getSupportFragmentManager())
+						.setStyleResId(R.style.BetterPickersDialogFragment_Light)
+						.setDayOfMonth(selected_day.get(Calendar.DAY_OF_MONTH))
+						.setMonthOfYear(selected_day.get(Calendar.MONTH))
+						.setYear(selected_day.get(Calendar.YEAR));
+				builder.show();
+			}
 			break;
 		case R.id.menu_fake_data:
 			dialog = CalendarDatePickerDialog.newInstance(
@@ -127,6 +141,16 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 	@Override
 	public void onDateSet(CalendarDatePickerDialog dialog, int year,
 			int monthOfYear, int dayOfMonth) {
+		startExporter(year, monthOfYear, dayOfMonth);
+	}
+
+	@Override
+	public void onDialogDateSet(int reference, int year, int monthOfYear,
+			int dayOfMonth) {
+		startExporter(year, monthOfYear, dayOfMonth);
+	}
+
+	private void startExporter(int year, int monthOfYear, int dayOfMonth) {
 		Log.d("History", "onDateSelected");
 		Calendar startDate = Calendar.getInstance();
 		startDate.set(Calendar.YEAR, year);
@@ -138,6 +162,14 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 
 	public void shareUri(Uri uri) {
 		Log.d("History", "shareURI");
+		if (uri == null) {
+			AlertDialog dialog = new AlertDialog.Builder(this)
+					.setTitle(R.string.app_name)
+					.setMessage(R.string.txt_no_data)
+					.setPositiveButton(android.R.string.ok, null).create();
+			dialog.show();
+			return;
+		}
 		Intent intentShare = new Intent(Intent.ACTION_SEND);
 		intentShare.setType("text/csv");
 		intentShare.putExtra(Intent.EXTRA_STREAM, uri);
@@ -175,20 +207,23 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 			}
 
 			String content = database.exportCSV(startDate, endDate);
+			SimpleDateFormat dateFormat = new SimpleDateFormat(
+					Database.DATE_FORMAT, Locale.getDefault());
+			String filename = "export_"
+					+ dateFormat.format(startDate.getTime()) + "_"
+					+ dateFormat.format(endDate.getTime()) + ".csv";
+			File file;
+			File dir;
 
 			if (isExternalStorageWritable()) {
-				SimpleDateFormat dateFormat = new SimpleDateFormat(
-						Database.DATE_FORMAT, Locale.getDefault());
-				String filename = "export_"
-						+ dateFormat.format(startDate.getTime()) + "_"
-						+ dateFormat.format(endDate.getTime()) + ".csv";
-				File file;
-				File dir;
 				dir = new File(Environment.getExternalStorageDirectory(),
 						"WorkSchedule");
 				if (!dir.exists()) {
 					dir.mkdirs();
 				}
+			} else {
+				dir = activity.getCacheDir();
+			}
 				file = new File(dir, filename);
 				Log.d("CVSExporter", "saving file on " + file.getAbsolutePath());
 
@@ -197,6 +232,9 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 					outputStream = new FileOutputStream(file);
 					outputStream.write(content.getBytes());
 					outputStream.close();
+				} catch (NullPointerException e) {
+					e.printStackTrace();
+					return null;
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 					return null;
@@ -206,10 +244,7 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 				}
 
 				return Uri.fromFile(file);
-			}
-
-			return null;
-
+			
 		}
 
 		@Override
