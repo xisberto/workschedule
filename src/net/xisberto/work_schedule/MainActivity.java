@@ -12,6 +12,7 @@ package net.xisberto.work_schedule;
 
 import java.util.Calendar;
 
+import net.xisberto.work_schedule.database.Database;
 import net.xisberto.work_schedule.database.Period;
 import net.xisberto.work_schedule.settings.Settings;
 import net.xisberto.work_schedule.settings.SettingsActivity;
@@ -168,9 +169,16 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	private void showTimePickerDialog(Period period) {
 		waiting_for = period.getId();
+		Calendar time;
+		if (period.getId() == R.string.fstp_entrance) {
+			Database database = Database.getInstance(this);
+			time = database.getAverageTime(waiting_for);
+		} else {
+			time = Calendar.getInstance();
+		}
 		RadialTimePickerDialog dialog = RadialTimePickerDialog.newInstance(
-				this, period.time.get(Calendar.HOUR_OF_DAY),
-				period.time.get(Calendar.MINUTE),
+				this, time.get(Calendar.HOUR_OF_DAY),
+				time.get(Calendar.MINUTE),
 				DateFormat.is24HourFormat(this));
 		dialog.show(getSupportFragmentManager(), "time_picker");
 	}

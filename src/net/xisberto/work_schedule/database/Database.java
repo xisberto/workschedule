@@ -171,6 +171,35 @@ public class Database extends SQLiteOpenHelper {
 		return result;
 	}
 
+	public Calendar getAverageTime(int period_id) {
+		String colume_average = "strftime('%H:%M'," + " avg(julianday("
+				+ TablePeriod.COLUMN_TIME + ", 'localtime')))";
+		Cursor cursor = db.query(TablePeriod.TABLE_NAME,
+				new String[] { colume_average }, TablePeriod.COLUMN_PREF_ID
+						+ " = '" + period_id + "'", null, null, null, null);
+		
+		if (cursor.getCount() > 0) {
+			cursor.moveToFirst();
+			String average = cursor.getString(0);
+			Log.d("Database", "average is "+average);
+			SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT,
+					Locale.getDefault());
+			Calendar result = Calendar.getInstance();
+			try {
+				result.setTime(timeFormat.parse(average));
+			} catch (NullPointerException npe) {
+				npe.printStackTrace();
+				return Calendar.getInstance();
+			} catch (ParseException e) {
+				e.printStackTrace();
+				return Calendar.getInstance();
+			}
+			return result;
+		}
+
+		return Calendar.getInstance();
+	}
+
 	public String exportCSV(Calendar dateStart, Calendar dateEnd) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT,
 				Locale.getDefault());
@@ -188,16 +217,17 @@ public class Database extends SQLiteOpenHelper {
 					+ ctx.getString(R.string.header_period) + "\t"
 					+ ctx.getString(R.string.header_time) + "\n";
 			export += header;
-//			Log.d("Export CSV", header);
+			// Log.d("Export CSV", header);
 			while (cursor.moveToNext()) {
 				String dateTime = cursor.getString(1);
 				String date = dateTime.substring(0, 10);
 				String time = dateTime.substring(11);
 				Period period = Period.getPeriod(ctx, cursor.getInt(0));
-				String line = "\"" + date + "\"\t\"" + ctx.getString(period.getLabelId())
-						+ "\"\t\"" + time + "\"\n";
+				String line = "\"" + date + "\"\t\""
+						+ ctx.getString(period.getLabelId()) + "\"\t\"" + time
+						+ "\"\n";
 				export += line;
-//				Log.d("Export CSV", line);
+				// Log.d("Export CSV", line);
 			}
 			return export;
 		}
