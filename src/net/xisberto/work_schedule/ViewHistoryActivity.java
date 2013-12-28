@@ -11,6 +11,7 @@ import java.util.Locale;
 import net.xisberto.work_schedule.DatePickerFragment.OnDateSelectedListener;
 import net.xisberto.work_schedule.database.Database;
 import net.xisberto.work_schedule.database.Period;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -131,6 +132,14 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 
 	public void shareUri(Uri uri) {
 		Log.d("History", "shareURI");
+		if (uri == null) {
+			AlertDialog dialog = new AlertDialog.Builder(this)
+					.setTitle(R.string.app_name)
+					.setMessage(R.string.txt_no_data)
+					.setPositiveButton(android.R.string.ok, null).create();
+			dialog.show();
+			return;
+		}
 		Intent intentShare = new Intent(Intent.ACTION_SEND);
 		intentShare.setType("text/csv");
 		intentShare.putExtra(Intent.EXTRA_STREAM, uri);
@@ -168,27 +177,34 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 			}
 
 			String content = database.exportCSV(startDate, endDate);
+			SimpleDateFormat dateFormat = new SimpleDateFormat(
+					Database.DATE_FORMAT, Locale.getDefault());
+			String filename = "export_"
+					+ dateFormat.format(startDate.getTime()) + "_"
+					+ dateFormat.format(endDate.getTime()) + ".csv";
+			File file;
+			File dir;
 
 			if (isExternalStorageWritable()) {
-				SimpleDateFormat dateFormat = new SimpleDateFormat(
-						Database.DATE_FORMAT, Locale.getDefault());
-				String filename = "export_"
-						+ dateFormat.format(startDate.getTime()) + "_"
-						+ dateFormat.format(endDate.getTime()) + ".csv";
-				File file;
-				File dir;
-				dir = new File(Environment.getExternalStorageDirectory(), "WorkSchedule");
+				dir = new File(Environment.getExternalStorageDirectory(),
+						"WorkSchedule");
 				if (!dir.exists()) {
 					dir.mkdirs();
 				}
+			} else {
+				dir = activity.getCacheDir();
+			}
 				file = new File(dir, filename);
 				Log.d("CVSExporter", "saving file on " + file.getAbsolutePath());
-				
+
 				FileOutputStream outputStream;
 				try {
 					outputStream = new FileOutputStream(file);
 					outputStream.write(content.getBytes());
 					outputStream.close();
+				} catch (NullPointerException e) {
+					e.printStackTrace();
+					return null;
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 					return null;
@@ -198,10 +214,7 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 				}
 
 				return Uri.fromFile(file);
-			}
-
-			return null;
-
+			
 		}
 
 		@Override

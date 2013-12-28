@@ -37,6 +37,7 @@
     <string name="header_time">Time</string>
     <string name="header_period">Period</string>
     <string name="menu_go_today">Go to today</string>
+    <string name="txt_no_data">No data to export</string>
     
     <string name="title_activity_settings">Settings</string>
     
