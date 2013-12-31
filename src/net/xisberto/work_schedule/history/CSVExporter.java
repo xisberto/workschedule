@@ -15,11 +15,20 @@ import android.os.Environment;
 import android.util.Log;
 
 public class CSVExporter extends AsyncTask<Calendar, Void, Uri> {
+	public interface CSVExporterCallback {
+		public void shareUri(Uri uri);
+	}
+
 	private ViewHistoryActivity activity;
 
-	public CSVExporter(ViewHistoryActivity context) {
+	public CSVExporter(ViewHistoryActivity activity) {
 		super();
-		this.activity = context;
+		if (activity instanceof CSVExporterCallback) {
+			this.activity = activity;
+		} else {
+			throw new ClassCastException(
+					"Activity must implement CSVExporterCallback");
+		}
 	}
 
 	/* Checks if external storage is available for read and write */
@@ -46,9 +55,8 @@ public class CSVExporter extends AsyncTask<Calendar, Void, Uri> {
 		String content = database.exportCSV(startDate, endDate);
 		SimpleDateFormat dateFormat = new SimpleDateFormat(
 				Database.DATE_FORMAT, Locale.getDefault());
-		String filename = "export_"
-				+ dateFormat.format(startDate.getTime()) + "_"
-				+ dateFormat.format(endDate.getTime()) + ".csv";
+		String filename = "export_" + dateFormat.format(startDate.getTime())
+				+ "_" + dateFormat.format(endDate.getTime()) + ".csv";
 		File file;
 		File dir;
 
@@ -61,27 +69,27 @@ public class CSVExporter extends AsyncTask<Calendar, Void, Uri> {
 		} else {
 			dir = activity.getCacheDir();
 		}
-			file = new File(dir, filename);
-			Log.d("CVSExporter", "saving file on " + file.getAbsolutePath());
+		file = new File(dir, filename);
+		Log.d("CVSExporter", "saving file on " + file.getAbsolutePath());
 
-			FileOutputStream outputStream;
-			try {
-				outputStream = new FileOutputStream(file);
-				outputStream.write(content.getBytes());
-				outputStream.close();
-			} catch (NullPointerException e) {
-				e.printStackTrace();
-				return null;
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				return null;
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
-			}
+		FileOutputStream outputStream;
+		try {
+			outputStream = new FileOutputStream(file);
+			outputStream.write(content.getBytes());
+			outputStream.close();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			return null;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 
-			return Uri.fromFile(file);
-		
+		return Uri.fromFile(file);
+
 	}
 
 	@Override

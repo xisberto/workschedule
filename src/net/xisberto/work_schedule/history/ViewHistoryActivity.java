@@ -5,7 +5,12 @@ import java.util.Calendar;
 import net.xisberto.work_schedule.BuildConfig;
 import net.xisberto.work_schedule.R;
 import net.xisberto.work_schedule.database.Period;
+import net.xisberto.work_schedule.history.CSVExporter.CSVExporterCallback;
+import net.xisberto.work_schedule.settings.Settings;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -13,7 +18,11 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.CheckBox;
 
+import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -24,7 +33,7 @@ import com.doomonafireball.betterpickers.datepicker.DatePickerDialogFragment.Dat
 import com.viewpagerindicator.TabPageIndicator;
 
 public class ViewHistoryActivity extends SherlockFragmentActivity implements
-		OnDateSetListener, DatePickerDialogHandler {
+		OnDateSetListener, DatePickerDialogHandler, CSVExporterCallback {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,37 +79,29 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		}
+
 		ViewPager view_pager = (ViewPager) findViewById(R.id.pager);
 		HistoryPagerAdapter adapter = (HistoryPagerAdapter) view_pager
 				.getAdapter();
 		Calendar selected_day = adapter.getSelectedDay(view_pager
 				.getCurrentItem());
-		CalendarDatePickerDialog dialog;
+
 		switch (item.getItemId()) {
 		case R.id.menu_go_today:
 			view_pager = (ViewPager) findViewById(R.id.pager);
 			view_pager.setCurrentItem(HistoryPagerAdapter.SIZE);
 			break;
 		case R.id.menu_share:
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-				dialog = CalendarDatePickerDialog.newInstance(this,
-						selected_day.get(Calendar.YEAR),
-						selected_day.get(Calendar.MONTH),
-						selected_day.get(Calendar.DAY_OF_MONTH));
-				dialog.show(getSupportFragmentManager(), "date_picker");
+			if (Settings.getInstance(this).getShowInstructions()) {
+				InstrucionDialog.newInstance(this, selected_day).show(
+						getSupportFragmentManager(), "instruction");
 			} else {
-				DatePickerBuilder builder = new DatePickerBuilder()
-						.setFragmentManager(getSupportFragmentManager())
-						.setStyleResId(R.style.BetterPickersDialogFragment_Light)
-						.setDayOfMonth(selected_day.get(Calendar.DAY_OF_MONTH))
-						.setMonthOfYear(selected_day.get(Calendar.MONTH))
-						.setYear(selected_day.get(Calendar.YEAR));
-				builder.show();
+				showDatePicker(selected_day);
 			}
 			break;
 		case R.id.menu_fake_data:
-			dialog = CalendarDatePickerDialog.newInstance(
-					new OnDateSetListener() {
+			CalendarDatePickerDialog dialog = CalendarDatePickerDialog
+					.newInstance(new OnDateSetListener() {
 						@Override
 						public void onDateSet(CalendarDatePickerDialog dialog,
 								int year, int monthOfYear, int dayOfMonth) {
@@ -143,6 +144,41 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 		startExporter(year, monthOfYear, dayOfMonth);
 	}
 
+	@Override
+	public void shareUri(Uri uri) {
+		Log.d("History", "shareURI");
+		if (uri == null) {
+			new AlertDialog.Builder(this).setTitle(R.string.app_name)
+					.setMessage(R.string.txt_no_data)
+					.setPositiveButton(android.R.string.ok, null).show();
+			return;
+		}
+		Intent intentShare = new Intent(Intent.ACTION_SEND);
+		intentShare.setType("text/csv");
+		intentShare.putExtra(Intent.EXTRA_STREAM, uri);
+		startActivity(Intent.createChooser(intentShare, getResources()
+				.getString(R.string.menu_share)));
+	}
+
+	private void showDatePicker(Calendar selected_day) {
+		CalendarDatePickerDialog dialog;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+			dialog = CalendarDatePickerDialog.newInstance(this,
+					selected_day.get(Calendar.YEAR),
+					selected_day.get(Calendar.MONTH),
+					selected_day.get(Calendar.DAY_OF_MONTH));
+			dialog.show(getSupportFragmentManager(), "date_picker");
+		} else {
+			DatePickerBuilder builder = new DatePickerBuilder()
+					.setFragmentManager(getSupportFragmentManager())
+					.setStyleResId(R.style.BetterPickersDialogFragment_Light)
+					.setDayOfMonth(selected_day.get(Calendar.DAY_OF_MONTH))
+					.setMonthOfYear(selected_day.get(Calendar.MONTH))
+					.setYear(selected_day.get(Calendar.YEAR));
+			builder.show();
+		}
+	}
+
 	private void startExporter(int year, int monthOfYear, int dayOfMonth) {
 		Log.d("History", "onDateSelected");
 		Calendar startDate = Calendar.getInstance();
@@ -153,21 +189,48 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 		exporter.execute(startDate);
 	}
 
-	public void shareUri(Uri uri) {
-		Log.d("History", "shareURI");
-		if (uri == null) {
-			AlertDialog dialog = new AlertDialog.Builder(this)
-					.setTitle(R.string.app_name)
-					.setMessage(R.string.txt_no_data)
-					.setPositiveButton(android.R.string.ok, null).create();
-			dialog.show();
-			return;
-		}
-		Intent intentShare = new Intent(Intent.ACTION_SEND);
-		intentShare.setType("text/csv");
-		intentShare.putExtra(Intent.EXTRA_STREAM, uri);
-		startActivity(Intent.createChooser(intentShare, getResources()
-				.getString(R.string.menu_share)));
-	}
+	public static class InstrucionDialog extends SherlockDialogFragment {
+		private ViewHistoryActivity activity;
+		private Calendar selected_day;
+		private View view;
 
+		public static InstrucionDialog newInstance(
+				ViewHistoryActivity activity, Calendar selected_day) {
+			InstrucionDialog dialog = new InstrucionDialog();
+			dialog.activity = activity;
+			dialog.selected_day = selected_day;
+			return dialog;
+		}
+
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			OnClickListener callback = new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					switch (which) {
+					case DialogInterface.BUTTON_POSITIVE:
+						CheckBox checkBox = (CheckBox) view
+								.findViewById(R.id.check_show_instructions);
+						if (checkBox.isChecked()) {
+							Settings.getInstance(activity).setShowInstructions(
+									false);
+						}
+						activity.showDatePicker(selected_day);
+						break;
+					default:
+						break;
+					}
+				}
+			};
+
+			view = LayoutInflater.from(getActivity()).inflate(
+					R.layout.dialog_instructions, null);
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+			builder.setTitle(R.string.app_name).setView(view)
+					.setPositiveButton(android.R.string.ok, callback)
+					.setNegativeButton(android.R.string.cancel, callback);
+			return builder.create();
+		}
+	}
 }
