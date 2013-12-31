@@ -1,4 +1,4 @@
-package net.xisberto.work_schedule;
+package net.xisberto.work_schedule.history;
 
 import java.text.DateFormat;
 import java.util.Calendar;
