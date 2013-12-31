@@ -46,7 +46,7 @@
                 android:value="net.xisberto.work_schedule.MainActivity" />
         </activity>
         <activity
-            android:name="net.xisberto.work_schedule.ViewHistoryActivity"
+            android:name="net.xisberto.work_schedule.history.ViewHistoryActivity"
             android:label="@string/title_activity_history"
             android:parentActivityName="net.xisberto.work_schedule.MainActivity" >
             <meta-data

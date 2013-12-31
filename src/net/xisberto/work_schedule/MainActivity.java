@@ -14,6 +14,7 @@ import java.util.Calendar;
 
 import net.xisberto.work_schedule.database.Database;
 import net.xisberto.work_schedule.database.Period;
+import net.xisberto.work_schedule.history.ViewHistoryActivity;
 import net.xisberto.work_schedule.settings.Settings;
 import net.xisberto.work_schedule.settings.SettingsActivity;
 import android.content.Intent;

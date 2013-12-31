@@ -37,6 +37,9 @@
     <string name="header_date">Date</string>
     <string name="header_time">Time</string>
     <string name="header_period">Period</string>
+    <string name="txt_instruction">Choose a initial date to export.
+        The final date is today.</string>
+    <string name="chk_dont_show_again">Don\'t show this message again</string>
     <string name="txt_no_data">No data to export</string>
     
     <string name="title_activity_settings">Settings</string>
