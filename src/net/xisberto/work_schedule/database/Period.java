@@ -7,7 +7,7 @@ import net.xisberto.work_schedule.DashClockExtensionService;
 import net.xisberto.work_schedule.R;
 import net.xisberto.work_schedule.alarm.AlarmMessageActivity;
 import net.xisberto.work_schedule.alarm.AlarmReceiver;
-import net.xisberto.work_schedule.widget.WidgetNextMinimalProvider;
+import net.xisberto.work_schedule.widget.WidgetNextProvider;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -156,8 +156,8 @@ public class Period {
 		}
 
 		Intent updateIntent = new Intent(context.getApplicationContext(),
-				WidgetNextMinimalProvider.class);
-		updateIntent.setAction(WidgetNextMinimalProvider.MY_ACTION_UPDATE);
+				WidgetNextProvider.class);
+		updateIntent.setAction(WidgetNextProvider.MY_ACTION_UPDATE);
 		context.sendBroadcast(updateIntent);
 
 		context.sendBroadcast(new Intent(
