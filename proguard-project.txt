@@ -38,6 +38,8 @@
 -keep interface com.doomonafireball.betterpickers.radialtimepicker.RadialTimePickerDialog.OnTimeSetListener { *; }
 -keep class com.doomonafireball.betterpickers.calendardatepicker.CalendarDatePickerDialog { *; }
 -keep interface com.doomonafireball.betterpickers.calendardatepicker.CalendarDatePickerDialog.OnDateSetListener { *; }
+-keep class com.doomonafireball.betterpickers.datepicker.DatePickerBuilder { *; }
+-keep interface com.doomonafireball.betterpickers.datepicker.DatePickerDialogFragment.DatePickerDialogHandler { *; }
 
 -keep public class net.xisberto.work_schedule.settings.SettingsActivity$AboutFragment
 -keep public class net.xisberto.work_schedule.settings.SettingsActivity$SettingsFragment
