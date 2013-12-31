@@ -1,11 +1,15 @@
-package net.xisberto.work_schedule;
+package net.xisberto.work_schedule.widget;
 
+import net.xisberto.work_schedule.MainActivity;
+import net.xisberto.work_schedule.R;
+import net.xisberto.work_schedule.database.Database;
+import net.xisberto.work_schedule.database.Period;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.widget.RemoteViews;
 
 public class WidgetNextProvider extends WidgetNextMinimalProvider {
@@ -25,14 +29,15 @@ public class WidgetNextProvider extends WidgetNextMinimalProvider {
 				1, intentAction, 0);
 		views.setOnClickPendingIntent(R.id.text_label, pendingIntentAction);
 
-		Settings settings = new Settings(context.getApplicationContext());
-		Bundle info = settings.getNextAlarm();
-		String period_label = info.getString(Settings.EXTRA_PERIOD_LABEL);
-		String time = info.getString(Settings.EXTRA_PERIOD_TIME);
-		if (!time.equals("")) {
-			period_label += "\n" + time;
+		Period period = Database.getInstance(context).getNextAlarm();
+		String info = null;
+		if (period != null) {
+			info = context.getString(period.getLabelId()) + "\n"
+					+ period.formatTime(DateFormat.is24HourFormat(context));
+		} else {
+			info = context.getString(R.string.no_alarm);
 		}
-		views.setTextViewText(R.id.text_label, period_label);
+		views.setTextViewText(R.id.text_label, info);
 
 		return views;
 	}

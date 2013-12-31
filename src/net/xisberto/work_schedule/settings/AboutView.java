@@ -8,8 +8,9 @@
  * Contributors:
  *     Humberto Fraga - initial API and implementation
  ******************************************************************************/
-package net.xisberto.work_schedule;
+package net.xisberto.work_schedule.settings;
 
+import net.xisberto.work_schedule.R;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.view.LayoutInflater;

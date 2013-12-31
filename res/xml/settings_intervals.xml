@@ -11,13 +11,13 @@
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <net.xisberto.work_schedule.TimePickerPreference
+    <net.xisberto.work_schedule.settings.TimePickerPreference
         android:key="@string/key_work_time"
         android:title="@string/lbl_work_time" />
-    <net.xisberto.work_schedule.TimePickerPreference
+    <net.xisberto.work_schedule.settings.TimePickerPreference
         android:key="@string/key_fstp_duration"
         android:title="@string/lbl_fstp_duration" />
-    <net.xisberto.work_schedule.TimePickerPreference
+    <net.xisberto.work_schedule.settings.TimePickerPreference
         android:key="@string/key_lunch_interval"
         android:title="@string/lbl_lunch_interval" />
 
@@ -25,10 +25,10 @@
         android:key="@string/key_mark_extra"
         android:title="@string/lbl_mark_extra" />
 
-    <net.xisberto.work_schedule.TimePickerPreference
+    <net.xisberto.work_schedule.settings.TimePickerPreference
         android:key="@string/key_fste_duration"
         android:title="@string/lbl_fste_duration" />
-    <net.xisberto.work_schedule.TimePickerPreference
+    <net.xisberto.work_schedule.settings.TimePickerPreference
         android:key="@string/key_extra_interval"
         android:title="@string/lbl_extra_intetrval" />
 

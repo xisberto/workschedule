@@ -8,12 +8,14 @@
  * Contributors:
  *     Humberto Fraga - initial API and implementation
  ******************************************************************************/
-package net.xisberto.work_schedule;
+package net.xisberto.work_schedule.alarm;
 
 import java.io.IOException;
 import java.util.Calendar;
 
-import net.xisberto.work_schedule.Settings.Period;
+import net.xisberto.work_schedule.R;
+import net.xisberto.work_schedule.database.Database;
+import net.xisberto.work_schedule.settings.Settings;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -29,6 +31,7 @@ import android.os.PowerManager;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.MotionEventCompat;
+import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -55,6 +58,7 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	private float currentPoint;
 	private boolean moving;
 	private HinterThread hinter;
+	private net.xisberto.work_schedule.database.Period period;
 
 	// Get an alarm sound. Try for saved user option. If none set, try default
 	// alarm, notification, or ringtone.
@@ -107,8 +111,8 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 			mMediaPlayer = null;
 		}
 	}
-
-	private void cancelAlarm() {
+	
+	private void stopSoundVibrator() {
 		stopSound();
 		((Vibrator) getSystemService(VIBRATOR_SERVICE)).cancel();
 		if (!isFinishing()) {
@@ -116,47 +120,48 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		}
 	}
 
+	private void cancelAlarm() {
+		period.enabled = false;
+		period.persist(this);
+		stopSoundVibrator();
+	}
+
 	private void snoozeAlarm() {
-		settings = new Settings(getApplicationContext());
+		settings = Settings.getInstance(getApplicationContext());
 
-		Calendar alarm_time = settings.getCalendar(period_pref_id);
-		Calendar snooze_increment = settings
-				.getCalendar(R.string.key_snooze_increment);
-		settings.addCalendars(alarm_time, snooze_increment);
+		period.addTime(settings.getCalendar(R.string.key_snooze_increment));
+		period.setAlarm(this);
+		period.persist(this);
 
-		Period period = Period.getFromPrefId(period_pref_id);
-		settings.setAlarm(period, alarm_time, true);
 		Toast.makeText(
 				this,
 				getResources().getString(R.string.snooze_set_to) + " "
-						+ settings.formatCalendar(alarm_time),
+						+ period.formatTime(DateFormat.is24HourFormat(this)),
 				Toast.LENGTH_SHORT).show();
-		cancelAlarm();
+		stopSoundVibrator();
 	}
 
 	private void showNotification() {
-		Period period = Period.getFromPrefId(period_pref_id);
-
 		Intent intentAlarm = new Intent(this, AlarmMessageActivity.class);
 		intentAlarm.setAction(AlarmMessageActivity.ACTION_SHOW_ALARM);
 		intentAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
 				| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 
 		PendingIntent notifySender = PendingIntent.getActivity(this,
-				period.pref_id, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
+				period.getId(), intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
 
 		NotificationManager nm = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
 		Notification notification = new NotificationCompat.Builder(this)
 				.setSmallIcon(R.drawable.ic_stat_notification)
-				.setContentTitle(this.getString(period.label_id))
-				.setTicker(this.getString(period.label_id))
+				.setContentTitle(this.getString(period.getLabelId()))
+				.setTicker(this.getString(period.getLabelId()))
 				.setWhen(settings.getCalendar(period_pref_id).getTimeInMillis())
 				.setOngoing(true).setOnlyAlertOnce(true)
 				.setContentIntent(notifySender).build();
 
-		nm.notify(period.pref_id, notification);
+		nm.notify(period.getId(), notification);
 	}
 
 	private boolean isLargeScreen() {
@@ -176,44 +181,48 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 			setRequestedOrientation(Configuration.ORIENTATION_PORTRAIT);
 		}
 	}
-	
-	private void startHinter() {
-        View hinter_top = findViewById(R.id.hinter_top);
-        View hinter_bottom = findViewById(R.id.hinter_bottom);
 
-        hinter = new HinterThread(hinter_top, hinter_bottom);
-        hinter.start();
-    }
+	private void startHinter() {
+		View hinter_top = findViewById(R.id.hinter_top);
+		View hinter_bottom = findViewById(R.id.hinter_bottom);
+
+		hinter = new HinterThread(hinter_top, hinter_bottom);
+		hinter.start();
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		overridePendingTransition(R.anim.activity_open_enter, R.anim.activity_close_exit);
-		
+		overridePendingTransition(R.anim.activity_open_enter,
+				R.anim.activity_close_exit);
+
 		getWindow().addFlags(
 				WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
 						| WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
 						| WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-		
+
 		setContentView(R.layout.activity_alarm_message);
 
 		period_pref_id = getIntent().getIntExtra(EXTRA_PERIOD_ID,
 				R.string.fstp_entrance);
-		settings = new Settings(getApplicationContext());
-		String time = settings.formatCalendar(settings
-				.getCalendar(period_pref_id));
+		Log.d("AlarmMessage", "showing alarm for "+period_pref_id);
+		period = Database.getInstance(getApplicationContext()).getPeriodOfDay(
+				period_pref_id, Calendar.getInstance());
+		Log.d("AlarmMessage", "time is "+period.formatTime(true));
 
-		((TextView) findViewById(R.id.txt_alarm_label)).setText(Period
-				.getFromPrefId(period_pref_id).label_id);
+		settings = Settings.getInstance(getApplicationContext());
+		String time = period.formatTime(DateFormat.is24HourFormat(this));
+
+		((TextView) findViewById(R.id.txt_alarm_label)).setText(period.getLabelId());
 		((TextView) findViewById(R.id.txt_alarm_time)).setText(time);
 
 		initialPoint = 0f;
-        currentPoint = 0f;
-        moving = false;
+		currentPoint = 0f;
+		moving = false;
 
-        findViewById(R.id.frame_top).setOnTouchListener(this);
-        findViewById(R.id.frame_bottom).setOnTouchListener(this);
+		findViewById(R.id.frame_top).setOnTouchListener(this);
+		findViewById(R.id.frame_bottom).setOnTouchListener(this);
 
 		setOrientation();
 
@@ -233,15 +242,16 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		if (!mMediaPlayer.isPlaying()) {
 			mMediaPlayer.start();
 		}
-        startHinter();
+		startHinter();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-        hinter.interrupt();
+		hinter.interrupt();
 		if (isFinishing()) {
-			overridePendingTransition(R.anim.activity_open_enter, R.anim.activity_close_exit);
+			overridePendingTransition(R.anim.activity_open_enter,
+					R.anim.activity_close_exit);
 		}
 	}
 
@@ -267,7 +277,7 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		case KeyEvent.KEYCODE_VOLUME_DOWN:
 		case KeyEvent.KEYCODE_VOLUME_MUTE:
 			mMediaPlayer.setVolume(0f, 0f);
-			((Vibrator)getSystemService(VIBRATOR_SERVICE)).cancel();
+			((Vibrator) getSystemService(VIBRATOR_SERVICE)).cancel();
 			return true;
 
 		default:
@@ -278,69 +288,71 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	@Override
 	public boolean onTouch(View view, MotionEvent event) {
 		if (event.getPointerCount() > 1) {
-            return super.onTouchEvent(event);
-        }
+			return super.onTouchEvent(event);
+		}
 
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) view.getLayoutParams();
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) view
+				.getLayoutParams();
 
-        int action = MotionEventCompat.getActionMasked(event);
-        if (view.getId() == R.id.frame_bottom || view.getId() == R.id.frame_top) {
-            switch (action) {
-                case MotionEvent.ACTION_DOWN:
-                    initialPoint = event.getRawY();
-                    moving = true;
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    if (moving) {
-                        hinter.interrupt();
-                        currentPoint = event.getRawY();
-                        
-                        DisplayMetrics displayMetrics = new DisplayMetrics();
-                        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-                        int screenHeight = displayMetrics.heightPixels;
+		int action = MotionEventCompat.getActionMasked(event);
+		if (view.getId() == R.id.frame_bottom || view.getId() == R.id.frame_top) {
+			switch (action) {
+			case MotionEvent.ACTION_DOWN:
+				initialPoint = event.getRawY();
+				moving = true;
+				break;
+			case MotionEvent.ACTION_MOVE:
+				if (moving) {
+					hinter.interrupt();
+					currentPoint = event.getRawY();
 
-                        if (view.getId() == R.id.frame_top) {
-                            int new_margin = (int) (currentPoint - initialPoint);
-                            params.topMargin = (new_margin > 0) ? new_margin : 0;
-                            if ( (new_margin > (screenHeight / 3)) 
-                            		&& (!isFinishing()) ) {
-                            	snoozeAlarm();
-                            	break;
-                            }
-                        } else {
-                            int new_margin = (int) (initialPoint - currentPoint);
-                            params.bottomMargin = (new_margin > 0) ? new_margin : 0;
-                            if ( (new_margin > (screenHeight / 3)) 
-                            		&& (!isFinishing()) ) {
-                            	cancelAlarm();
-                            	break;
-                            }
-                        }
-                        view.setLayoutParams(params);
-                        view.invalidate();
-                    }
-                    break;
-                case MotionEvent.ACTION_UP:
-                    initialPoint = 0;
-                    TranslateAnimation ta;
-                    if (view.getId() == R.id.frame_top) {
-                        ta = new TranslateAnimation(0, 0, params.topMargin, 0);
-                        params.topMargin = 0;
-                    } else {
-                        ta = new TranslateAnimation(0, 0, -params.bottomMargin, 0);
-                        params.bottomMargin = 0;
-                    }
-                    ta.setDuration(100);
-                    view.setLayoutParams(params);
-                    view.startAnimation(ta);
-                    moving = false;
-                    startHinter();
-                    break;
-                default:
-                    return super.onTouchEvent(event);
-            }
-        }
-        return true;
+					DisplayMetrics displayMetrics = new DisplayMetrics();
+					getWindowManager().getDefaultDisplay().getMetrics(
+							displayMetrics);
+					int screenHeight = displayMetrics.heightPixels;
+
+					if (view.getId() == R.id.frame_top) {
+						int new_margin = (int) (currentPoint - initialPoint);
+						params.topMargin = (new_margin > 0) ? new_margin : 0;
+						if ((new_margin > (screenHeight / 3))
+								&& (!isFinishing())) {
+							snoozeAlarm();
+							break;
+						}
+					} else {
+						int new_margin = (int) (initialPoint - currentPoint);
+						params.bottomMargin = (new_margin > 0) ? new_margin : 0;
+						if ((new_margin > (screenHeight / 3))
+								&& (!isFinishing())) {
+							cancelAlarm();
+							break;
+						}
+					}
+					view.setLayoutParams(params);
+					view.invalidate();
+				}
+				break;
+			case MotionEvent.ACTION_UP:
+				initialPoint = 0;
+				TranslateAnimation ta;
+				if (view.getId() == R.id.frame_top) {
+					ta = new TranslateAnimation(0, 0, params.topMargin, 0);
+					params.topMargin = 0;
+				} else {
+					ta = new TranslateAnimation(0, 0, -params.bottomMargin, 0);
+					params.bottomMargin = 0;
+				}
+				ta.setDuration(100);
+				view.setLayoutParams(params);
+				view.startAnimation(ta);
+				moving = false;
+				startHinter();
+				break;
+			default:
+				return super.onTouchEvent(event);
+			}
+		}
+		return true;
 	}
 
 }
