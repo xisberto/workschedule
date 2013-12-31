@@ -1,7 +1,9 @@
-package net.xisberto.work_schedule;
+package net.xisberto.work_schedule.history;
 
 import java.util.Calendar;
 
+import net.xisberto.work_schedule.PeriodListAdapter;
+import net.xisberto.work_schedule.R;
 import net.xisberto.work_schedule.database.Database;
 import net.xisberto.work_schedule.database.Period;
 import android.os.Bundle;

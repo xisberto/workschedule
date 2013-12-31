@@ -1,4 +1,4 @@
-package net.xisberto.work_schedule;
+package net.xisberto.work_schedule.history;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -8,15 +8,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 
-public class HistoryPageAdapter extends FragmentPagerAdapter {
+public class HistoryPagerAdapter extends FragmentPagerAdapter {
 
 	public static final int SIZE = 120;
 
-	public HistoryPageAdapter(FragmentManager fm) {
+	public HistoryPagerAdapter(FragmentManager fm) {
 		super(fm);
 	}
 
-	private Calendar getSelectedDay(int position) {
+	public Calendar getSelectedDay(int position) {
 		Calendar selected_day = Calendar.getInstance();
 		selected_day.add(Calendar.DATE, -SIZE + position + 1);
 		return selected_day;

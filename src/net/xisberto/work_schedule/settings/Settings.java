@@ -230,4 +230,16 @@ public class Settings {
 	public boolean getVibrate() {
 		return prefs.getBoolean(context.getString(R.string.key_vibrate), true);
 	}
+
+	public boolean getShowInstructions() {
+		return prefs.getBoolean(
+				context.getString(R.string.key_show_instructions), true);
+	}
+	
+	public void setShowInstructions(boolean value) {
+		Editor editor = prefs.edit().putBoolean(
+				context.getString(R.string.key_show_instructions), value);
+		apply(editor);
+	}
+
 }

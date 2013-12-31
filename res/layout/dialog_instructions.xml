@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:layout_marginBottom="8dp"
+        android:text="@string/txt_instruction" />
+
+    <CheckBox
+        android:id="@+id/check_show_instructions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/chk_dont_show_again" />
+
+</LinearLayout>
