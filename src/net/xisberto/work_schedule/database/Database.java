@@ -171,6 +171,35 @@ public class Database extends SQLiteOpenHelper {
 		return result;
 	}
 
+	public Calendar getAverageTime(int period_id) {
+		String colume_average = "strftime('%H:%M'," + " avg(julianday("
+				+ TablePeriod.COLUMN_TIME + ", 'localtime')))";
+		Cursor cursor = db.query(TablePeriod.TABLE_NAME,
+				new String[] { colume_average }, TablePeriod.COLUMN_PREF_ID
+						+ " = '" + period_id + "'", null, null, null, null);
+		
+		if (cursor.getCount() > 0) {
+			cursor.moveToFirst();
+			String average = cursor.getString(0);
+			Log.d("Database", "average is "+average);
+			SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT,
+					Locale.getDefault());
+			Calendar result = Calendar.getInstance();
+			try {
+				result.setTime(timeFormat.parse(average));
+			} catch (NullPointerException npe) {
+				npe.printStackTrace();
+				return Calendar.getInstance();
+			} catch (ParseException e) {
+				e.printStackTrace();
+				return Calendar.getInstance();
+			}
+			return result;
+		}
+
+		return Calendar.getInstance();
+	}
+
 	public String exportCSV(Calendar dateStart, Calendar dateEnd) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT,
 				Locale.getDefault());

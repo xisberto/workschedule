@@ -13,6 +13,8 @@
     
     <string name="app_name">Work Schedule</string>
     <string name="menu_settings">Preferências</string>
+    <string name="menu_history">Histórico</string>
+    
     <string name="lbl_fstp_entrance">1º Período: Entrada</string>
     <string name="lbl_fstp_exit">1º Período: Saída</string>
     <string name="lbl_sndp_entrance">2º Período: Entrada</string>
@@ -21,13 +23,24 @@
     <string name="lbl_fste_exit">1º Extra: Saída</string>
     <string name="lbl_snde_entrance">2º Extra: Entrada</string>
     <string name="lbl_snde_exit">2º Extra: Saída</string>
+    
     <string name="time_zero">00:00</string>
     <string name="alarm_set">Próximo alarme para:</string>
+    
     <string name="dismiss">Dispensar</string>
     <string name="snooze">Soneca</string>
     <string name="snooze_set_to">Soneca para </string>
+    
+    <string name="title_activity_history">Histórico</string>
+    <string name="menu_share">Compartilhar arquivo CSV</string>
+    <string name="menu_go_today">Ir para hoje</string>
+    <string name="header_date">Dia</string>
+    <string name="header_time">Hora</string>
+    <string name="header_period">Período</string>
+    <string name="txt_no_data">Sem dados para exportar</string>
        
     <string name="title_activity_settings">Preferências</string>
+    
     <string name="pref_category_intervals">Intervalos</string>
     <string name="pref_category_alarm">Alarme</string>
     <string name="pref_category_about">Sobre</string>
@@ -42,11 +55,6 @@
     <string name="lbl_snooze_increment">Incremento da soneca</string>
     <string name="lbl_ringtone">Toque do alarme</string>
     <string name="lbl_vibrate">Vibrar</string>
-        
-    <string name="msg_rating">Você quer avaliar o Work Schedule na Play Store?</string>
-    <string name="yes">Sim</string>
-    <string name="later">Depois</string>
-    <string name="no">Não</string>
     
     <string name="author_name">Criado por Humberto Fraga, baseado em uma ideia de Marcos Lacerda</string>
     <string name="text_source">Work Schedule é um aplicativo de código aberto. Seu código pode ser acessado no Github</string>
@@ -54,7 +62,7 @@
     <string name="btn_share_link">Compartilhar link</string>
     
     <string name="widget_title">Próximo alarme:</string>
+    <string name="widget_updating">Atualizando&#8230;</string>
     <string name="no_alarm">Nenhum alarme definido</string>
-
     <string name="dashclock_description">Mostra o próximo alarme do Work Schedule</string>
 </resources>
