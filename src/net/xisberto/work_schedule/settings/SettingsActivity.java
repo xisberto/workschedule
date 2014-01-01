@@ -61,6 +61,15 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 		loadHeadersFromResource(R.xml.settings_headers, target);
 	}
 
+	@Override
+	protected boolean isValidFragment(String fragmentName) {
+		if (fragmentName.equals(SettingsFragment.class.getName())
+				|| fragmentName.equals(AboutFragment.class.getName())) {
+			return true;
+		}
+		return false;
+	}
+
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public static class SettingsFragment extends PreferenceFragment {
 
@@ -78,7 +87,7 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 			}
 		}
 	}
-	
+
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public static class AboutFragment extends Fragment {
 
