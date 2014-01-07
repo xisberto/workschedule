@@ -172,6 +172,10 @@ public class Settings {
 	public boolean getVibrate() {
 		return prefs.getBoolean(context.getString(R.string.key_vibrate), true);
 	}
+	
+	public boolean getNotifyCountdown() {
+		return prefs.getBoolean(context.getString(R.string.key_nofity_countdown), true);
+	}
 
 	public boolean getShowInstructions() {
 		return prefs.getBoolean(
