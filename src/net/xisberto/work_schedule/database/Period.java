@@ -7,11 +7,13 @@ import net.xisberto.work_schedule.DashClockExtensionService;
 import net.xisberto.work_schedule.R;
 import net.xisberto.work_schedule.alarm.AlarmMessageActivity;
 import net.xisberto.work_schedule.alarm.AlarmReceiver;
-import net.xisberto.work_schedule.widget.WidgetNextMinimalProvider;
+import net.xisberto.work_schedule.widget.WidgetNextProvider;
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Process;
 import android.text.format.DateFormat;
@@ -136,6 +138,7 @@ public class Period {
 	 * @param context
 	 *            the {@link Context} to handle the need Intents
 	 */
+	@SuppressLint("NewApi")
 	public void setAlarm(Context context) {
 		Intent intentAlarm = new Intent(context.getApplicationContext(),
 				AlarmReceiver.class);
@@ -150,14 +153,20 @@ public class Period {
 		AlarmManager am = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 		if (enabled) {
-			am.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), alarmSender);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+				am.setExact(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(),
+						alarmSender);
+			} else {
+				am.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(),
+						alarmSender);
+			}
 		} else {
 			am.cancel(alarmSender);
 		}
 
 		Intent updateIntent = new Intent(context.getApplicationContext(),
-				WidgetNextMinimalProvider.class);
-		updateIntent.setAction(WidgetNextMinimalProvider.MY_ACTION_UPDATE);
+				WidgetNextProvider.class);
+		updateIntent.setAction(WidgetNextProvider.MY_ACTION_UPDATE);
 		context.sendBroadcast(updateIntent);
 
 		context.sendBroadcast(new Intent(

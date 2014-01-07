@@ -13,10 +13,6 @@
 
     <corners android:radius="4dp" />
 
-    <solid android:color="@color/blue_transparent" />
-
-    <stroke
-        android:width="2dp"
-        android:color="@color/gray_light" />
+    <solid android:color="@color/dark_transparent" />
 
 </shape>

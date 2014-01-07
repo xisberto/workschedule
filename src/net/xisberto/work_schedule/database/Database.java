@@ -203,7 +203,10 @@ public class Database extends SQLiteOpenHelper {
 	public String exportCSV(Calendar dateStart, Calendar dateEnd) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT,
 				Locale.getDefault());
+
 		String start = dateFormat.format(dateStart.getTime());
+		// SQL's BETWEEN...AND don't include the end date
+		dateEnd.add(Calendar.DAY_OF_MONTH, 1);
 		String end = dateFormat.format(dateEnd.getTime());
 
 		Cursor cursor = db.query(TablePeriod.TABLE_NAME, new String[] {

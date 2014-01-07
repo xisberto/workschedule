@@ -30,36 +30,6 @@ public class Settings {
 	private Context context;
 	private SharedPreferences prefs;
 
-	// public enum Period {
-	// FSTP_ENTRANCE(R.string.fstp_entrance, R.string.lbl_fstp_entrance),
-	// FSTP_EXIT(
-	// R.string.fstp_exit, R.string.lbl_fstp_exit), SNDP_ENTRANCE(
-	// R.string.sndp_entrance, R.string.lbl_sndp_entrance), SNDP_EXIT(
-	// R.string.sndp_exit, R.string.lbl_sndp_exit), FSTE_ENTRANCE(
-	// R.string.fste_entrance, R.string.lbl_fste_entrance), FSTE_EXIT(
-	// R.string.fste_exit, R.string.lbl_fste_exit), SNDE_ENTRANCE(
-	// R.string.snde_entrance, R.string.lbl_snde_entrance), SNDE_EXIT(
-	// R.string.snde_exit, R.string.lbl_snde_exit);
-	//
-	// public int pref_id;
-	// public int label_id;
-	//
-	// private Period(int pref_id, int label_id) {
-	// this.pref_id = pref_id;
-	// this.label_id = label_id;
-	// }
-	//
-	// public static Period getFromPrefId(int pref_id) {
-	// for (Period period : Period.values()) {
-	// if (period.pref_id == pref_id) {
-	// return period;
-	// }
-	// }
-	// return null;
-	// }
-	//
-	// }
-
 	private Settings(Context context) {
 		this.context = context;
 		prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -148,34 +118,6 @@ public class Settings {
 		apply(editor);
 	}
 
-	public boolean canAskForRating() {
-		boolean ask_for_rating = prefs.getBoolean(
-				context.getString(R.string.key_ask_for_rating), true);
-		// If shouldn't ask, exit without any other calculation
-		if (ask_for_rating == false) {
-			return false;
-		}
-		// After 8 iterations, will begin to ask
-		int ask_counter = prefs.getInt(
-				context.getString(R.string.key_ask_counter), 0);
-		if (ask_counter < 8) {
-			ask_counter++;
-			apply(prefs.edit().putInt(
-					context.getString(R.string.key_ask_counter), ask_counter));
-			return false;
-		} else if (Math.random() >= 0.6) {
-			// After the 8 iterations, have a 40% chance of asking
-			return ask_for_rating;
-		}
-		return false;
-	}
-
-	public void setAskForRating(boolean value) {
-		Editor editor = prefs.edit().putBoolean(
-				context.getString(R.string.key_ask_for_rating), value);
-		apply(editor);
-	}
-
 	/**
 	 * Returns the Calendar with the alarm for a preference.
 	 * 
@@ -230,4 +172,16 @@ public class Settings {
 	public boolean getVibrate() {
 		return prefs.getBoolean(context.getString(R.string.key_vibrate), true);
 	}
+
+	public boolean getShowInstructions() {
+		return prefs.getBoolean(
+				context.getString(R.string.key_show_instructions), true);
+	}
+	
+	public void setShowInstructions(boolean value) {
+		Editor editor = prefs.edit().putBoolean(
+				context.getString(R.string.key_show_instructions), value);
+		apply(editor);
+	}
+
 }
