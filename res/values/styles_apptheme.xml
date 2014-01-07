@@ -19,15 +19,16 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="Theme.Apptheme" parent="@style/Theme.Sherlock.Light.DarkActionBar">
+    <style name="Theme.AppThemeBase" parent="@style/Theme.Sherlock.Light.DarkActionBar">
+        <item name="android:listViewStyle">@style/Theme.AppTheme.ListView</item>
+        <item name="vpiTabPageIndicatorStyle">@style/Theme.AppTheme.TabPageIndicator</item>
+    </style>
+    
+    <style name="Theme.Apptheme" parent="@style/Theme.AppThemeBase">
         <item name="actionBarItemBackground">@drawable/selectable_background_apptheme</item>
         <item name="popupMenuStyle">@style/PopupMenu.Apptheme</item>
         <item name="dropDownListViewStyle">@style/DropDownListView.Apptheme</item>
         <item name="actionBarStyle">@style/ActionBar.Solid.Apptheme</item>
-
-        <item name="android:listViewStyle">@style/Theme.AppTheme.ListView</item>
-        <item name="vpiTabPageIndicatorStyle">@style/Theme.AppTheme.TabPageIndicator</item>
-    
     </style>
 
     <style name="ActionBar.Solid.Apptheme" parent="@style/Widget.Sherlock.Light.ActionBar.Solid.Inverse">
