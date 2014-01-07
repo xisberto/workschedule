@@ -34,6 +34,8 @@
     <string name="key_snooze_increment">snooze_increment</string>
     <string name="key_ringtone">ringtone</string>
     <string name="key_vibrate">vibrate</string>
+    <string name="key_nofity_countdown">notify_countdown</string>
+    
     <string name="key_show_instructions">show_instructions</string>
     
     <string name="action_settings_intervals">net.xisberto.work_schedule.settings.intervals</string>

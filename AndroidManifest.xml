@@ -107,6 +107,12 @@
                 android:value="@string/dashclock_description" />
         </service>
 
+        <service 
+            android:name="net.xisberto.work_schedule.alarm.CountdownService"
+            android:exported="false">
+            
+        </service>
+        
         <receiver android:name="net.xisberto.work_schedule.settings.BootCompletedReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

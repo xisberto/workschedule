@@ -7,6 +7,8 @@ import net.xisberto.work_schedule.DashClockExtensionService;
 import net.xisberto.work_schedule.R;
 import net.xisberto.work_schedule.alarm.AlarmMessageActivity;
 import net.xisberto.work_schedule.alarm.AlarmReceiver;
+import net.xisberto.work_schedule.alarm.CountdownService;
+import net.xisberto.work_schedule.settings.Settings;
 import net.xisberto.work_schedule.widget.WidgetNextProvider;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
@@ -44,8 +46,8 @@ public class Period {
 	}
 
 	public static Period getPeriod(Context context, int pref_id) {
-		Database database = Database.getInstance(context);
-		Period p = database.getPeriodOfDay(pref_id, Calendar.getInstance());
+		Period p = Database.getInstance(context).getPeriodOfDay(pref_id,
+				Calendar.getInstance());
 		if (p != null) {
 			return p;
 		}
@@ -159,6 +161,18 @@ public class Period {
 			} else {
 				am.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(),
 						alarmSender);
+			}
+			if (Settings.getInstance(context).getNotifyCountdown()) {
+				Intent countdown = new Intent(context.getApplicationContext(),
+						CountdownService.class);
+				countdown.setAction(CountdownService.ACTION_START);
+				countdown.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID,
+						pref_id);
+				PendingIntent countSender = PendingIntent.getService(
+						context.getApplicationContext(), pref_id, countdown,
+						PendingIntent.FLAG_CANCEL_CURRENT);
+				am.set(AlarmManager.RTC_WAKEUP,
+						time.getTimeInMillis() - 5 * 60 * 1000, countSender);
 			}
 		} else {
 			am.cancel(alarmSender);

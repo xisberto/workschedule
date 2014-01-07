@@ -21,7 +21,13 @@
         android:showDefault="true"
         android:showSilent="true"
         android:title="@string/lbl_ringtone" />
-    
-    <CheckBoxPreference android:key="@string/key_vibrate" android:title="@string/lbl_vibrate"/>
+
+    <CheckBoxPreference
+        android:key="@string/key_vibrate"
+        android:title="@string/lbl_vibrate" />
+    <CheckBoxPreference
+        android:key="@string/key_nofity_countdown"
+        android:title="@string/lbl_notify_countdown"
+        android:defaultValue="true" />
 
 </PreferenceScreen>
