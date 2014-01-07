@@ -50,7 +50,7 @@
 
     <FrameLayout
         android:id="@+id/frame_top"
-        style="@style/AppTheme.Slider"
+        style="@style/Theme.AppTheme.Widget.Slider"
         android:background="@color/snooze"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -92,7 +92,7 @@
 
     <FrameLayout
         android:id="@+id/frame_bottom"
-        style="@style/AppTheme.Slider"
+        style="@style/Theme.AppTheme.Widget.Slider"
         android:background="@color/dismiss"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
