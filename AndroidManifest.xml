@@ -57,7 +57,7 @@
             android:name="net.xisberto.work_schedule.alarm.AlarmMessageActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:excludeFromRecents="true"
-            android:launchMode="singleTask"
+            android:launchMode="singleInstance"
             android:taskAffinity=""
             android:theme="@style/Theme.AppTheme.NoActionBar" >
         </activity>
