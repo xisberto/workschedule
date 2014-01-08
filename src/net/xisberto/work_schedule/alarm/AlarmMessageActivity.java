@@ -11,10 +11,9 @@
 package net.xisberto.work_schedule.alarm;
 
 import java.io.IOException;
-import java.util.Calendar;
 
 import net.xisberto.work_schedule.R;
-import net.xisberto.work_schedule.database.Database;
+import net.xisberto.work_schedule.database.Period;
 import net.xisberto.work_schedule.settings.Settings;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -50,7 +49,10 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		OnTouchListener {
 	public static final String EXTRA_TIME = "time",
 			EXTRA_PERIOD_ID = "period_id",
-			ACTION_SHOW_ALARM = "net.xisberto.workschedule.showalarm";
+			ACTION_SHOW_ALARM = "net.xisberto.workschedule.show_alarm",
+			ACTION_DISMISS_ALARM = "net.xisberto.workschedule.dismiss_alarm",
+			ACTION_SNOOZE_ALARM = "net.xisberto.workschedule.snooze_alarm";
+	private static final int REQ_DISMISS = 1, REQ_SNOOZE = 2;
 	private MediaPlayer mMediaPlayer;
 	private int period_pref_id;
 	private Settings settings;
@@ -98,12 +100,6 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		}
 	}
 
-	private void dismissNotification() {
-		NotificationManager nm = (NotificationManager) this
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-		nm.cancel(period_pref_id);
-	}
-
 	private void stopSound() {
 		if (mMediaPlayer != null) {
 			mMediaPlayer.stop();
@@ -111,7 +107,7 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 			mMediaPlayer = null;
 		}
 	}
-	
+
 	private void stopSoundVibrator() {
 		stopSound();
 		((Vibrator) getSystemService(VIBRATOR_SERVICE)).cancel();
@@ -122,6 +118,7 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 
 	private void cancelAlarm() {
 		period.enabled = false;
+		period.setAlarm(this);
 		period.persist(this);
 		stopSoundVibrator();
 	}
@@ -142,13 +139,25 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	}
 
 	private void showNotification() {
-		Intent intentAlarm = new Intent(this, AlarmMessageActivity.class);
-		intentAlarm.setAction(AlarmMessageActivity.ACTION_SHOW_ALARM);
-		intentAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+		Intent alarmIntent = new Intent(this, AlarmMessageActivity.class);
+		alarmIntent.setAction(AlarmMessageActivity.ACTION_SHOW_ALARM);
+		alarmIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
 				| Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 
-		PendingIntent notifySender = PendingIntent.getActivity(this,
-				period.getId(), intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
+		PendingIntent alarmSender = PendingIntent.getActivity(this,
+				period.getId(), alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+		Intent dismissIntent = new Intent(this, AlarmMessageActivity.class)
+				.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT).setAction(
+						ACTION_DISMISS_ALARM);
+		PendingIntent dismissSender = PendingIntent.getActivity(this,
+				REQ_DISMISS, dismissIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+		Intent snoozeIntent = new Intent(this, AlarmMessageActivity.class)
+				.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT).setAction(
+						ACTION_SNOOZE_ALARM);
+		PendingIntent snoozeSender = PendingIntent.getActivity(this,
+				REQ_SNOOZE, snoozeIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
 		NotificationManager nm = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -158,10 +167,21 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 				.setContentTitle(this.getString(period.getLabelId()))
 				.setTicker(this.getString(period.getLabelId()))
 				.setWhen(settings.getCalendar(period_pref_id).getTimeInMillis())
-				.setOngoing(true).setOnlyAlertOnce(true)
-				.setContentIntent(notifySender).build();
+				.setOngoing(true)
+				.setOnlyAlertOnce(true)
+				.setContentIntent(alarmSender)
+				.addAction(R.drawable.ic_snooze, getString(R.string.snooze),
+						snoozeSender)
+				.addAction(R.drawable.ic_dismiss, getString(R.string.dismiss),
+						dismissSender).build();
 
 		nm.notify(period.getId(), notification);
+	}
+
+	private void dismissNotification() {
+		NotificationManager nm = (NotificationManager) this
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+		nm.cancel(period_pref_id);
 	}
 
 	private boolean isLargeScreen() {
@@ -206,15 +226,15 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 
 		period_pref_id = getIntent().getIntExtra(EXTRA_PERIOD_ID,
 				R.string.fstp_entrance);
-		Log.d("AlarmMessage", "showing alarm for "+period_pref_id);
-		period = Database.getInstance(getApplicationContext()).getPeriodOfDay(
-				period_pref_id, Calendar.getInstance());
-		Log.d("AlarmMessage", "time is "+period.formatTime(true));
+		Log.d("AlarmMessage", "showing alarm for " + period_pref_id);
+		period = Period.getPeriod(this, period_pref_id);
+		Log.d("AlarmMessage", "time is " + period.formatTime(true));
 
 		settings = Settings.getInstance(getApplicationContext());
 		String time = period.formatTime(DateFormat.is24HourFormat(this));
 
-		((TextView) findViewById(R.id.txt_alarm_label)).setText(period.getLabelId());
+		((TextView) findViewById(R.id.txt_alarm_label)).setText(period
+				.getLabelId());
 		((TextView) findViewById(R.id.txt_alarm_time)).setText(time);
 
 		initialPoint = 0f;
@@ -233,12 +253,27 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 					500, 500 }, 0);
 		}
 
+		showNotification();
+
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		if (ACTION_DISMISS_ALARM.equals(intent.getAction())) {
+			cancelAlarm();
+			dismissNotification();
+			finish();
+		} else if (ACTION_SNOOZE_ALARM.equals(intent.getAction())) {
+			snoozeAlarm();
+			dismissNotification();
+			finish();
+		}
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		dismissNotification();
 		if (!mMediaPlayer.isPlaying()) {
 			mMediaPlayer.start();
 		}
@@ -259,9 +294,8 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	protected void onStop() {
 		super.onStop();
 		if (isFinishing()) {
+			dismissNotification();
 			cancelAlarm();
-		} else {
-			showNotification();
 		}
 	}
 
