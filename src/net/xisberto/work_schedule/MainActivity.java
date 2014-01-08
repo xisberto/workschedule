@@ -48,6 +48,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	private int waiting_for = -1;
 
+	private RadialTimePickerDialog timePickerDialog;
+
 	@Override
 	public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
 		Calendar now = Calendar.getInstance();
@@ -171,10 +173,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private void showTimePickerDialog(Period period) {
 		waiting_for = period.getId();
 		Calendar time = Calendar.getInstance();
-		RadialTimePickerDialog dialog = RadialTimePickerDialog.newInstance(
-				this, time.get(Calendar.HOUR_OF_DAY),
-				time.get(Calendar.MINUTE), DateFormat.is24HourFormat(this));
-		dialog.show(getSupportFragmentManager(), "time_picker");
+		timePickerDialog = RadialTimePickerDialog.newInstance(this,
+				time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE),
+				DateFormat.is24HourFormat(this));
+		timePickerDialog.show(getSupportFragmentManager(), "time_picker");
 	}
 
 	/**
@@ -210,9 +212,16 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		buildPeriods();
 
-		if (getIntent().getAction() != null
-				&& getIntent().getAction().equals(ACTION_SET_PERIOD)) {
-			showDialogOnResume = true;
+		if ((getIntent().getAction() != null && getIntent().getAction().equals(
+				ACTION_SET_PERIOD))
+				|| getIntent().getScheme() != null
+				&& getIntent().getScheme().equals("work_schedule")) {
+			if (savedInstanceState != null) {
+				showDialogOnResume = savedInstanceState.getBoolean(
+						"showDialogOnResume", true);
+			} else {
+				showDialogOnResume = true;
+			}
 			startService(new Intent(this, CountdownService.class)
 					.setAction(CountdownService.ACTION_STOP));
 		}
@@ -230,6 +239,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 				showTimePickerDialog(next);
 			}
 		}
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putBoolean("showDialogOnResume", showDialogOnResume);
+		super.onSaveInstanceState(outState);
 	}
 
 	@Override

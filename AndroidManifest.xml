@@ -36,6 +36,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter >
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="work_schedule"/>
+            </intent-filter>
         </activity>
         <activity
             android:name="net.xisberto.work_schedule.settings.SettingsActivity"
