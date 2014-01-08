@@ -166,10 +166,11 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 				.setSmallIcon(R.drawable.ic_stat_notification)
 				.setContentTitle(this.getString(period.getLabelId()))
 				.setTicker(this.getString(period.getLabelId()))
-				.setWhen(settings.getCalendar(period_pref_id).getTimeInMillis())
-				.setOngoing(true)
+				.setWhen(period.time.getTimeInMillis())
+				.setOngoing(false)
 				.setOnlyAlertOnce(true)
 				.setContentIntent(alarmSender)
+				.setDeleteIntent(dismissSender)
 				.addAction(R.drawable.ic_snooze, getString(R.string.snooze),
 						snoozeSender)
 				.addAction(R.drawable.ic_dismiss, getString(R.string.dismiss),
@@ -274,7 +275,7 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (!mMediaPlayer.isPlaying()) {
+		if (mMediaPlayer != null && !mMediaPlayer.isPlaying()) {
 			mMediaPlayer.start();
 		}
 		startHinter();
