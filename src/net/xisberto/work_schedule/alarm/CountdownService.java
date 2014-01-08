@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
@@ -21,46 +22,50 @@ public class CountdownService extends Service {
 	private CountDownTimer timer;
 	private NotificationCompat.Builder builder;
 	private NotificationManager manager;
-	private int period_id;
+	private Period period;
 
 	public CountdownService() {
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-
 		if (intent.hasExtra(AlarmMessageActivity.EXTRA_PERIOD_ID)) {
-			period_id = intent.getIntExtra(
+			int period_id = intent.getIntExtra(
 					AlarmMessageActivity.EXTRA_PERIOD_ID,
 					R.string.fstp_entrance);
+			period = Period.getPeriod(this, period_id);
 		} else {
 			stopSelf();
 		}
 
 		if (ACTION_START.equals(intent.getAction())) {
-			Period period = Period.getPeriod(this, period_id);
 
 			long millisInFuture = period.time.getTimeInMillis()
 					- System.currentTimeMillis();
 			if (millisInFuture > 0) {
 
-				Intent deleteIntent = new Intent(this, CountdownService.class);
-				deleteIntent.setAction(ACTION_STOP);
-
 				Intent mainIntent = new Intent(this, MainActivity.class);
 				mainIntent.setAction(MainActivity.ACTION_SET_PERIOD);
 				mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
+				Intent deleteIntent = new Intent(this, CountdownService.class);
+				deleteIntent.setAction(ACTION_STOP);
+
 				builder = new Builder(this)
 						.setSmallIcon(R.drawable.ic_stat_notification)
-						.setContentTitle(this.getString(period.getLabelId()))
-						.setTicker(this.getString(period.getLabelId()))
+						.setContentTitle(getString(period.getLabelId()))
+						.setTicker(getString(period.getLabelId()))
+						.setOnlyAlertOnce(true)
+						.setAutoCancel(true)
+						.setSound(
+								RingtoneManager
+										.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
 						.setContentIntent(
-								PendingIntent.getActivity(this, period_id,
+								PendingIntent.getActivity(this, period.getId(),
 										mainIntent,
 										PendingIntent.FLAG_CANCEL_CURRENT))
 						.setDeleteIntent(
-								PendingIntent.getService(this, period_id,
+								PendingIntent.getService(this, period.getId(),
 										deleteIntent,
 										PendingIntent.FLAG_CANCEL_CURRENT));
 				manager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
@@ -72,7 +77,8 @@ public class CountdownService extends Service {
 					public void onTick(long millisUntilFinished) {
 						Time t = new Time();
 						t.set(millisUntilFinished);
-						builder.setContentText(t.format("%M:%S"));
+						builder.setContentText(getString(
+								R.string.time_until_alarm, t.format("%M:%S")));
 						manager.notify(0, builder.build());
 					}
 
@@ -86,8 +92,10 @@ public class CountdownService extends Service {
 				timer.start();
 			}
 		} else if (ACTION_STOP.equals(intent.getAction())) {
-			timer.cancel();
-			manager.cancel(0);
+			if (timer != null)
+				timer.cancel();
+			((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
+					.cancel(0);
 			stopSelf();
 		}
 

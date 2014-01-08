@@ -12,6 +12,7 @@ package net.xisberto.work_schedule;
 
 import java.util.Calendar;
 
+import net.xisberto.work_schedule.alarm.CountdownService;
 import net.xisberto.work_schedule.database.Period;
 import net.xisberto.work_schedule.history.ViewHistoryActivity;
 import net.xisberto.work_schedule.settings.Settings;
@@ -172,8 +173,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		Calendar time = Calendar.getInstance();
 		RadialTimePickerDialog dialog = RadialTimePickerDialog.newInstance(
 				this, time.get(Calendar.HOUR_OF_DAY),
-				time.get(Calendar.MINUTE),
-				DateFormat.is24HourFormat(this));
+				time.get(Calendar.MINUTE), DateFormat.is24HourFormat(this));
 		dialog.show(getSupportFragmentManager(), "time_picker");
 	}
 
@@ -213,6 +213,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 		if (getIntent().getAction() != null
 				&& getIntent().getAction().equals(ACTION_SET_PERIOD)) {
 			showDialogOnResume = true;
+			startService(new Intent(this, CountdownService.class)
+					.setAction(CountdownService.ACTION_STOP));
 		}
 
 	}
