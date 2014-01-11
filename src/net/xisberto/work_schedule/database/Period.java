@@ -134,26 +134,36 @@ public class Period {
 
 	/**
 	 * Set a new alarm or cancel a existing one, based on this object's
-	 * {@link enabled}. The alarm won't be set if this object's time is before
+	 * {@link enabled}. Also configure the countdown notification
+	 * ({@link CountdownService}) if enable on Preferences.
+	 * The alarm won't be set if this object's {@link time} is before
 	 * now.
+	 * If {@link updateWidgets} is {@value true}, sends Broadcasts
+	 * to {@link WidgetNextProvider} and to {@link DashClockExtensionService}
+	 * making those widgets update their informations.
 	 * 
 	 * @param context
 	 *            the {@link Context} to handle the need Intents
+	 * @param updateWidgets
+	 *            if the widgets should be updated to reflect the alarms
 	 */
 	@SuppressLint("NewApi")
-	public void setAlarm(Context context) {
+	public void setAlarm(Context context, boolean updateWidgets) {
+		Log.d("Period", "setting alarm to " + pref_id + ", " + enabled);
+
+		AlarmManager am = (AlarmManager) context
+				.getSystemService(Context.ALARM_SERVICE);
+		
+		// Prepare the actual alarm
 		Intent intentAlarm = new Intent(context.getApplicationContext(),
 				AlarmReceiver.class);
 		intentAlarm.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID, pref_id);
 
-		Log.d("Period", "setting alarm to " + pref_id + ", " + enabled);
-
 		PendingIntent alarmSender = PendingIntent.getBroadcast(
 				context.getApplicationContext(), pref_id, intentAlarm,
 				PendingIntent.FLAG_CANCEL_CURRENT);
-
-		AlarmManager am = (AlarmManager) context
-				.getSystemService(Context.ALARM_SERVICE);
+		// This Period is set enabled, set the alarm
+		// If not, cancel it
 		if (enabled) {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 				am.setExact(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(),
@@ -162,29 +172,48 @@ public class Period {
 				am.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(),
 						alarmSender);
 			}
-			if (Settings.getInstance(context).getNotifyCountdown()) {
-				Intent countdown = new Intent(context.getApplicationContext(),
-						CountdownService.class);
-				countdown.setAction(CountdownService.ACTION_START);
-				countdown.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID,
-						pref_id);
-				PendingIntent countSender = PendingIntent.getService(
-						context.getApplicationContext(), pref_id, countdown,
-						PendingIntent.FLAG_CANCEL_CURRENT);
-				am.set(AlarmManager.RTC_WAKEUP,
-						time.getTimeInMillis() - 5 * 60 * 1000, countSender);
-			}
 		} else {
 			am.cancel(alarmSender);
 		}
 
-		Intent updateIntent = new Intent(context.getApplicationContext(),
-				WidgetNextProvider.class);
-		updateIntent.setAction(WidgetNextProvider.MY_ACTION_UPDATE);
-		context.sendBroadcast(updateIntent);
+		// This is the countdown notification, that goes off 
+		// 5 minutes before the alarm, if enabled by the user
+		if (Settings.getInstance(context).getNotifyCountdown()) {
+			Intent countdown = new Intent(context.getApplicationContext(),
+					CountdownService.class);
+			countdown.setAction(CountdownService.ACTION_START);
+			countdown.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID,
+					pref_id);
+			PendingIntent countSender = PendingIntent.getService(
+					context.getApplicationContext(), pref_id, countdown,
+					PendingIntent.FLAG_CANCEL_CURRENT);
+			// If the user disables this Period, so we cancel the
+			// countdown notification
+			if (enabled) {
+				am.set(AlarmManager.RTC_WAKEUP,
+						time.getTimeInMillis() - 5 * 60 * 1000, countSender);
+			} else {
+				am.cancel(countSender);
+			}
+		}
+		
+		if (updateWidgets) {
+			Intent updateIntent = new Intent(context.getApplicationContext(),
+					WidgetNextProvider.class);
+			updateIntent.setAction(WidgetNextProvider.MY_ACTION_UPDATE);
+			context.sendBroadcast(updateIntent);
 
-		context.sendBroadcast(new Intent(
-				DashClockExtensionService.ACTION_UPDATE_ALARM));
+			context.sendBroadcast(new Intent(
+					DashClockExtensionService.ACTION_UPDATE_ALARM));
+		}
+	}
+	
+	/**
+	 * Calls {@code setAlarm(context, false)}
+	 * @param context
+	 */
+	public void setAlarm(Context context) {
+		setAlarm(context, false);
 	}
 
 	public void persist(Context context, PersistCallback callback) {

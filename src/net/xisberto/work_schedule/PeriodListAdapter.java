@@ -87,7 +87,7 @@ public class PeriodListAdapter implements ListAdapter {
 				@Override
 				public void onClick(View check_box) {
 					period.enabled = ((CompoundButton) check_box).isChecked();
-					period.setAlarm(context);
+					period.setAlarm(context, true);
 					period.persist(context);
 				}
 			});

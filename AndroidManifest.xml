@@ -11,7 +11,7 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.xisberto.work_schedule"
-    android:versionCode="135"
+    android:versionCode="136"
     android:versionName="1.4.0 beta" >
 
     <uses-sdk
@@ -35,6 +35,11 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter >
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="work_schedule"/>
             </intent-filter>
         </activity>
         <activity
