@@ -14,7 +14,7 @@
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="@dimen/border_padding"
-        android:layout_marginRight="@dimen/border_padding" />
+        android:paddingLeft="@dimen/border_padding"
+        android:paddingRight="@dimen/border_padding" />
 
 </LinearLayout>

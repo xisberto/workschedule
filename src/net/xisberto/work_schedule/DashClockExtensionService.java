@@ -62,12 +62,13 @@ public class DashClockExtensionService extends DashClockExtension {
 
 		String formated_time = period.formatTime(DateFormat
 				.is24HourFormat(getApplicationContext()));
+		Intent clickIntent = new Intent(this, MainActivity.class)
+				.setAction(MainActivity.ACTION_SET_PERIOD);
 
 		publishUpdate(new ExtensionData().visible(true)
 				.icon(R.drawable.ic_dashclock).status(formated_time)
 				.expandedTitle(getString(period.getLabelId()))
-				.expandedBody(formated_time)
-				.clickIntent(new Intent(this, MainActivity.class)));
+				.expandedBody(formated_time).clickIntent(clickIntent));
 	}
 
 	public void updateAlarm() {

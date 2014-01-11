@@ -27,6 +27,8 @@
     <string name="time_zero">00:00</string>
     <string name="alarm_set">Próximo alarme para:</string>
     
+    <string name="time_until_alarm">%s até o próximo alarme</string>
+    
     <string name="dismiss">Dispensar</string>
     <string name="snooze">Soneca</string>
     <string name="snooze_set_to">Soneca para </string>
@@ -34,10 +36,13 @@
     <string name="title_activity_history">Histórico</string>
     <string name="menu_share">Compartilhar arquivo CSV</string>
     <string name="menu_go_today">Ir para hoje</string>
+    <string name="txt_instruction">Escolha uma data inicial para exportar.
+        A data final é hoje.</string>
+    <string name="chk_dont_show_again">Não mostre esta mensagem novamente</string>
+    <string name="txt_no_data">Sem dados para exportar</string>
     <string name="header_date">Dia</string>
     <string name="header_time">Hora</string>
     <string name="header_period">Período</string>
-    <string name="txt_no_data">Sem dados para exportar</string>
        
     <string name="title_activity_settings">Preferências</string>
     
@@ -65,4 +70,5 @@
     <string name="widget_updating">Atualizando&#8230;</string>
     <string name="no_alarm">Nenhum alarme definido</string>
     <string name="dashclock_description">Mostra o próximo alarme do Work Schedule</string>
+
 </resources>

@@ -7,11 +7,15 @@ import net.xisberto.work_schedule.DashClockExtensionService;
 import net.xisberto.work_schedule.R;
 import net.xisberto.work_schedule.alarm.AlarmMessageActivity;
 import net.xisberto.work_schedule.alarm.AlarmReceiver;
-import net.xisberto.work_schedule.widget.WidgetNextMinimalProvider;
+import net.xisberto.work_schedule.alarm.CountdownService;
+import net.xisberto.work_schedule.settings.Settings;
+import net.xisberto.work_schedule.widget.WidgetNextProvider;
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Process;
 import android.text.format.DateFormat;
@@ -42,8 +46,8 @@ public class Period {
 	}
 
 	public static Period getPeriod(Context context, int pref_id) {
-		Database database = Database.getInstance(context);
-		Period p = database.getPeriodOfDay(pref_id, Calendar.getInstance());
+		Period p = Database.getInstance(context).getPeriodOfDay(pref_id,
+				Calendar.getInstance());
 		if (p != null) {
 			return p;
 		}
@@ -136,6 +140,7 @@ public class Period {
 	 * @param context
 	 *            the {@link Context} to handle the need Intents
 	 */
+	@SuppressLint("NewApi")
 	public void setAlarm(Context context) {
 		Intent intentAlarm = new Intent(context.getApplicationContext(),
 				AlarmReceiver.class);
@@ -150,14 +155,32 @@ public class Period {
 		AlarmManager am = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 		if (enabled) {
-			am.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), alarmSender);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+				am.setExact(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(),
+						alarmSender);
+			} else {
+				am.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(),
+						alarmSender);
+			}
+			if (Settings.getInstance(context).getNotifyCountdown()) {
+				Intent countdown = new Intent(context.getApplicationContext(),
+						CountdownService.class);
+				countdown.setAction(CountdownService.ACTION_START);
+				countdown.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID,
+						pref_id);
+				PendingIntent countSender = PendingIntent.getService(
+						context.getApplicationContext(), pref_id, countdown,
+						PendingIntent.FLAG_CANCEL_CURRENT);
+				am.set(AlarmManager.RTC_WAKEUP,
+						time.getTimeInMillis() - 5 * 60 * 1000, countSender);
+			}
 		} else {
 			am.cancel(alarmSender);
 		}
 
 		Intent updateIntent = new Intent(context.getApplicationContext(),
-				WidgetNextMinimalProvider.class);
-		updateIntent.setAction(WidgetNextMinimalProvider.MY_ACTION_UPDATE);
+				WidgetNextProvider.class);
+		updateIntent.setAction(WidgetNextProvider.MY_ACTION_UPDATE);
 		context.sendBroadcast(updateIntent);
 
 		context.sendBroadcast(new Intent(

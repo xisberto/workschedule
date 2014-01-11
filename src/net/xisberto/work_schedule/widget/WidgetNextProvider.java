@@ -6,19 +6,54 @@ import net.xisberto.work_schedule.database.Database;
 import net.xisberto.work_schedule.database.Period;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.text.format.DateFormat;
 import android.widget.RemoteViews;
 
-public class WidgetNextProvider extends WidgetNextMinimalProvider {
+public class WidgetNextProvider extends AppWidgetProvider {
+	/**
+	 * Allows the app to update this widget at an arbitrary time, sending a
+	 * broadcast intent with this action
+	 */
+	public static final String MY_ACTION_UPDATE = "net.xisberto.work_schedule.update_widgets";
 
 	@Override
+	public void onReceive(Context context, Intent intent) {
+		if (intent.getAction().equals(MY_ACTION_UPDATE)) {
+			int[] appWidgetIds = AppWidgetManager.getInstance(context)
+					.getAppWidgetIds(new ComponentName(context, getClass()));
+			onUpdate(context, AppWidgetManager.getInstance(context),
+					appWidgetIds);
+			return;
+		}
+		super.onReceive(context, intent);
+	}
+
+	@Override
+	public void onUpdate(Context context, AppWidgetManager appWidgetManager,
+			int[] appWidgetIds) {
+		for (int appWidgetId : appWidgetIds) {
+			RemoteViews views = prepareWidget(context, appWidgetManager,
+					appWidgetId, R.layout.widget_next_alarm);
+			appWidgetManager.updateAppWidget(appWidgetId, views);
+		}
+	}
+
 	protected RemoteViews prepareWidget(Context context,
 			AppWidgetManager appWidgetManager, int appWidgetId, int layout_id) {
-		RemoteViews views = super.prepareWidget(context, appWidgetManager,
-				appWidgetId, R.layout.widget_next_alarm_horizontal);
+
+		RemoteViews views = new RemoteViews(context.getPackageName(), layout_id);
+
+		// Set an intent to open MainActivity
+		Intent intent = new Intent(context, MainActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
+				intent, 0);
+		views.setOnClickPendingIntent(R.id.widget_layout, pendingIntent);
+		views.setOnClickPendingIntent(R.id.image_icon, pendingIntent);
 
 		// Set an intent to open MainActivity setting a period
 		Intent intentAction = new Intent(MainActivity.ACTION_SET_PERIOD);
