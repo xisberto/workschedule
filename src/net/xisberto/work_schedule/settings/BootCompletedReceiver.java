@@ -30,8 +30,12 @@ public class BootCompletedReceiver extends BroadcastReceiver {
 		Database database = Database.getInstance(context);
 		SparseArrayCompat<Period> periods = database
 				.listPeriodsFromDay(Calendar.getInstance());
+		boolean updateWidgets = true;
 		for (int i = 0; i < periods.size(); i++) {
-			periods.valueAt(i).setAlarm(context);
+			if (updateWidgets && periods.valueAt(i).enabled) {
+				updateWidgets = false;
+			}
+			periods.valueAt(i).setAlarm(context, updateWidgets);
 		}
 	}
 }

@@ -60,7 +60,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 		period.setTime(hourOfDay, minute);
 		period.enabled = period.time.after(now);
 		period.persist(this);
-		period.setAlarm(this);
+		// From every setAlarm we will call during this operation, only this
+		// need to update the widgets, because this will become the next alarm
+		period.setAlarm(this, true);
 
 		// We will use next_period to set all Periods remaining
 		Period next_period = null;
@@ -77,8 +79,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			// fstp_exit = fstp_entrance + key_fstp_duration
 			next_period.setTime(period.time);
-			next_period.addTime(settings
-					.getCalendar(R.string.key_fstp_duration));
+			next_period.addTime(settings.getCalendar(R.string.key_fstp_duration));
 
 			next_period.enabled = next_period.time.after(now);
 			next_period.persist(this);
@@ -90,8 +91,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			// sndp_entrance = fstp_exit + key_lunch_interval
 			next_period.setTime(period.time);
-			next_period.addTime(settings
-					.getCalendar(R.string.key_lunch_interval));
+			next_period.addTime(settings.getCalendar(R.string.key_lunch_interval));
 
 			next_period.enabled = next_period.time.after(now);
 			next_period.persist(this);
@@ -105,14 +105,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 			// is based on the total work time (key_work_time) minus the today's
 			// first period (fstp_exit - fstp_entrance). It's best calculated
 			// using milliseconds math
-			Calendar work_time = settings
-					.getCalendar(getString(R.string.key_work_time));
+			Calendar work_time = settings.getCalendar(getString(R.string.key_work_time));
 			Calendar fstp_entrance = periods.get(R.string.fstp_entrance).time;
 			Calendar fstp_exit = periods.get(R.string.fstp_exit).time;
 
 			long mili_sndp_duration = work_time.getTimeInMillis()
-					- (fstp_exit.getTimeInMillis() - fstp_entrance
-							.getTimeInMillis());
+					- (fstp_exit.getTimeInMillis() - fstp_entrance.getTimeInMillis());
 
 			// We set this Calendar to the duration calculated above. It will be
 			// added to next_period
@@ -133,11 +131,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			// fste_entrance = sndp_exis + key_extra_interval
 			next_period.setTime(period.time);
-			next_period.addTime(settings
-					.getCalendar(R.string.key_extra_interval));
+			next_period.addTime(settings.getCalendar(R.string.key_extra_interval));
 
-			next_period.enabled = settings.getMarkExtra()
-					&& next_period.time.after(now);
+			next_period.enabled = settings.getMarkExtra() && next_period.time.after(now);
 			next_period.persist(this);
 			next_period.setAlarm(this);
 			period = next_period;
@@ -147,11 +143,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			// fste_exit = fste_entrance + key_fste_duration
 			next_period.setTime(period.time);
-			next_period.addTime(settings
-					.getCalendar(R.string.key_fste_duration));
+			next_period.addTime(settings.getCalendar(R.string.key_fste_duration));
 
-			next_period.enabled = settings.getMarkExtra()
-					&& next_period.time.after(now);
+			next_period.enabled = settings.getMarkExtra() && next_period.time.after(now);
 			next_period.persist(this);
 			next_period.setAlarm(this);
 			period = next_period;
@@ -217,8 +211,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 				|| getIntent().getScheme() != null
 				&& getIntent().getScheme().equals("work_schedule")) {
 			if (savedInstanceState != null) {
-				showDialogOnResume = savedInstanceState.getBoolean(
-						"showDialogOnResume", true);
+				showDialogOnResume = savedInstanceState.getBoolean("showDialogOnResume",
+						true);
 			} else {
 				showDialogOnResume = true;
 			}

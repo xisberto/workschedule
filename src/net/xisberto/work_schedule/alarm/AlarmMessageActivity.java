@@ -118,7 +118,7 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 
 	private void cancelAlarm() {
 		period.enabled = false;
-		period.setAlarm(this);
+		period.setAlarm(this, true);
 		period.persist(this);
 		stopSoundVibrator();
 	}
@@ -127,7 +127,7 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		settings = Settings.getInstance(getApplicationContext());
 
 		period.addTime(settings.getCalendar(R.string.key_snooze_increment));
-		period.setAlarm(this);
+		period.setAlarm(this, true);
 		period.persist(this);
 
 		Toast.makeText(
