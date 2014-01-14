@@ -56,6 +56,7 @@ public class CountdownService extends Service {
 						.setContentTitle(getString(period.getLabelId()))
 						.setTicker(getString(period.getLabelId()))
 						.setOnlyAlertOnce(true)
+						.setPriority(NotificationCompat.PRIORITY_LOW)
 						.setAutoCancel(true)
 						.setSound(
 								RingtoneManager

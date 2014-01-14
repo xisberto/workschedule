@@ -60,7 +60,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 		period.setTime(hourOfDay, minute);
 		period.enabled = period.time.after(now);
 		period.persist(this);
-		period.setAlarm(this);
+		// From every setAlarm we will call during this operation, only this
+		// need to update the widgets, because this will become the next alarm
+		period.setAlarm(this, true);
 
 		// We will use next_period to set all Periods remaining
 		Period next_period = null;
