@@ -170,6 +170,14 @@ public class MainActivity extends SherlockFragmentActivity implements
 		timePickerDialog = RadialTimePickerDialog.newInstance(this,
 				time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE),
 				DateFormat.is24HourFormat(this));
+		// Originally, RadialTimePickerDialog has no title and use no arguments
+		// When using the original from Better Pickers, there's no difference
+		// But I'm using a lightly different version that adds a title to the
+		// dialog and uses the "title" key from arguments to set the dialog's
+		// title
+		Bundle args = new Bundle();
+		args.putString("title", getString(period.getLabelId()));
+		timePickerDialog.setArguments(args);
 		timePickerDialog.show(getSupportFragmentManager(), "time_picker");
 	}
 
