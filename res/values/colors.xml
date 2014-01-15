@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (c) 2013 Humberto Fraga <xisberto@gmail.com>.
-  All rights reserved. This program and the accompanying materials
-  are made available under the terms of the GNU Public License v3.0
-  which accompanies this distribution, and is available at
-  http://www.gnu.org/licenses/gpl.html
+  Copyright 2014 xisberto
   
-  Contributors:
-      Humberto Fraga <xisberto@gmail.com> - initial API and implementation
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 -->
 <resources>
 
@@ -17,7 +22,8 @@
     <color name="blue_transparent">#880A5577</color>
     <color name="blue_dark">#0A3557</color>
     <color name="blue_light">#5Aa5c7</color>
-    <color name="gray_light">#F2F1ED</color>
-    <color name="gray_dark">#B0AEAF</color>
+    <color name="gray_light">#D6D6D6</color>
+    <color name="dark_transparent">#88808080</color>
+    <color name="gray_dark">#B0B0B0</color>
 
 </resources>

@@ -1,49 +1,65 @@
 /*******************************************************************************
- * Copyright (c) 2012 Humberto Fraga.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Public License v3.0
- * which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/gpl.html
+ * Copyright 2014 xisberto
  * 
- * Contributors:
- *     Humberto Fraga - initial API and implementation
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  ******************************************************************************/
 package net.xisberto.work_schedule;
 
-import net.xisberto.work_schedule.Settings.Period;
+import net.xisberto.work_schedule.database.Period;
 import android.content.Context;
 import android.database.DataSetObserver;
-import android.util.SparseArray;
+import android.support.v4.util.SparseArrayCompat;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 public class PeriodListAdapter implements ListAdapter {
-	Context context;
-	private SparseArray<Period> list;
+	private Context context;
+	private SparseArrayCompat<Period> periods;
+	private boolean show_checkboxes;
 
-	public PeriodListAdapter(Context context, SparseArray<Period> periods) {
+	public PeriodListAdapter(Context context, SparseArrayCompat<Period> periods) {
+		this(context, periods, true);
+	}
+
+	public PeriodListAdapter(Context context,
+			SparseArrayCompat<Period> periods, boolean show_checkboxes) {
 		this.context = context;
-		list = periods;
+		this.periods = periods;
+		this.show_checkboxes = show_checkboxes;
 	}
 
 	@Override
 	public int getCount() {
-		return list.size();
+		return periods.size();
 	}
 
 	@Override
 	public Object getItem(int position) {
-		return list.valueAt(position);
+		return periods.valueAt(position);
 	}
 
 	@Override
 	public long getItemId(int position) {
-		return (Integer) list.keyAt(position);
+		return periods.keyAt(position);
 	}
 
 	@Override
@@ -53,36 +69,42 @@ public class PeriodListAdapter implements ListAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		View view = convertView;
-		if (view == null) {
+		if (convertView == null) {
 			LayoutInflater inflater = (LayoutInflater) context
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			view = inflater.inflate(R.layout.period_list_item, null);
+			convertView = inflater.inflate(R.layout.period_list_item, null);
 		}
 
 		final Period period = (Period) getItem(position);
-		final Settings settings = new Settings(context);
-		final String period_pref_key = context.getString(period.pref_id);
 
-		((TextView) view.findViewById(R.id.period_label)).setText(context
-				.getString(period.label_id));
+		((TextView) convertView.findViewById(R.id.period_label))
+				.setText(context.getString(period.getLabelId()));
 
-		((TextView) view.findViewById(R.id.period_time)).setText(settings
-				.formatCalendar(settings.getCalendar(period_pref_key)));
+		((TextView) convertView.findViewById(R.id.period_time)).setText(period
+				.formatTime(DateFormat.is24HourFormat(context)));
 
-		CompoundButton check_alarm = (CompoundButton) view.findViewById(R.id.check_alarm);
-		check_alarm.setChecked(settings.isAlarmSet(period.pref_id));
-		check_alarm.setOnClickListener(new OnClickListener() {
+		CompoundButton check_alarm = (CompoundButton) convertView
+				.findViewById(R.id.check_alarm);
+		if (show_checkboxes) {
+			check_alarm.setChecked(period.enabled);
+			check_alarm.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View check_box) {
-				settings.setAlarm(period,
-						settings.getCalendar(period_pref_key),
-						((CompoundButton) check_box).isChecked());
-			}
-		});
+				@Override
+				public void onClick(View check_box) {
+					period.enabled = ((CompoundButton) check_box).isChecked();
+					period.setAlarm(context, true);
+					period.persist(context);
+				}
+			});
+		} else {
+			check_alarm.setVisibility(View.GONE);
+			LinearLayout layout_labels = (LinearLayout) convertView.findViewById(R.id.layout_labels);
+			LayoutParams params = (LayoutParams) layout_labels.getLayoutParams();
+			params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+			layout_labels.setLayoutParams(params);
+		}
 
-		return view;
+		return convertView;
 	}
 
 	@Override

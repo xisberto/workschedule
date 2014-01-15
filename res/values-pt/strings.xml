@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (c) 2012 Humberto Fraga.
-  All rights reserved. This program and the accompanying materials
-  are made available under the terms of the GNU Public License v3.0
-  which accompanies this distribution, and is available at
-  http://www.gnu.org/licenses/gpl.html
+  Copyright 2014 xisberto
   
-  Contributors:
-      Humberto Fraga - initial API and implementation
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 -->
 <resources>
     
     <string name="app_name">Work Schedule</string>
     <string name="menu_settings">Preferências</string>
+    <string name="menu_history">Histórico</string>
+    
     <string name="lbl_fstp_entrance">1º Período: Entrada</string>
     <string name="lbl_fstp_exit">1º Período: Saída</string>
     <string name="lbl_sndp_entrance">2º Período: Entrada</string>
@@ -21,13 +28,29 @@
     <string name="lbl_fste_exit">1º Extra: Saída</string>
     <string name="lbl_snde_entrance">2º Extra: Entrada</string>
     <string name="lbl_snde_exit">2º Extra: Saída</string>
+    
     <string name="time_zero">00:00</string>
     <string name="alarm_set">Próximo alarme para:</string>
+    
+    <string name="time_until_alarm">%s até o próximo alarme</string>
+    
     <string name="dismiss">Dispensar</string>
     <string name="snooze">Soneca</string>
     <string name="snooze_set_to">Soneca para </string>
+    
+    <string name="title_activity_history">Histórico</string>
+    <string name="menu_share">Compartilhar arquivo CSV</string>
+    <string name="menu_go_today">Ir para hoje</string>
+    <string name="txt_instruction">Escolha uma data inicial para exportar.
+        A data final é hoje.</string>
+    <string name="chk_dont_show_again">Não mostre esta mensagem novamente</string>
+    <string name="txt_no_data">Sem dados para exportar</string>
+    <string name="header_date">Dia</string>
+    <string name="header_time">Hora</string>
+    <string name="header_period">Período</string>
        
     <string name="title_activity_settings">Preferências</string>
+    
     <string name="pref_category_intervals">Intervalos</string>
     <string name="pref_category_alarm">Alarme</string>
     <string name="pref_category_about">Sobre</string>
@@ -42,19 +65,16 @@
     <string name="lbl_snooze_increment">Incremento da soneca</string>
     <string name="lbl_ringtone">Toque do alarme</string>
     <string name="lbl_vibrate">Vibrar</string>
-        
-    <string name="msg_rating">Você quer avaliar o Work Schedule na Play Store?</string>
-    <string name="yes">Sim</string>
-    <string name="later">Depois</string>
-    <string name="no">Não</string>
+    <string name="lbl_notify_countdown">Notificar antes do alarme</string>
     
     <string name="author_name">Criado por Humberto Fraga, baseado em uma ideia de Marcos Lacerda</string>
     <string name="text_source">Work Schedule é um aplicativo de código aberto. Seu código pode ser acessado no Github</string>
-    <string name="text_sherlock">Work Schedule usa a ActionBarSherlock</string>
+    <string name="text_libraries">Work Schedule usa algumas bibliotecas open-source:</string>
     <string name="btn_share_link">Compartilhar link</string>
     
     <string name="widget_title">Próximo alarme:</string>
+    <string name="widget_updating">Atualizando&#8230;</string>
     <string name="no_alarm">Nenhum alarme definido</string>
-
     <string name="dashclock_description">Mostra o próximo alarme do Work Schedule</string>
+
 </resources>

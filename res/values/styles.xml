@@ -1,34 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (c) 2012 Humberto Fraga.
-  All rights reserved. This program and the accompanying materials
-  are made available under the terms of the GNU Public License v3.0
-  which accompanies this distribution, and is available at
-  http://www.gnu.org/licenses/gpl.html
+  Copyright 2014 xisberto
   
-  Contributors:
-      Humberto Fraga - initial API and implementation
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
-	<style name="AppTheme" parent="Theme.Sherlock.Light.DarkActionBar">
-        <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
-        <item name="android:actionBarStyle" tools:ignore="NewApi">@style/Widget.Styled.ActionBar</item>
-    </style>
-    <style name="Widget.Styled.ActionBar" parent="Widget.Sherlock.Light.ActionBar.Solid.Inverse">
-        <item name="background">@drawable/bg_styled</item>
-        <item name="android:background">@drawable/bg_styled</item>
-    </style>
-
-    <style name="AppTheme.NoActionBar" parent="Theme.Sherlock.NoActionBar">
+	<style name="Theme.AppTheme.NoActionBar" parent="Theme.Sherlock.NoActionBar">
     </style>
     
-    <style name="AppTheme.Slider" parent="@android:style/TextAppearance.Large">
+    <style name="Theme.AppTheme.Widget.Slider" parent="@android:style/TextAppearance.Large">
         <item name="android:textColor">@android:color/black</item>
         <item name="android:gravity">center_horizontal</item>
         <item name="android:padding">5dp</item>
         <item name="android:layout_marginLeft">@dimen/slider_margin</item>
         <item name="android:layout_marginRight">@dimen/slider_margin</item>
         <item name="android:minHeight">?android:attr/listPreferredItemHeight</item>
+    </style>
+
+    <style name="Theme.AppTheme.TabPageIndicator" parent="Widget.TabPageIndicator">
+        <item name="android:background">@drawable/tab_indicator_ab_apptheme</item>
+        <item name="android:textAppearance">@style/Theme.AppTheme.TabPageIndicator.Text</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:divider">@color/gray_dark</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
+        <item name="android:fadingEdge">horizontal</item>
+        <item name="android:fadingEdgeLength">8dp</item>
+    </style>
+
+    <style name="Theme.AppTheme.TabPageIndicator.Text" parent="android:TextAppearance.Medium">
+        <item name="android:typeface">monospace</item>
     </style>
 
 </resources>

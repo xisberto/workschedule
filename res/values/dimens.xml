@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (c) 2012 Humberto Fraga.
-  All rights reserved. This program and the accompanying materials
-  are made available under the terms of the GNU Public License v3.0
-  which accompanies this distribution, and is available at
-  http://www.gnu.org/licenses/gpl.html
+  Copyright 2014 xisberto
   
-  Contributors:
-      Humberto Fraga - initial API and implementation
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 -->
 <resources>
+
     <dimen name="border_padding">8dp</dimen>
     <dimen name="slider_margin">0dp</dimen>
     <dimen name="widget_margin">8dp</dimen>
-    
-    <dimen name="slider_margin_large">240dp</dimen>
-    <dimen name="slider_margin_large_portrait">120dp</dimen>
+
+    <!-- Copy resources from better-pickers to decrease some sizes -->
+    <dimen name="selected_calendar_layout_height">105dp</dimen>
+    <dimen name="selected_date_year_size">20sp</dimen>
+    <dimen name="selected_date_day_size">55sp</dimen>
+    <dimen name="selected_date_month_size">20sp</dimen>
+	<dimen name="header_height">76dip</dimen>
+	<dimen name="picker_dimen">250dip</dimen>
 </resources>
