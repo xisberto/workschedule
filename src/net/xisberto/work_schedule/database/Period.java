@@ -134,13 +134,12 @@ public class Period {
 
 	/**
 	 * Set a new alarm or cancel a existing one, based on this object's
-	 * {@link enabled}. Also configure the countdown notification
-	 * ({@link CountdownService}) if enable on Preferences.
-	 * The alarm won't be set if this object's {@link time} is before
-	 * now.
-	 * If {@link updateWidgets} is {@value true}, sends Broadcasts
-	 * to {@link WidgetNextProvider} and to {@link DashClockExtensionService}
-	 * making those widgets update their informations.
+	 * {@link enabled}. Also configure the countdown notification (
+	 * {@link CountdownService}) if enable on Preferences. The alarm won't be
+	 * set if this object's {@link time} is before now. If {@link updateWidgets}
+	 * is true} , sends Broadcasts to {@link WidgetNextProvider} and to
+	 * {@link DashClockExtensionService} making those widgets update their
+	 * informations.
 	 * 
 	 * @param context
 	 *            the {@link Context} to handle the need Intents
@@ -151,9 +150,8 @@ public class Period {
 	public void setAlarm(Context context, boolean updateWidgets) {
 		Log.d("Period", "setting alarm to " + pref_id + ", " + enabled);
 
-		AlarmManager am = (AlarmManager) context
-				.getSystemService(Context.ALARM_SERVICE);
-		
+		AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
 		// Prepare the actual alarm
 		Intent intentAlarm = new Intent(context.getApplicationContext(),
 				AlarmReceiver.class);
@@ -166,37 +164,39 @@ public class Period {
 		// If not, cancel it
 		if (enabled) {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-				am.setExact(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(),
-						alarmSender);
+				am.setExact(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), alarmSender);
 			} else {
-				am.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(),
-						alarmSender);
+				am.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), alarmSender);
 			}
 		} else {
 			am.cancel(alarmSender);
 		}
 
-		// This is the countdown notification, that goes off 
+		// This is the countdown notification, that goes off
 		// 5 minutes before the alarm, if enabled by the user
 		if (Settings.getInstance(context).getNotifyCountdown()) {
 			Intent countdown = new Intent(context.getApplicationContext(),
 					CountdownService.class);
 			countdown.setAction(CountdownService.ACTION_START);
-			countdown.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID,
-					pref_id);
+			countdown.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID, pref_id);
 			PendingIntent countSender = PendingIntent.getService(
 					context.getApplicationContext(), pref_id, countdown,
 					PendingIntent.FLAG_CANCEL_CURRENT);
 			// If the user disables this Period, so we cancel the
 			// countdown notification
 			if (enabled) {
-				am.set(AlarmManager.RTC_WAKEUP,
-						time.getTimeInMillis() - 5 * 60 * 1000, countSender);
+				am.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis() - 5 * 60 * 1000,
+						countSender);
 			} else {
 				am.cancel(countSender);
+				// If the service is couting for this Period, stop it
+				Intent stopSpecific = new Intent(context, CountdownService.class)
+						.setAction(CountdownService.ACTION_STOP_SPECIFIC)
+						.putExtra(AlarmMessageActivity.EXTRA_PERIOD_ID, pref_id);
+				context.startService(stopSpecific);
 			}
 		}
-		
+
 		if (updateWidgets) {
 			Intent updateIntent = new Intent(context.getApplicationContext(),
 					WidgetNextProvider.class);
@@ -207,9 +207,10 @@ public class Period {
 					DashClockExtensionService.ACTION_UPDATE_ALARM));
 		}
 	}
-	
+
 	/**
 	 * Calls {@code setAlarm(context, false)}
+	 * 
 	 * @param context
 	 */
 	public void setAlarm(Context context) {
@@ -217,8 +218,8 @@ public class Period {
 	}
 
 	public void persist(Context context, PersistCallback callback) {
-		new PersistThread(context, this, PersistThread.ACTION_INSERT_OR_UPDATE,
-				callback).start();
+		new PersistThread(context, this, PersistThread.ACTION_INSERT_OR_UPDATE, callback)
+				.start();
 	}
 
 	public void persist(Context context) {

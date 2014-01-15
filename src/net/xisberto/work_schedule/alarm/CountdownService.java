@@ -17,7 +17,8 @@ import android.text.format.Time;
 
 public class CountdownService extends Service {
 	public static final String ACTION_START = "net.xisberto.work_schedule.start_countdown",
-			ACTION_STOP = "net.xisberto.work_schedule.stop_countdown";
+			ACTION_STOP = "net.xisberto.work_schedule.stop_countdown",
+			ACTION_STOP_SPECIFIC = "net.xisberto.work_schedule.stop_countdown_specific";
 
 	private CountDownTimer timer;
 	private NotificationCompat.Builder builder;
@@ -29,16 +30,17 @@ public class CountdownService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		if (intent.hasExtra(AlarmMessageActivity.EXTRA_PERIOD_ID)) {
-			int period_id = intent.getIntExtra(
-					AlarmMessageActivity.EXTRA_PERIOD_ID,
-					R.string.fstp_entrance);
-			period = Period.getPeriod(this, period_id);
-		} else {
-			stopSelf();
-		}
 
 		if (ACTION_START.equals(intent.getAction())) {
+			if (intent.hasExtra(AlarmMessageActivity.EXTRA_PERIOD_ID)) {
+				int period_id = intent.getIntExtra(
+						AlarmMessageActivity.EXTRA_PERIOD_ID,
+						R.string.fstp_entrance);
+				period = Period.getPeriod(this, period_id);
+			} else {
+				stopSelf();
+				return super.onStartCommand(intent, flags, startId);
+			}
 
 			long millisInFuture = period.time.getTimeInMillis()
 					- System.currentTimeMillis();
@@ -92,12 +94,20 @@ public class CountdownService extends Service {
 
 				timer.start();
 			}
+		} else if (ACTION_STOP_SPECIFIC.equals(intent.getAction())) {
+			if (intent.hasExtra(AlarmMessageActivity.EXTRA_PERIOD_ID)) {
+				int period_id = intent.getIntExtra(
+						AlarmMessageActivity.EXTRA_PERIOD_ID,
+						R.string.fstp_entrance);
+				if (period != null && period.getId() == period_id) {
+					stopAndCancel();
+				}
+			} else {
+				stopSelf();
+				return super.onStartCommand(intent, flags, startId);
+			}
 		} else if (ACTION_STOP.equals(intent.getAction())) {
-			if (timer != null)
-				timer.cancel();
-			((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
-					.cancel(0);
-			stopSelf();
+			stopAndCancel();
 		}
 
 		return super.onStartCommand(intent, flags, startId);
@@ -106,5 +116,13 @@ public class CountdownService extends Service {
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
+	}
+	
+	private void stopAndCancel() {
+		if (timer != null)
+			timer.cancel();
+		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
+				.cancel(0);
+		stopSelf();
 	}
 }
