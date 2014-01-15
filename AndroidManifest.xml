@@ -11,8 +11,8 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.xisberto.work_schedule"
-    android:versionCode="135"
-    android:versionName="1.4.0 beta" >
+    android:versionCode="137"
+    android:versionName="1.4.0 beta 4" >
 
     <uses-sdk
         android:minSdkVersion="7"
@@ -36,6 +36,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter >
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="work_schedule"/>
+            </intent-filter>
         </activity>
         <activity
             android:name="net.xisberto.work_schedule.settings.SettingsActivity"
@@ -57,7 +62,7 @@
             android:name="net.xisberto.work_schedule.alarm.AlarmMessageActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:excludeFromRecents="true"
-            android:launchMode="singleTask"
+            android:launchMode="singleInstance"
             android:taskAffinity=""
             android:theme="@style/Theme.AppTheme.NoActionBar" >
         </activity>
@@ -107,6 +112,12 @@
                 android:value="@string/dashclock_description" />
         </service>
 
+        <service 
+            android:name="net.xisberto.work_schedule.alarm.CountdownService"
+            android:exported="false">
+            
+        </service>
+        
         <receiver android:name="net.xisberto.work_schedule.settings.BootCompletedReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

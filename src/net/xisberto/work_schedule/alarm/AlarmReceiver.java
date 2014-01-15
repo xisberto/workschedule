@@ -22,7 +22,6 @@ public class AlarmReceiver extends BroadcastReceiver {
 		Bundle extras = intent.getExtras();
 		int pref_id = extras.getInt(AlarmMessageActivity.EXTRA_PERIOD_ID);
 		showAlarm(context, pref_id);
-//		Settings.getInstance(context.getApplicationContext()).unsetAlarm(p);
 	}
 
 	private void showAlarm(Context context, int pref_id) {

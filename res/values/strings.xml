@@ -27,6 +27,8 @@
     <string name="time_zero">00:00</string>
     <string name="alarm_set">Next alarm set to</string>
     
+    <string name="time_until_alarm">%s until next alarm</string>
+    
     <string name="dismiss">Dismiss</string>
     <string name="snooze">Snooze</string>
     <string name="snooze_set_to">Snooze set to</string>
@@ -58,6 +60,7 @@
     <string name="lbl_snooze_increment">Snooze increment</string>
     <string name="lbl_ringtone">Ringtone</string>
     <string name="lbl_vibrate">Vibrate</string>
+    <string name="lbl_notify_countdown">Notify before alarm</string>
     
     <string name="author_name">Created by Humberto Fraga, based on an idea by Marcos Lacerda</string>
     <string name="text_source">Work Schedule is an open-source app. It\'s code can be accessed on Github</string>

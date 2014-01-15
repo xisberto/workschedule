@@ -27,6 +27,8 @@
     <string name="time_zero">00:00</string>
     <string name="alarm_set">Próximo alarme para:</string>
     
+    <string name="time_until_alarm">%s até o próximo alarme</string>
+    
     <string name="dismiss">Dispensar</string>
     <string name="snooze">Soneca</string>
     <string name="snooze_set_to">Soneca para </string>
