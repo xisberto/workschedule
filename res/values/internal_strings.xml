@@ -42,6 +42,7 @@
     <string name="action_settings_alarm">net.xisberto.work_schedule.settings.alarm</string>
     
     <string name="github_link">https://github.com/xisberto/workschedule</string>
-    <string name="sherlock_link">http://actionbarsherlock.com</string>
+    <string name="sherlock_link">ActionBar Sherlock:\nhttps://github.com/JakeWharton/ActionBarSherlock</string>
+    <string name="betterpickers_link">Better Pickers:\nhttps://github.com/derekbrameyer/android-betterpickers</string>
     
 </resources>
