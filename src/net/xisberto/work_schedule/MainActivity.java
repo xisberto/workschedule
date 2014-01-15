@@ -13,6 +13,7 @@ package net.xisberto.work_schedule;
 import java.util.Calendar;
 
 import net.xisberto.work_schedule.alarm.CountdownService;
+import net.xisberto.work_schedule.database.Database;
 import net.xisberto.work_schedule.database.Period;
 import net.xisberto.work_schedule.history.ViewHistoryActivity;
 import net.xisberto.work_schedule.settings.Settings;
@@ -193,15 +194,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 		}
 	}
 
-	public Period getNextAlarm() {
-		Calendar cal = Calendar.getInstance();
-		for (int i = 0; i < periods.size(); i++) {
-			Period period = periods.valueAt(i);
-			if (period.enabled && period.time.after(cal)) {
-				return period;
-			}
-		}
-		return null;
+	private boolean shouldSetPeriod(Intent intent) {
+		return (intent.getAction() != null && intent.getAction()
+				.equals(ACTION_SET_PERIOD))
+				|| (intent.getScheme() != null && intent.getScheme().equals(
+						"work_schedule"));
 	}
 
 	@Override
@@ -214,10 +211,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		buildPeriods();
 
-		if ((getIntent().getAction() != null && getIntent().getAction().equals(
-				ACTION_SET_PERIOD))
-				|| getIntent().getScheme() != null
-				&& getIntent().getScheme().equals("work_schedule")) {
+		if (shouldSetPeriod(getIntent())) {
 			if (savedInstanceState != null) {
 				showDialogOnResume = savedInstanceState.getBoolean("showDialogOnResume",
 						true);
@@ -231,16 +225,36 @@ public class MainActivity extends SherlockFragmentActivity implements
 	}
 
 	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		showDialogOnResume = shouldSetPeriod(intent);
+	}
+
+	@Override
 	protected void onResume() {
 		super.onResume();
 		updateLayout();
+		// If we should show the dialog
 		if (showDialogOnResume) {
-			showDialogOnResume = false;
-			Period next = getNextAlarm();
-			if (next != null) {
+			// We get the period to set
+			Period next = Database.getInstance(this).getNextAlarm();
+			if (next == null) {
+				next = periods.get(R.string.fstp_entrance);
+			}
+			// If the dialog is already present
+			if (timePickerDialog != null && timePickerDialog.isVisible()) {
+				// We compare the period to set with the current waiting_for
+				if (next.getId() != waiting_for) {
+					// If it's different, we must change it
+					timePickerDialog.dismiss();
+					showTimePickerDialog(next);
+				}
+			} else {
 				showTimePickerDialog(next);
 			}
 		}
+		// And we don't show the dialog again until onNewIntent says so
+		showDialogOnResume = false;
 	}
 
 	@Override
