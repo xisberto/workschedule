@@ -26,9 +26,5 @@
         android:icon="@drawable/ic_action_share"
         android:showAsAction="ifRoom"
         android:title="@string/menu_share"/>
-    <item
-        android:id="@+id/menu_fake_data"
-        android:showAsAction="never"
-        android:title="Build fake data"/>
 
 </menu>

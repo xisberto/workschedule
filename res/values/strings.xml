@@ -30,7 +30,6 @@
     <string name="lbl_snde_exit">2nd Extra Exit</string>
     
     <string name="time_zero">00:00</string>
-    <string name="alarm_set">Next alarm set to</string>
     
     <string name="time_until_alarm">%s until next alarm</string>
     
@@ -70,9 +69,7 @@
     <string name="author_name">Created by Humberto Fraga, based on an idea by Marcos Lacerda</string>
     <string name="text_source">Work Schedule is an open-source app. It\'s code can be accessed on Github</string>
     <string name="text_libraries">Work Schedule uses some open-source libraries:</string>
-    <string name="btn_share_link">Share link</string>
     
-    <string name="widget_title">Next alarm:</string>
     <string name="widget_updating">Updating&#8230;</string>
     <string name="no_alarm">No alarm defined</string>
     <string name="dashclock_description">Displays next alarm on Work Schedule</string>

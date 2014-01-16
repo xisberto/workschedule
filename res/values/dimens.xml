@@ -25,6 +25,7 @@
     <dimen name="selected_date_year_size">20sp</dimen>
     <dimen name="selected_date_day_size">55sp</dimen>
     <dimen name="selected_date_month_size">20sp</dimen>
-	<dimen name="header_height">76dip</dimen>
-	<dimen name="picker_dimen">250dip</dimen>
+	<dimen name="header_height">68dip</dimen>
+	<dimen name="time_label_size">50sp</dimen>
+	<dimen name="picker_dimen">220dip</dimen>
 </resources>

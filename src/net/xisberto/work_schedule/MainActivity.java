@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.util.SparseArrayCompat;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.AdapterView;
@@ -48,7 +49,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private SparseArrayCompat<Period> periods;
 	private Settings settings;
 
-	private boolean showDialogOnResume;
+	private boolean shouldShowDialog;
 
 	private PeriodListAdapter adapter;
 
@@ -173,6 +174,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private void showTimePickerDialog(Period period) {
 		waiting_for = period.getId();
 		Calendar time = Calendar.getInstance();
+		if (timePickerDialog != null && timePickerDialog.isVisible()) {
+			timePickerDialog.dismiss();
+		}
 		timePickerDialog = RadialTimePickerDialog.newInstance(this,
 				time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE),
 				DateFormat.is24HourFormat(this));
@@ -185,6 +189,18 @@ public class MainActivity extends SherlockFragmentActivity implements
 		args.putString("title", getString(period.getLabelId()));
 		timePickerDialog.setArguments(args);
 		timePickerDialog.show(getSupportFragmentManager(), "time_picker");
+	}
+
+	private void setNextPeriod() {
+		Log.d("setNExtPeriod", "shouldShowDialog: " + shouldShowDialog);
+		if (shouldShowDialog) {
+			Period next = Database.getInstance(this).getNextAlarm();
+			if (next == null) {
+				next = periods.get(R.string.fstp_entrance);
+			}
+			showTimePickerDialog(next);
+			shouldShowDialog = false;
+		}
 	}
 
 	/**
@@ -216,15 +232,26 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		buildPeriods();
 
-		if (shouldSetPeriod(getIntent())) {
-			if (savedInstanceState != null) {
-				showDialogOnResume = savedInstanceState.getBoolean("showDialogOnResume",
-						true);
-			} else {
-				showDialogOnResume = true;
+		if (savedInstanceState != null) {
+			RadialTimePickerDialog dialog = (RadialTimePickerDialog) getSupportFragmentManager()
+					.findFragmentByTag("time_picker");
+			if (dialog != null) {
+				dialog.setOnTimeSetListener(this);
 			}
+			Log.d("onCreate", "dialog is " + dialog);
+			Log.d("onCreate", "activity is " + this);
+			shouldShowDialog = savedInstanceState.getBoolean("shouldShowDialog");
+			waiting_for = savedInstanceState.getInt("waiting_for", -1);
+		} else {
+			waiting_for = -1;
+			shouldShowDialog = shouldSetPeriod(getIntent());
+		}
+		Log.d("onCreate", "waiting_for: " + waiting_for);
+
+		if (shouldSetPeriod(getIntent())) {
 			startService(new Intent(this, CountdownService.class)
 					.setAction(CountdownService.ACTION_STOP));
+			setNextPeriod();
 		}
 
 	}
@@ -232,39 +259,43 @@ public class MainActivity extends SherlockFragmentActivity implements
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
-		showDialogOnResume = shouldSetPeriod(intent);
+		shouldShowDialog = shouldSetPeriod(intent);
+		setNextPeriod();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 		updateLayout();
-		// If we should show the dialog
-		if (showDialogOnResume) {
-			// We get the period to set
-			Period next = Database.getInstance(this).getNextAlarm();
-			if (next == null) {
-				next = periods.get(R.string.fstp_entrance);
-			}
-			// If the dialog is already present
-			if (timePickerDialog != null && timePickerDialog.isVisible()) {
-				// We compare the period to set with the current waiting_for
-				if (next.getId() != waiting_for) {
-					// If it's different, we must change it
-					timePickerDialog.dismiss();
-					showTimePickerDialog(next);
-				}
-			} else {
-				showTimePickerDialog(next);
-			}
-		}
-		// And we don't show the dialog again until onNewIntent says so
-		showDialogOnResume = false;
+		// // If we should show the dialog
+		// if (showDialogOnResume) {
+		// // We get the period to set
+		// Period next = Database.getInstance(this).getNextAlarm();
+		// if (next == null) {
+		// next = periods.get(R.string.fstp_entrance);
+		// }
+		// // If the dialog is already present
+		// if (timePickerDialog != null && timePickerDialog.isVisible()) {
+		// // We compare the period to set with the current waiting_for
+		// if (next.getId() != waiting_for) {
+		// Log.d("onResume", "next.getId: " + next.getId());
+		// Log.d("onResume", "waiting_for: " + waiting_for);
+		// // If it's different, we must change it
+		// timePickerDialog.dismiss();
+		// showTimePickerDialog(next);
+		// }
+		// } else {
+		// showTimePickerDialog(next);
+		// }
+		// }
+		// // And we don't show the dialog again until onNewIntent says so
+		// showDialogOnResume = false;
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		outState.putBoolean("showDialogOnResume", showDialogOnResume);
+		outState.putBoolean("shouldShowDialog", shouldShowDialog);
+		outState.putInt("waiting_for", waiting_for);
 		super.onSaveInstanceState(outState);
 	}
 

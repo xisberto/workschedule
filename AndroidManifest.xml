@@ -36,7 +36,7 @@
         <activity
             android:name="net.xisberto.work_schedule.MainActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTask" >
+            android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
