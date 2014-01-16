@@ -30,7 +30,6 @@
     <string name="lbl_snde_exit">2º Extra: Saída</string>
     
     <string name="time_zero">00:00</string>
-    <string name="alarm_set">Próximo alarme para:</string>
     
     <string name="time_until_alarm">%s até o próximo alarme</string>
     
@@ -70,9 +69,7 @@
     <string name="author_name">Criado por Humberto Fraga, baseado em uma ideia de Marcos Lacerda</string>
     <string name="text_source">Work Schedule é um aplicativo de código aberto. Seu código pode ser acessado no Github</string>
     <string name="text_libraries">Work Schedule usa algumas bibliotecas open-source:</string>
-    <string name="btn_share_link">Compartilhar link</string>
     
-    <string name="widget_title">Próximo alarme:</string>
     <string name="widget_updating">Atualizando&#8230;</string>
     <string name="no_alarm">Nenhum alarme definido</string>
     <string name="dashclock_description">Mostra o próximo alarme do Work Schedule</string>
