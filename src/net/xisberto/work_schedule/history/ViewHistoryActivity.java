@@ -19,25 +19,19 @@ import java.util.Calendar;
 
 import net.xisberto.work_schedule.BuildConfig;
 import net.xisberto.work_schedule.R;
-import net.xisberto.work_schedule.database.Period;
 import net.xisberto.work_schedule.history.CSVExporter.CSVExporterCallback;
+import net.xisberto.work_schedule.history.InstrucionDialog.InstructionCallback;
 import net.xisberto.work_schedule.settings.Settings;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.CheckBox;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -48,7 +42,8 @@ import com.doomonafireball.betterpickers.datepicker.DatePickerDialogFragment.Dat
 import com.viewpagerindicator.TabPageIndicator;
 
 public class ViewHistoryActivity extends SherlockFragmentActivity implements
-		OnDateSetListener, DatePickerDialogHandler, CSVExporterCallback {
+		OnDateSetListener, DatePickerDialogHandler, CSVExporterCallback,
+		InstructionCallback {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +61,20 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 
 		pager_indicator.setViewPager(view_pager);
 		view_pager.setCurrentItem(HistoryPagerAdapter.SIZE);
+
+		if (savedInstanceState != null) {
+			Fragment fragment = getSupportFragmentManager().findFragmentByTag(
+					"instruction_dialog");
+			if (fragment != null && fragment instanceof InstrucionDialog) {
+				((InstrucionDialog) fragment).setInstructionCallback(this);
+			}
+			fragment = getSupportFragmentManager().findFragmentByTag("date_dialog");
+			if (fragment != null) {
+				if (fragment instanceof CalendarDatePickerDialog) {
+					((CalendarDatePickerDialog) fragment).setOnDateSetListener(this);
+				}
+			}
+		}
 
 	}
 
@@ -96,10 +105,6 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 		}
 
 		ViewPager view_pager = (ViewPager) findViewById(R.id.pager);
-		HistoryPagerAdapter adapter = (HistoryPagerAdapter) view_pager
-				.getAdapter();
-		Calendar selected_day = adapter.getSelectedDay(view_pager
-				.getCurrentItem());
 
 		switch (item.getItemId()) {
 		case R.id.menu_go_today:
@@ -108,38 +113,11 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 			break;
 		case R.id.menu_share:
 			if (Settings.getInstance(this).getShowInstructions()) {
-				InstrucionDialog.newInstance(this, selected_day).show(
-						getSupportFragmentManager(), "instruction");
+				InstrucionDialog.newInstance(this).show(getSupportFragmentManager(),
+						"instruction_dialog");
 			} else {
-				showDatePicker(selected_day);
+				onInstructionsAccepted();
 			}
-			break;
-		case R.id.menu_fake_data:
-			CalendarDatePickerDialog dialog = CalendarDatePickerDialog
-					.newInstance(new OnDateSetListener() {
-						@Override
-						public void onDateSet(CalendarDatePickerDialog dialog,
-								int year, int monthOfYear, int dayOfMonth) {
-							Calendar date = Calendar.getInstance();
-							date.set(Calendar.YEAR, year);
-							date.set(Calendar.MONTH, monthOfYear);
-							date.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-							while (date.before(Calendar.getInstance())) {
-								if ((date.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY)
-										&& (date.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY)) {
-									for (int id : Period.ids) {
-										Period period = new Period(id, date);
-										period.persist(ViewHistoryActivity.this);
-									}
-								}
-								date.add(Calendar.DAY_OF_MONTH, 1);
-							}
-						}
-					}, selected_day.get(Calendar.YEAR), selected_day
-							.get(Calendar.MONTH), selected_day
-							.get(Calendar.DAY_OF_MONTH));
-			dialog.show(getSupportFragmentManager(), "date_picker");
 			break;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -148,14 +126,13 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 	}
 
 	@Override
-	public void onDateSet(CalendarDatePickerDialog dialog, int year,
-			int monthOfYear, int dayOfMonth) {
+	public void onDateSet(CalendarDatePickerDialog dialog, int year, int monthOfYear,
+			int dayOfMonth) {
 		startExporter(year, monthOfYear, dayOfMonth);
 	}
 
 	@Override
-	public void onDialogDateSet(int reference, int year, int monthOfYear,
-			int dayOfMonth) {
+	public void onDialogDateSet(int reference, int year, int monthOfYear, int dayOfMonth) {
 		startExporter(year, monthOfYear, dayOfMonth);
 	}
 
@@ -171,18 +148,24 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 		Intent intentShare = new Intent(Intent.ACTION_SEND);
 		intentShare.setType("text/csv");
 		intentShare.putExtra(Intent.EXTRA_STREAM, uri);
-		startActivity(Intent.createChooser(intentShare, getResources()
-				.getString(R.string.menu_share)));
+		startActivity(Intent.createChooser(intentShare,
+				getResources().getString(R.string.menu_share)));
 	}
 
-	private void showDatePicker(Calendar selected_day) {
-		CalendarDatePickerDialog dialog;
+	@Override
+	public void onInstructionsAccepted() {
+		ViewPager view_pager = (ViewPager) findViewById(R.id.pager);
+		HistoryPagerAdapter adapter = (HistoryPagerAdapter) view_pager.getAdapter();
+		Calendar selected_day = adapter.getSelectedDay(view_pager.getCurrentItem());
+		showDatePicker(selected_day);
+	}
+
+	void showDatePicker(Calendar selected_day) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-			dialog = CalendarDatePickerDialog.newInstance(this,
-					selected_day.get(Calendar.YEAR),
-					selected_day.get(Calendar.MONTH),
+			CalendarDatePickerDialog dialog = CalendarDatePickerDialog.newInstance(this,
+					selected_day.get(Calendar.YEAR), selected_day.get(Calendar.MONTH),
 					selected_day.get(Calendar.DAY_OF_MONTH));
-			dialog.show(getSupportFragmentManager(), "date_picker");
+			dialog.show(getSupportFragmentManager(), "date_dialog");
 		} else {
 			DatePickerBuilder builder = new DatePickerBuilder()
 					.setFragmentManager(getSupportFragmentManager())
@@ -202,50 +185,5 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 		startDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 		CSVExporter exporter = new CSVExporter(ViewHistoryActivity.this);
 		exporter.execute(startDate);
-	}
-
-	public static class InstrucionDialog extends SherlockDialogFragment {
-		private ViewHistoryActivity activity;
-		private Calendar selected_day;
-		private View view;
-
-		public static InstrucionDialog newInstance(
-				ViewHistoryActivity activity, Calendar selected_day) {
-			InstrucionDialog dialog = new InstrucionDialog();
-			dialog.activity = activity;
-			dialog.selected_day = selected_day;
-			return dialog;
-		}
-
-		@Override
-		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			OnClickListener callback = new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					switch (which) {
-					case DialogInterface.BUTTON_POSITIVE:
-						CheckBox checkBox = (CheckBox) view
-								.findViewById(R.id.check_show_instructions);
-						if (checkBox.isChecked()) {
-							Settings.getInstance(activity).setShowInstructions(
-									false);
-						}
-						activity.showDatePicker(selected_day);
-						break;
-					default:
-						break;
-					}
-				}
-			};
-
-			view = LayoutInflater.from(getActivity()).inflate(
-					R.layout.dialog_instructions, null);
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-			builder.setTitle(R.string.app_name).setView(view)
-					.setPositiveButton(android.R.string.ok, callback)
-					.setNegativeButton(android.R.string.cancel, callback);
-			return builder.create();
-		}
 	}
 }
