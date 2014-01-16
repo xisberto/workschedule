@@ -18,6 +18,8 @@
     android:id="@+id/alarm_layout_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingLeft="@dimen/slider_margin"
+    android:paddingRight="@dimen/slider_margin"
     tools:context=".AlarmMessageActivity" >
 
     <LinearLayout

@@ -22,8 +22,6 @@
         <item name="android:textColor">@android:color/black</item>
         <item name="android:gravity">center_horizontal</item>
         <item name="android:padding">5dp</item>
-        <item name="android:layout_marginLeft">@dimen/slider_margin</item>
-        <item name="android:layout_marginRight">@dimen/slider_margin</item>
         <item name="android:minHeight">?android:attr/listPreferredItemHeight</item>
     </style>
 
