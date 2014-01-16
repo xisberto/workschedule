@@ -17,7 +17,6 @@ package net.xisberto.work_schedule.history;
 
 import java.util.Calendar;
 
-import net.xisberto.work_schedule.BuildConfig;
 import net.xisberto.work_schedule.R;
 import net.xisberto.work_schedule.history.CSVExporter.CSVExporterCallback;
 import net.xisberto.work_schedule.history.InstrucionDialog.InstructionCallback;
@@ -86,14 +85,6 @@ public class ViewHistoryActivity extends SherlockFragmentActivity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getSupportMenuInflater().inflate(R.menu.activity_history, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		if (!BuildConfig.DEBUG) {
-			menu.findItem(R.id.menu_fake_data).setVisible(false);
-		}
 		return true;
 	}
 
