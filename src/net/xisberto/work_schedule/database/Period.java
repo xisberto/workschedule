@@ -34,7 +34,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Process;
 import android.text.format.DateFormat;
-import android.util.Log;
 
 public class Period {
 	protected long id;
@@ -63,10 +62,11 @@ public class Period {
 	public static Period getPeriod(Context context, int pref_id) {
 		Period p = Database.getInstance(context).getPeriodOfDay(pref_id,
 				Calendar.getInstance());
-		if (p != null) {
-			return p;
+		if (p == null) {
+			p = new Period(pref_id, Calendar.getInstance());
+			p.persist(context);
 		}
-		return new Period(pref_id, Calendar.getInstance());
+		return p;
 	}
 
 	public int getId() {
@@ -163,8 +163,6 @@ public class Period {
 	 */
 	@SuppressLint("NewApi")
 	public void setAlarm(Context context, boolean updateWidgets) {
-		Log.d("Period", "setting alarm to " + pref_id + ", " + enabled);
-
 		AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
 		// Prepare the actual alarm
