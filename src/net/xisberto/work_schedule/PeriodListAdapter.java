@@ -40,8 +40,8 @@ public class PeriodListAdapter implements ListAdapter {
 		this(context, periods, true);
 	}
 
-	public PeriodListAdapter(Context context,
-			SparseArrayCompat<Period> periods, boolean show_checkboxes) {
+	public PeriodListAdapter(Context context, SparseArrayCompat<Period> periods,
+			boolean show_checkboxes) {
 		this.context = context;
 		this.periods = periods;
 		this.show_checkboxes = show_checkboxes;
@@ -77,8 +77,8 @@ public class PeriodListAdapter implements ListAdapter {
 
 		final Period period = (Period) getItem(position);
 
-		((TextView) convertView.findViewById(R.id.period_label))
-				.setText(context.getString(period.getLabelId()));
+		((TextView) convertView.findViewById(R.id.period_label)).setText(context
+				.getString(period.getLabelId()));
 
 		((TextView) convertView.findViewById(R.id.period_time)).setText(period
 				.formatTime(DateFormat.is24HourFormat(context)));
@@ -91,14 +91,19 @@ public class PeriodListAdapter implements ListAdapter {
 
 				@Override
 				public void onClick(View check_box) {
-					period.enabled = ((CompoundButton) check_box).isChecked();
+					boolean isChecked = ((CompoundButton) check_box).isChecked();
+					period.enabled = isChecked
+							&& (period.time.getTimeInMillis() > System
+									.currentTimeMillis());
 					period.setAlarm(context, true);
 					period.persist(context);
+					((CompoundButton) check_box).setChecked(period.enabled);
 				}
 			});
 		} else {
 			check_alarm.setVisibility(View.GONE);
-			LinearLayout layout_labels = (LinearLayout) convertView.findViewById(R.id.layout_labels);
+			LinearLayout layout_labels = (LinearLayout) convertView
+					.findViewById(R.id.layout_labels);
 			LayoutParams params = (LayoutParams) layout_labels.getLayoutParams();
 			params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
 			layout_labels.setLayoutParams(params);
