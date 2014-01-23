@@ -45,86 +45,84 @@ public class CountdownService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-
-		if (ACTION_START.equals(intent.getAction())) {
-			if (intent.hasExtra(AlarmMessageActivity.EXTRA_PERIOD_ID)) {
-				int period_id = intent.getIntExtra(
-						AlarmMessageActivity.EXTRA_PERIOD_ID,
-						R.string.fstp_entrance);
-				period = Period.getPeriod(this, period_id);
-			} else {
-				stopSelf();
-				return super.onStartCommand(intent, flags, startId);
-			}
-
-			long millisInFuture = period.time.getTimeInMillis()
-					- System.currentTimeMillis();
-			if (millisInFuture > 0) {
-
-				Intent mainIntent = new Intent(this, MainActivity.class);
-				mainIntent.setAction(MainActivity.ACTION_SET_PERIOD);
-				mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-				Intent deleteIntent = new Intent(this, CountdownService.class);
-				deleteIntent.setAction(ACTION_STOP);
-
-				builder = new Builder(this)
-						.setSmallIcon(R.drawable.ic_stat_notification)
-						.setContentTitle(getString(period.getLabelId()))
-						.setTicker(getString(period.getLabelId()))
-						.setOnlyAlertOnce(true)
-						.setPriority(NotificationCompat.PRIORITY_LOW)
-						.setAutoCancel(true)
-						.setSound(
-								RingtoneManager
-										.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-						.setContentIntent(
-								PendingIntent.getActivity(this, period.getId(),
-										mainIntent,
-										PendingIntent.FLAG_CANCEL_CURRENT))
-						.setDeleteIntent(
-								PendingIntent.getService(this, period.getId(),
-										deleteIntent,
-										PendingIntent.FLAG_CANCEL_CURRENT));
-				manager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
-				manager.notify(0, builder.build());
-
-				timer = new CountDownTimer(millisInFuture, 1000) {
-
-					@Override
-					public void onTick(long millisUntilFinished) {
-						Time t = new Time();
-						t.set(millisUntilFinished);
-						builder.setContentText(getString(
-								R.string.time_until_alarm, t.format("%M:%S")));
-						manager.notify(0, builder.build());
-					}
-
-					@Override
-					public void onFinish() {
-						manager.cancel(0);
-						stopSelf();
-					}
-				};
-
-				timer.start();
-			}
-		} else if (ACTION_STOP_SPECIFIC.equals(intent.getAction())) {
-			if (intent.hasExtra(AlarmMessageActivity.EXTRA_PERIOD_ID)) {
-				int period_id = intent.getIntExtra(
-						AlarmMessageActivity.EXTRA_PERIOD_ID,
-						R.string.fstp_entrance);
-				if (period != null && period.getId() == period_id) {
-					stopAndCancel();
+		if (intent != null) {
+			if (ACTION_START.equals(intent.getAction())) {
+				if (intent.hasExtra(AlarmMessageActivity.EXTRA_PERIOD_ID)) {
+					int period_id = intent.getIntExtra(
+							AlarmMessageActivity.EXTRA_PERIOD_ID, R.string.fstp_entrance);
+					period = Period.getPeriod(this, period_id);
+				} else {
+					stopSelf();
+					return super.onStartCommand(intent, flags, startId);
 				}
-			} else {
-				stopSelf();
-				return super.onStartCommand(intent, flags, startId);
-			}
-		} else if (ACTION_STOP.equals(intent.getAction())) {
-			stopAndCancel();
-		}
 
+				long millisInFuture = period.time.getTimeInMillis()
+						- System.currentTimeMillis();
+				if (millisInFuture > 0) {
+
+					Intent mainIntent = new Intent(this, MainActivity.class);
+					mainIntent.setAction(MainActivity.ACTION_SET_PERIOD);
+					mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+					Intent deleteIntent = new Intent(this, CountdownService.class);
+					deleteIntent.setAction(ACTION_STOP);
+
+					builder = new Builder(this)
+							.setSmallIcon(R.drawable.ic_stat_notification)
+							.setContentTitle(getString(period.getLabelId()))
+							.setTicker(getString(period.getLabelId()))
+							.setOnlyAlertOnce(true)
+							.setPriority(NotificationCompat.PRIORITY_LOW)
+							.setAutoCancel(false)
+							.setSound(
+									RingtoneManager
+											.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+							.setContentIntent(
+									PendingIntent.getActivity(this, period.getId(),
+											mainIntent, PendingIntent.FLAG_CANCEL_CURRENT))
+							.setDeleteIntent(
+									PendingIntent.getService(this, period.getId(),
+											deleteIntent,
+											PendingIntent.FLAG_CANCEL_CURRENT));
+					manager = ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE));
+					manager.notify(0, builder.build());
+
+					timer = new CountDownTimer(millisInFuture, 1000) {
+
+						@Override
+						public void onTick(long millisUntilFinished) {
+							Time t = new Time();
+							t.set(millisUntilFinished);
+							builder.setContentText(getString(R.string.time_until_alarm,
+									t.format("%M:%S")));
+							manager.notify(0, builder.build());
+						}
+
+						@Override
+						public void onFinish() {
+							manager.cancel(0);
+							stopSelf();
+						}
+					};
+
+					timer.start();
+				}
+			} else if (ACTION_STOP_SPECIFIC.equals(intent.getAction())) {
+				if (intent.hasExtra(AlarmMessageActivity.EXTRA_PERIOD_ID)) {
+					int period_id = intent.getIntExtra(
+							AlarmMessageActivity.EXTRA_PERIOD_ID, R.string.fstp_entrance);
+					if (period != null && period.getId() == period_id) {
+						stopAndCancel();
+					}
+				} else {
+					stopSelf();
+					return super.onStartCommand(intent, flags, startId);
+				}
+			} else if (ACTION_STOP.equals(intent.getAction())) {
+				stopAndCancel();
+			}
+
+		}
 		return super.onStartCommand(intent, flags, startId);
 	}
 
@@ -132,12 +130,11 @@ public class CountdownService extends Service {
 	public IBinder onBind(Intent intent) {
 		return null;
 	}
-	
+
 	private void stopAndCancel() {
 		if (timer != null)
 			timer.cancel();
-		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
-				.cancel(0);
+		((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).cancel(0);
 		stopSelf();
 	}
 }
