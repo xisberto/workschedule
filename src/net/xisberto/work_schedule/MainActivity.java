@@ -249,8 +249,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 		Log.d("onCreate", "waiting_for: " + waiting_for);
 
 		if (shouldSetPeriod(getIntent())) {
-			startService(new Intent(this, CountdownService.class)
-					.setAction(CountdownService.ACTION_STOP));
 			setNextPeriod();
 		}
 
@@ -267,29 +265,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 	protected void onResume() {
 		super.onResume();
 		updateLayout();
-		// // If we should show the dialog
-		// if (showDialogOnResume) {
-		// // We get the period to set
-		// Period next = Database.getInstance(this).getNextAlarm();
-		// if (next == null) {
-		// next = periods.get(R.string.fstp_entrance);
-		// }
-		// // If the dialog is already present
-		// if (timePickerDialog != null && timePickerDialog.isVisible()) {
-		// // We compare the period to set with the current waiting_for
-		// if (next.getId() != waiting_for) {
-		// Log.d("onResume", "next.getId: " + next.getId());
-		// Log.d("onResume", "waiting_for: " + waiting_for);
-		// // If it's different, we must change it
-		// timePickerDialog.dismiss();
-		// showTimePickerDialog(next);
-		// }
-		// } else {
-		// showTimePickerDialog(next);
-		// }
-		// }
-		// // And we don't show the dialog again until onNewIntent says so
-		// showDialogOnResume = false;
+		if (shouldSetPeriod(getIntent())) {
+			startService(new Intent(this, CountdownService.class)
+					.setAction(CountdownService.ACTION_STOP));
+		}
 	}
 
 	@Override
