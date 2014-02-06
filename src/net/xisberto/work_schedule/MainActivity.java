@@ -265,10 +265,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 	protected void onResume() {
 		super.onResume();
 		updateLayout();
-		if (shouldSetPeriod(getIntent())) {
-			startService(new Intent(this, CountdownService.class)
-					.setAction(CountdownService.ACTION_STOP));
-		}
+		startService(new Intent(this, CountdownService.class)
+				.setAction(CountdownService.ACTION_STOP));
 	}
 
 	@Override
