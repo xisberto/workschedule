@@ -116,9 +116,6 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 	private void stopSoundVibrator() {
 		stopSound();
 		((Vibrator) getSystemService(VIBRATOR_SERVICE)).cancel();
-		if (!isFinishing()) {
-			finish();
-		}
 	}
 
 	private void cancelAlarm() {
@@ -126,12 +123,14 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		period.setAlarm(this, true);
 		period.persist(this);
 		stopSoundVibrator();
+		finish();
 	}
 
 	private void snoozeAlarm() {
 		settings = Settings.getInstance(getApplicationContext());
 
 		period.addTime(settings.getCalendar(R.string.key_snooze_increment));
+		period.enabled = true;
 		period.setAlarm(this, true);
 		period.persist(this);
 
@@ -141,6 +140,7 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 						+ period.formatTime(DateFormat.is24HourFormat(this)),
 				Toast.LENGTH_SHORT).show();
 		stopSoundVibrator();
+		finish();
 	}
 
 	private void showNotification() {
@@ -234,6 +234,8 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 				R.string.fstp_entrance);
 		Log.d("AlarmMessage", "showing alarm for " + period_pref_id);
 		period = Period.getPeriod(this, period_pref_id);
+		period.enabled = false;
+		period.persist(this);
 		Log.d("AlarmMessage", "time is " + period.formatTime(true));
 
 		settings = Settings.getInstance(getApplicationContext());
@@ -301,7 +303,7 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		super.onStop();
 		if (isFinishing()) {
 			dismissNotification();
-			cancelAlarm();
+			stopSoundVibrator();
 		}
 	}
 
@@ -316,8 +318,7 @@ public class AlarmMessageActivity extends SherlockFragmentActivity implements
 		switch (event.getKeyCode()) {
 		case KeyEvent.KEYCODE_VOLUME_DOWN:
 		case KeyEvent.KEYCODE_VOLUME_MUTE:
-			mMediaPlayer.setVolume(0f, 0f);
-			((Vibrator) getSystemService(VIBRATOR_SERVICE)).cancel();
+			stopSound();
 			return true;
 
 		default:
