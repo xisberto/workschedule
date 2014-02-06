@@ -16,8 +16,8 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.xisberto.work_schedule"
-    android:versionCode="140"
-    android:versionName="1.4.2" >
+    android:versionCode="141"
+    android:versionName="1.4.3" >
 
     <uses-sdk
         android:minSdkVersion="7"
